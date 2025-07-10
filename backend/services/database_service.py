@@ -94,45 +94,45 @@ class DatabaseService:
             with self._get_connection(db_name) as conn:
                 with conn.cursor() as cursor:
                     # Create tables
-                    for table in schema.tables:
+                    for table in schema["tables"]:
                         columns = []
-                        for column in table.columns:
-                            postgres_type = self._get_postgres_type(column.type)
-                            nullable = "" if column.nullable else "NOT NULL"
-                            columns.append(f"{column.name} {postgres_type} {nullable}")
+                        for column in table["columns"]:
+                            postgres_type = self._get_postgres_type(column["type"])
+                            nullable = "" if column["nullable"] else "NOT NULL"
+                            columns.append(f"{column['name']} {postgres_type} {nullable}")
                         
                         # Add primary key constraint
-                        columns.append(f"PRIMARY KEY ({table.primary_key})")
+                        columns.append(f"PRIMARY KEY ({table['primary_key']})")
                         
                         create_sql = f"""
-                        CREATE TABLE IF NOT EXISTS {table.name} (
+                        CREATE TABLE IF NOT EXISTS {table["name"]} (
                             {', '.join(columns)}
                         )
                         """
                         cursor.execute(create_sql)
-                        logger.info(f"Created table: {table.name}")
+                        logger.info(f"Created table: {table['name']}")
                     
                     # Create relationships (foreign keys)
-                    for relationship in schema.relationships:
-                        if relationship.type in ["one-to-many", "many-to-one"]:
-                            constraint_name = f"fk_{relationship.from_table}_{relationship.from_column}"
+                    for relationship in schema["relationships"]:
+                        if relationship["type"] in ["one-to-many", "many-to-one"]:
+                            constraint_name = f"fk_{relationship['from_table']}_{relationship['from_column']}"
                             
                             # Check if constraint already exists
                             cursor.execute("""
                                 SELECT 1 FROM information_schema.table_constraints 
                                 WHERE constraint_name = %s AND table_name = %s
-                            """, (constraint_name, relationship.from_table))
+                            """, (constraint_name, relationship["from_table"]))
                             
                             if cursor.fetchone() is None:
                                 alter_sql = f"""
-                                ALTER TABLE {relationship.from_table}
+                                ALTER TABLE {relationship["from_table"]}
                                 ADD CONSTRAINT {constraint_name}
-                                FOREIGN KEY ({relationship.from_column})
-                                REFERENCES {relationship.to_table}({relationship.to_column})
+                                FOREIGN KEY ({relationship["from_column"]})
+                                REFERENCES {relationship["to_table"]}({relationship["to_column"]})
                                 """
                                 try:
                                     cursor.execute(alter_sql)
-                                    logger.info(f"Added foreign key: {relationship.from_table}.{relationship.from_column} -> {relationship.to_table}.{relationship.to_column}")
+                                    logger.info(f"Added foreign key: {relationship['from_table']}.{relationship['from_column']} -> {relationship['to_table']}.{relationship['to_column']}")
                                 except psycopg2.Error as e:
                                     logger.warn(f"Could not add foreign key: {e}")
                             else:
@@ -218,7 +218,7 @@ class DatabaseService:
                 "port": self.port,
                 "username": self.username,
                 "company_name": company_name,
-                "created_tables": [table.name for table in schema.tables],
+                "created_tables": [table["name"] for table in schema["tables"]],
                 "total_rows": sum(len(rows) for rows in sample_data.values()),
                 "connection_string": f"postgresql://{self.username}@{self.host}:{self.port}/{db_name}"
             }
