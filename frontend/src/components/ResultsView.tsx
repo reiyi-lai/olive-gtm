@@ -78,14 +78,14 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ result, onClose }) => 
                 <h3 className="text-lg font-semibold text-gray-800 mb-3">
                   Business Analysis
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
+                <div className="bg-white p-4 rounded border">
+                  <div className="space-y-2 text-gray-800">
                     <p><strong>Business Type:</strong> {result.scrapedData.businessType || result.scrapedData.business_type || 'N/A'}</p>
                     <p><strong>Description:</strong> {result.scrapedData.description || 'N/A'}</p>
                   </div>
-                  <div>
+                  <div className="mt-2 text-gray-800">
                     <p><strong>Key Features:</strong></p>
-                    <ul className="list-disc list-inside text-sm text-gray-600">
+                    <ul className="list-disc list-inside text-gray-600">
                       {(result.scrapedData.keyFeatures || result.scrapedData.key_features || []).map((feature: string, index: number) => (
                         <li key={index}>{feature}</li>
                       ))}
