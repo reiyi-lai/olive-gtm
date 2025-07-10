@@ -30,14 +30,8 @@ A workflow to research Olive's potential customers, generate their sample databa
    brew services start postgresql
    ```
 
-3. Set up environment variables:
-   ```bash
-   cp backend/.env.example backend/.env
-   # Edit backend/.env with your API keys and database credentials
-   ```
-   
-   Required environment variables:
-   ```env
+3. Set up environment variables in `backend/.env`:
+    ```env
    # OpenAI API Configuration
    OPENAI_API_KEY=your_openai_api_key_here
    
@@ -64,7 +58,7 @@ A workflow to research Olive's potential customers, generate their sample databa
    npm install
    ```
 
-### Running the Application
+### Run the Application
 
 1. Start the FastAPI backend server:
    ```bash
@@ -78,7 +72,7 @@ A workflow to research Olive's potential customers, generate their sample databa
    npm start
    ```
 
-3. Open http://localhost:3000 in your browser
+3. Open http://localhost:3000
 
 ## API Endpoints
 
@@ -99,8 +93,6 @@ Results are stored in multiple locations:
 
 ### PostgreSQL Databases
 - Each company gets its own PostgreSQL database: `olive_gtm_{company_name}`
-- Contains all tables from the inferred schema populated with sample data
-- Enables live database queries and realistic demo experiences
 
 ## Architecture
 

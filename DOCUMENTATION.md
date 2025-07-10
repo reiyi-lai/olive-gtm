@@ -2,14 +2,14 @@
 
 ## Data Flow & Transformations
 
-### Processing Pipeline
+### Processing Stages
 
 ```
-1. Website Scraping (10%)    → scraped_data.json
-2. Schema Inference (30%)    → inferred_schema.json  
-3. Sample Data Generation (50%) → sample_data.json
-4. Database Creation (70%)   → database_info.json
-5. Prompt Generation (90%)   → generated_prompt.json
+1. Website Scraping    → scraped_data.json
+2. Schema Inference    → inferred_schema.json  
+3. Sample Data Generation → sample_data.json
+4. Database Creation   → database_info.json
+5. Prompt Generation   → generated_prompt.json
 ```
 
 ### Data Transformations
