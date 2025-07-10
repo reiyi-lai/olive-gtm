@@ -1,4 +1,4 @@
-# Olive GTM Engine
+# Olive Outbound Engine
 
 A workflow to research Olive's potential customers, generate their sample database schema, and create optimized dashboard prompts for Olive's platform.
 
