@@ -2,33 +2,24 @@
 
 A workflow to research Olive's potential customers, generate their sample database schema, and create optimized dashboard prompts for Olive's platform.
 
-## How It Works
+## Steps
 
-1. **Input**: Enter company name and website URL
-2. **Scraping**: Firecrawl API extracts clean website content
-3. **Analysis**: OpenAI API analyzes business context and industry
-4. **Schema Generation**: Creates realistic database schema
-5. **Sample Data**: Generates business-relevant sample data
+1. **Lead Info Input**: Enter company name and website URL
+2. **Web Scraping**: Firecrawl API extracts clean website content
+3. **Business Analysis**: OpenAI API analyzes business context and industry
+4. **Data Schema Generation**: Creates realistic database schema
+5. **Sample Data Generation**: Generates business-relevant sample data
 6. **Database Creation**: Creates PostgreSQL database with schema and populates with sample data
 7. **Prompt Creation**: Builds Olive dashboard prompt
 
 ## Tech Stack
 
 - **Frontend**: React, TypeScript, Tailwind CSS
-- **Backend**: FastAPI, Python, Pydantic, PostgreSQL
-- **AI Services**: OpenAI GPT-4, Firecrawl API
+- **Backend**: FastAPI, Python, PostgreSQL
+- **AI Services**: OpenAI API, Firecrawl API
 - **Storage**: Local JSON files, PostgreSQL databases (for now)
 
-## Getting Started
-
-### Prerequisites
-
-- Python 3.8+
-- Node.js (v16 or higher)
-- npm or yarn
-- PostgreSQL (v12 or higher)
-
-### Installation
+## Installation
 
 1. Clone the repository
 
