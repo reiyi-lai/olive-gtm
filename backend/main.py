@@ -1,4 +1,3 @@
-import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
@@ -9,8 +8,8 @@ load_dotenv()
 
 # Create FastAPI app
 app = FastAPI(
-    title="Olive GTM Engine",
-    description="Automated Go-To-Market engine for Olive",
+    title="Olive Outbound Engine",
+    description="Automated workflow for Olive",
     version="1.0.0"
 )
 
@@ -36,4 +35,4 @@ async def health_check():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

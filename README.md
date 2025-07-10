@@ -65,7 +65,7 @@ A workflow to research Olive's potential customers, generate their sample databa
 1. Start the FastAPI backend server:
    ```bash
    cd backend
-   python run.py
+   python main.py
    ```
 
 2. Start the React frontend development server:
