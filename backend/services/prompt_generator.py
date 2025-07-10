@@ -2,8 +2,7 @@ import os
 import json
 from typing import Dict, Any
 from openai import OpenAI
-from pydantic import ValidationError
-from models.schemas import DatabaseSchema, ScrapedData, GeneratedPrompt
+from models.schemas import DatabaseSchemaDict, ScrapedDataDict, GeneratedPromptDict
 from utils.logger import logger
 
 class PromptGenerator:
@@ -12,12 +11,12 @@ class PromptGenerator:
     
     async def generate_prompt(
         self, 
-        schema: DatabaseSchema, 
+        schema: DatabaseSchemaDict, 
         sample_data: Dict[str, Any], 
-        scraped_data: ScrapedData
-    ) -> GeneratedPrompt:
+        scraped_data: ScrapedDataDict
+    ) -> GeneratedPromptDict:
         try:
-            logger.info(f"Generating Olive prompt for: {scraped_data.company.name}")
+            logger.info(f"Generating Olive prompt for: {scraped_data['company']['name']}")
             
             prompt = self._build_prompt_generation_prompt(schema, sample_data, scraped_data)
             
@@ -41,46 +40,39 @@ class PromptGenerator:
                 content = content.replace('```', '').strip()
             
             prompt_dict = json.loads(content)
-            
-            # Validate and create GeneratedPrompt with Pydantic
-            generated_prompt = GeneratedPrompt(**prompt_dict)
-            
-            logger.info(f"Successfully generated prompt for: {scraped_data.company.name}")
-            return generated_prompt
-            
-        except ValidationError as e:
-            logger.error(f"Prompt validation error for {scraped_data.company.name}", e)
-            raise Exception(f"Invalid prompt structure: {e}")
+            # No Pydantic validation, just return dict
+            logger.info(f"Successfully generated prompt for: {scraped_data['company']['name']}")
+            return prompt_dict
         except json.JSONDecodeError as e:
-            logger.error(f"JSON parsing error for {scraped_data.company.name}: {e}")
+            logger.error(f"JSON parsing error for {scraped_data['company']['name']}: {e}")
             logger.error(f"Raw OpenAI content: '{content}'")
             raise Exception(f"Invalid JSON response from AI: {e}")
         except Exception as e:
-            logger.error(f"Error generating prompt for {scraped_data.company.name}", e)
+            logger.error(f"Error generating prompt for {scraped_data['company']['name']}", e)
             raise
-    
+
     def _build_prompt_generation_prompt(
         self, 
-        schema: DatabaseSchema, 
+        schema: DatabaseSchemaDict, 
         sample_data: Dict[str, Any], 
-        scraped_data: ScrapedData
+        scraped_data: ScrapedDataDict
     ) -> str:
         return f"""
         You are an expert at creating dashboard prompts for Olive, a tool that turns natural language prompts into live dashboards from company databases.
 
         Company Context:
-        - Name: {scraped_data.company.name}
-        - Business Type: {scraped_data.business_type}
-        - Key Features: {', '.join(scraped_data.key_features)}
-        - Description: {scraped_data.description}
+        - Name: {scraped_data['company']['name']}
+        - Business Type: {scraped_data['business_type']}
+        - Key Features: {', '.join(scraped_data['key_features'])}
+        - Description: {scraped_data['description']}
 
         Database Schema:
-        {json.dumps(schema.dict(), indent=2)}
+        {json.dumps(schema, indent=2)}
 
         Sample Data Preview:
         {json.dumps(sample_data, indent=2)[:1000]}...
 
-        Your task is to create the optimal natural language prompt that a {scraped_data.business_type} company would use to create a comprehensive executive dashboard in Olive.
+        Your task is to create the optimal natural language prompt that a {scraped_data['business_type']} company would use to create a comprehensive executive dashboard in Olive.
 
         The prompt should:
         1. Request the most important KPIs for this business type

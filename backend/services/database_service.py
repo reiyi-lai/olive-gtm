@@ -6,7 +6,7 @@ from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from typing import Dict, Any, List
 from dotenv import load_dotenv
 
-from models.schemas import DatabaseSchema, ScrapedData
+from models.schemas import DatabaseSchemaDict, ScrapedDataDict
 from utils.logger import logger
 
 # Load environment variables
@@ -88,7 +88,7 @@ class DatabaseService:
         }
         return type_mapping.get(schema_type, "TEXT")
     
-    def _create_tables(self, db_name: str, schema: DatabaseSchema):
+    def _create_tables(self, db_name: str, schema: DatabaseSchemaDict):
         """Create tables in the database based on the schema."""
         try:
             with self._get_connection(db_name) as conn:
@@ -186,9 +186,9 @@ class DatabaseService:
     async def create_company_database(
         self, 
         company_name: str, 
-        schema: DatabaseSchema, 
+        schema: DatabaseSchemaDict, 
         sample_data: Dict[str, List[Dict[str, Any]]], 
-        scraped_data: ScrapedData
+        scraped_data: ScrapedDataDict
     ) -> Dict[str, Any]:
         """
         Create a PostgreSQL database for a company with schema and sample data.

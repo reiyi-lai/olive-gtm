@@ -4,9 +4,9 @@ from typing import Dict, Any
 from dotenv import load_dotenv
 from firecrawl import FirecrawlApp
 from openai import OpenAI
-from pydantic import ValidationError
-from models.schemas import Company, ScrapedData
+from models.schemas import CompanyDict, ScrapedDataDict
 from utils.logger import logger
+from datetime import datetime
 
 # Load environment variables
 load_dotenv()
@@ -16,14 +16,14 @@ class CompanyScraper:
         self.firecrawl = FirecrawlApp(api_key=os.getenv("FIRECRAWL_API_KEY"))
         self.openai = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
     
-    async def scrape_company(self, company: Company) -> ScrapedData:
+    async def scrape_company(self, company: CompanyDict) -> ScrapedDataDict:
         try:
-            logger.info(f"Starting scrape for company: {company.name}")
+            logger.info(f"Starting scrape for company: {company['name']}")
             
             # Scrape website content
-            logger.info(f"Attempting to scrape: {company.website}")
+            logger.info(f"Attempting to scrape: {company['website']}")
             scrape_result = self.firecrawl.scrape_url(
-                company.website,
+                company['website'],
                 params={
                     'formats': ['markdown'],
                     'onlyMainContent': True,
@@ -36,8 +36,8 @@ class CompanyScraper:
             # Check if we got content (Firecrawl returns data directly)
             if 'markdown' not in scrape_result and 'content' not in scrape_result:
                 error_msg = scrape_result.get('error', 'No content returned')
-                logger.error(f"Firecrawl failed for {company.website}: {error_msg}")
-                raise Exception(f"Failed to scrape {company.website}: {error_msg}")
+                logger.error(f"Firecrawl failed for {company['website']}: {error_msg}")
+                raise Exception(f"Failed to scrape {company['website']}: {error_msg}")
             
             # Get content - try markdown first, then content
             website_content = scrape_result.get('markdown', '') or scrape_result.get('content', '')
@@ -45,30 +45,27 @@ class CompanyScraper:
             
             # Analyze business context using OpenAI
             logger.info("Starting business context analysis with OpenAI...")
-            business_analysis = await self._analyze_business_context(website_content, company.name)
+            business_analysis = await self._analyze_business_context(website_content, company['name'])
             logger.info(f"Business analysis result: {business_analysis}")
             
-            # Create and validate ScrapedData with Pydantic
-            logger.info("Creating ScrapedData object...")
-            scraped_data = ScrapedData(
-                company=company,
-                website_content=website_content,
-                business_type=business_analysis['business_type'],
-                key_features=business_analysis['key_features'],
-                description=business_analysis['description']
-            )
-            logger.info("ScrapedData created successfully")
+            # Create scraped data as dict
+            logger.info("Creating scraped data dict...")
+            scraped_data: ScrapedDataDict = {
+                "company": company,
+                "website_content": website_content,
+                "business_type": business_analysis['business_type'],
+                "key_features": business_analysis['key_features'],
+                "description": business_analysis['description'],
+                "timestamp": datetime.now().isoformat()
+            }
+            logger.info("Scraped data dict created successfully")
             
-            logger.info(f"Successfully scraped company: {company.name}")
+            logger.info(f"Successfully scraped company: {company['name']}")
             return scraped_data
-            
-        except ValidationError as e:
-            logger.error(f"Validation error for company {company.name}", e)
-            raise
         except Exception as e:
-            logger.error(f"Error scraping company {company.name}", e)
+            logger.error(f"Error scraping company {company['name']}", e)
             raise
-    
+
     async def _analyze_business_context(self, content: str, company_name: str) -> Dict[str, Any]:
         prompt = f"""
         Analyze the following website content for {company_name} and extract:
@@ -108,7 +105,6 @@ class CompanyScraper:
                 content = content.replace('```', '').strip()
             
             return json.loads(content)
-            
         except json.JSONDecodeError as e:
             logger.error(f"Error parsing OpenAI response: {e}")
             logger.error(f"Raw OpenAI content: '{content}'")

@@ -2,16 +2,16 @@ import os
 import json
 from typing import Dict, Any
 from openai import OpenAI
-from models.schemas import DatabaseSchema, ScrapedData
+from models.schemas import DatabaseSchemaDict, ScrapedDataDict
 from utils.logger import logger
 
 class SampleDataGenerator:
     def __init__(self):
         self.openai = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
     
-    async def generate_sample_data(self, schema: DatabaseSchema, scraped_data: ScrapedData) -> Dict[str, Any]:
+    async def generate_sample_data(self, schema: DatabaseSchemaDict, scraped_data: ScrapedDataDict) -> Dict[str, Any]:
         try:
-            logger.info(f"Generating sample data for: {scraped_data.company.name}")
+            logger.info(f"Generating sample data for: {scraped_data['company']['name']}")
             
             prompt = self._build_sample_data_prompt(schema, scraped_data)
             
@@ -39,20 +39,19 @@ class SampleDataGenerator:
             # Validate that all tables from schema are present
             self._validate_sample_data(sample_data, schema)
             
-            logger.info(f"Successfully generated sample data for: {scraped_data.company.name}")
+            logger.info(f"Successfully generated sample data for: {scraped_data['company']['name']}")
             return sample_data
-            
         except json.JSONDecodeError as e:
-            logger.error(f"JSON parsing error for {scraped_data.company.name}: {e}")
+            logger.error(f"JSON parsing error for {scraped_data['company']['name']}: {e}")
             logger.error(f"Raw OpenAI content: '{content}'")
             raise Exception(f"Invalid JSON response from AI: {e}")
         except Exception as e:
-            logger.error(f"Error generating sample data for {scraped_data.company.name}", e)
+            logger.error(f"Error generating sample data for {scraped_data['company']['name']}", e)
             raise
-    
-    def _validate_sample_data(self, sample_data: Dict[str, Any], schema: DatabaseSchema) -> None:
+
+    def _validate_sample_data(self, sample_data: Dict[str, Any], schema: DatabaseSchemaDict) -> None:
         """Validate that sample data contains all required tables."""
-        schema_tables = {table.name for table in schema.tables}
+        schema_tables = {table['name'] for table in schema['tables']}
         sample_tables = set(sample_data.keys())
         
         missing_tables = schema_tables - sample_tables
@@ -64,18 +63,18 @@ class SampleDataGenerator:
             if not records or not isinstance(records, list):
                 raise Exception(f"Table {table_name} must have at least one record")
     
-    def _build_sample_data_prompt(self, schema: DatabaseSchema, scraped_data: ScrapedData) -> str:
+    def _build_sample_data_prompt(self, schema: DatabaseSchemaDict, scraped_data: ScrapedDataDict) -> str:
         return f"""
-        Generate realistic sample data for the following database schema. The data should be representative of what {scraped_data.company.name} ({scraped_data.business_type}) would actually store.
+        Generate realistic sample data for the following database schema. The data should be representative of what {scraped_data['company']['name']} ({scraped_data['business_type']}) would actually store.
 
         Company Context:
-        - Name: {scraped_data.company.name}
-        - Business Type: {scraped_data.business_type}
-        - Key Features: {', '.join(scraped_data.key_features)}
-        - Description: {scraped_data.description}
+        - Name: {scraped_data['company']['name']}
+        - Business Type: {scraped_data['business_type']}
+        - Key Features: {', '.join(scraped_data['key_features'])}
+        - Description: {scraped_data['description']}
 
         Database Schema:
-        {json.dumps(schema.dict(), indent=2)}
+        {json.dumps(schema, indent=2)}
 
         Guidelines for sample data:
         - Generate 5-10 realistic records per table
