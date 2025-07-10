@@ -1,0 +1,16 @@
+{
+  "database_name": "olive_gtm_scribe",
+  "host": "localhost",
+  "port": "5432",
+  "username": "rachellai",
+  "company_name": "Scribe",
+  "created_tables": [
+    "users",
+    "subscriptions",
+    "documents",
+    "integrations",
+    "user_integrations"
+  ],
+  "total_rows": 25,
+  "connection_string": "postgresql://rachellai@localhost:5432/olive_gtm_scribe"
+}
