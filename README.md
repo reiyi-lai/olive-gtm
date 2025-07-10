@@ -1,22 +1,23 @@
 # Olive GTM Engine
 
-An automated Go-To-Market engine that researches potential customers, generates sample database schemas, and creates optimized dashboard prompts for Olive's platform.
+A workflow to research Olive's potential customers, generate their sample database schema, and create optimized dashboard prompts for Olive's platform.
 
-## Features
+## How It Works
 
-- **Company Research**: Scrapes company websites using Firecrawl API
-- **Schema Inference**: AI-powered database schema generation based on business context
-- **Sample Data Generation**: Creates realistic sample data matching inferred schemas
-- **Database Creation**: Creates PostgreSQL databases with schema and sample data for each company
-- **Dashboard Prompt Creation**: Generates optimized prompts for Olive's dashboard creation tool
-- **Real-time Processing**: Live progress tracking with modern React interface
+1. **Input**: Enter company name and website URL
+2. **Scraping**: Firecrawl API extracts clean website content
+3. **Analysis**: OpenAI API analyzes business context and industry
+4. **Schema Generation**: Creates realistic database schema
+5. **Sample Data**: Generates business-relevant sample data
+6. **Database Creation**: Creates PostgreSQL database with schema and populates with sample data
+7. **Prompt Creation**: Builds Olive dashboard prompt
 
 ## Tech Stack
 
 - **Frontend**: React, TypeScript, Tailwind CSS
 - **Backend**: FastAPI, Python, Pydantic, PostgreSQL
 - **AI Services**: OpenAI GPT-4, Firecrawl API
-- **Storage**: Local JSON files, PostgreSQL databases
+- **Storage**: Local JSON files, PostgreSQL databases (for now)
 
 ## Getting Started
 
@@ -26,8 +27,6 @@ An automated Go-To-Market engine that researches potential customers, generates 
 - Node.js (v16 or higher)
 - npm or yarn
 - PostgreSQL (v12 or higher)
-- OpenAI API key
-- Firecrawl API key
 
 ### Installation
 
@@ -55,11 +54,11 @@ An automated Go-To-Market engine that researches potential customers, generates 
    FIRECRAWL_API_KEY=your_firecrawl_api_key_here
    
    # PostgreSQL Database Configuration
-   POSTGRES_HOST=localhost
-   POSTGRES_PORT=5432
-   POSTGRES_USER=postgres
-   POSTGRES_PASSWORD=your_postgres_password_here
-   POSTGRES_ADMIN_DB=postgres
+   POSTGRES_HOST=
+   POSTGRES_PORT=
+   POSTGRES_USER=
+   POSTGRES_PASSWORD=
+   POSTGRES_ADMIN_DB=
    ```
 
 4. Install backend dependencies:
@@ -90,16 +89,6 @@ An automated Go-To-Market engine that researches potential customers, generates 
 
 3. Open http://localhost:3000 in your browser
 
-## How It Works
-
-1. **Input**: Enter a company name and website URL
-2. **Scraping**: Firecrawl extracts clean website content
-3. **Analysis**: AI analyzes business context and industry
-4. **Schema Generation**: Creates realistic database schema
-5. **Sample Data**: Generates business-relevant sample data
-6. **Database Creation**: Creates PostgreSQL database with schema and populates with sample data
-7. **Prompt Creation**: Builds optimized Olive dashboard prompt
-
 ## API Endpoints
 
 - `POST /api/gtm/process-company` - Start processing a company
@@ -129,14 +118,3 @@ Frontend (React) → Backend API (FastAPI) → AI Services → Local Storage + P
                                         ↓
                                    Firecrawl → OpenAI
 ```
-
-### Processing Pipeline
-1. **Website Scraping** (10%) - Firecrawl API extracts website content
-2. **Schema Inference** (30%) - OpenAI generates database schema  
-3. **Sample Data Generation** (50%) - AI creates realistic sample data
-4. **Database Creation** (70%) - PostgreSQL database created and populated
-5. **Prompt Generation** (90%) - Olive dashboard prompt generated
-
-## License
-
-MIT License
