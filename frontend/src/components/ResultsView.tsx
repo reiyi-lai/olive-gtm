@@ -39,11 +39,11 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ result, onClose }) => 
                       {result.databaseInfo.connection_string}
                     </code>
                     <button
-                      onClick={() => navigator.clipboard.writeText(result.databaseInfo!.connection_string)}
+                      onClick={() => window.location.href = result.databaseInfo!.connection_string}
                       className="px-3 py-1 bg-purple-600 text-white text-xs rounded hover:bg-purple-700 transition-colors"
-                      title="Copy connection string"
+                      title="Open database connection"
                     >
-                      Copy
+                      Open
                     </button>
                   </div>
                 </div>
