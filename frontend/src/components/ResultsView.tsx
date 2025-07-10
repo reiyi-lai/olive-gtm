@@ -26,8 +26,29 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ result, onClose }) => 
               ×
             </button>
           </div>
-          
+
           <div className="space-y-6">
+            {result.databaseInfo && (
+              <div className="bg-purple-50 rounded-lg p-4">
+                <h3 className="text-lg font-semibold text-purple-800 mb-3">
+                  PostgreSQL Database
+                </h3>
+                <div className="bg-white p-4 rounded border">
+                  <div className="flex items-center space-x-2">
+                    <code className="px-2 py-1 bg-gray-100 rounded text-sm font-mono flex-1">
+                      {result.databaseInfo.connection_string}
+                    </code>
+                    <button
+                      onClick={() => navigator.clipboard.writeText(result.databaseInfo!.connection_string)}
+                      className="px-3 py-1 bg-purple-600 text-white text-xs rounded hover:bg-purple-700 transition-colors"
+                      title="Copy connection string"
+                    >
+                      Copy
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
             {result.generatedPrompt ? (
               <div className="bg-olive-50 rounded-lg p-4">
                 <h3 className="text-lg font-semibold text-olive-800 mb-3">

@@ -24,4 +24,7 @@ export interface GTMResult {
     confidence: number;
     reasoning: string;
   };
+  databaseInfo?: {
+    connection_string: string;
+  };
 }
