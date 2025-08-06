@@ -121,3 +121,67 @@ class FileManager:
                 return json.load(f)
         except FileNotFoundError:
             return None
+    
+    async def save_markdown_output(self, company_name: str, markdown_content: str) -> str:
+        """Save the final markdown output for a company."""
+        company_dir, company_id = await self.ensure_company_dir(company_name)
+        sanitized_name = self._sanitize_company_name(company_name)
+        file_path = company_dir / f"{sanitized_name}.md"
+        async with asyncio.Lock():
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.write(markdown_content)
+        return company_id
+    
+    async def load_markdown_output(self, company_identifier: str) -> Optional[str]:
+        """Load the markdown output for a company."""
+        try:
+            sanitized_name = self._sanitize_company_name(company_identifier)
+            file_path = self.companies_dir / company_identifier / f"{sanitized_name}.md"
+            if not file_path.exists():
+                file_path = self.companies_dir / sanitized_name / f"{sanitized_name}.md"
+            with open(file_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        except FileNotFoundError:
+            return None
+    
+    async def save_connection_string(self, company_name: str, connection_string: str) -> str:
+        """Save the Neon database connection string."""
+        company_dir, company_id = await self.ensure_company_dir(company_name)
+        file_path = company_dir / "connection_string.txt"
+        async with asyncio.Lock():
+            with open(file_path, 'w') as f:
+                f.write(connection_string)
+        return company_id
+    
+    async def load_connection_string(self, company_identifier: str) -> Optional[str]:
+        """Load the connection string for a company."""
+        try:
+            file_path = self.companies_dir / company_identifier / "connection_string.txt"
+            if not file_path.exists():
+                sanitized_name = self._sanitize_company_name(company_identifier)
+                file_path = self.companies_dir / sanitized_name / "connection_string.txt"
+            with open(file_path, 'r') as f:
+                return f.read().strip()
+        except FileNotFoundError:
+            return None
+    
+    async def save_json_file(self, company_name: str, filename: str, data: dict) -> str:
+        """Save any JSON data for a company."""
+        company_dir, company_id = await self.ensure_company_dir(company_name)
+        file_path = company_dir / filename
+        async with asyncio.Lock():
+            with open(file_path, 'w') as f:
+                json.dump(data, f, indent=2)
+        return company_id
+    
+    async def load_json_file(self, company_identifier: str, filename: str) -> Optional[dict]:
+        """Load any JSON file for a company."""
+        try:
+            file_path = self.companies_dir / company_identifier / filename
+            if not file_path.exists():
+                sanitized_name = self._sanitize_company_name(company_identifier)
+                file_path = self.companies_dir / sanitized_name / filename
+            with open(file_path, 'r') as f:
+                return json.load(f)
+        except FileNotFoundError:
+            return None

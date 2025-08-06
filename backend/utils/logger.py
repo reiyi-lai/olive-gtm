@@ -28,6 +28,12 @@ class Logger:
         else:
             self.logger.warn(message)
     
+    def warning(self, message: str, data: Any = None):
+        if data:
+            self.logger.warning(f"{message}: {data}")
+        else:
+            self.logger.warning(message)
+    
     def debug(self, message: str, data: Any = None):
         if data:
             self.logger.debug(f"{message}: {data}")

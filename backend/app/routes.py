@@ -4,11 +4,8 @@ from fastapi import APIRouter, HTTPException, BackgroundTasks
 from models.schemas import (
     CompanyDict, CompanyRequest, CompanyStatus, ProcessingStatusDict
 )
-from services.company_scraper import CompanyScraper
-from services.schema_service import SchemaService
-from services.sample_data_generator import SampleDataGenerator
-from services.prompt_generator import PromptGenerator
-from services.database_service import DatabaseService
+from typing import Optional
+from services.gtm_service import GTMService
 from utils.file_manager import FileManager
 from utils.logger import logger
 
@@ -18,15 +15,16 @@ router = APIRouter(prefix="/api/gtm", tags=["gtm"])
 processing_status: Dict[str, ProcessingStatusDict] = {}
 
 # Initialize services
-company_scraper = CompanyScraper()
-schema_service = SchemaService()
-sample_data_generator = SampleDataGenerator()
-prompt_generator = PromptGenerator()
-database_service = DatabaseService()
+gtm_service = GTMService()
 file_manager = FileManager()
 
 @router.post("/process-company")
-async def process_company(request: CompanyRequest, background_tasks: BackgroundTasks):
+async def process_company(
+    request: CompanyRequest, 
+    background_tasks: BackgroundTasks,
+    olive_backend_url: Optional[str] = "http://localhost:3000",
+    olive_frontend_url: Optional[str] = "http://localhost:3001"
+):
     """Start processing a company through the GTM pipeline."""
     try:
         # Check if company data already exists
@@ -56,8 +54,13 @@ async def process_company(request: CompanyRequest, background_tasks: BackgroundT
             "progress": 0
         }
         
-        # Start background processing
-        background_tasks.add_task(process_company_async, company)
+        # Start background processing with Olive configuration
+        background_tasks.add_task(
+            process_company_async, 
+            company, 
+            olive_backend_url, 
+            olive_frontend_url
+        )
         
         return {
             "company_id": company["id"],
@@ -81,134 +84,103 @@ async def get_processing_status(company_id: str):
 async def get_result(company_id: str):
     """Get the complete GTM results for a company."""
     try:
-        # Load all data from files
-        scraped_data_dict = await file_manager.load_scraped_data(company_id)
-        schema_dict = await file_manager.load_schema(company_id)
-        sample_data = await file_manager.load_sample_data(company_id)
-        prompt_dict = await file_manager.load_generated_prompt(company_id)
-        database_info = await file_manager.load_database_info(company_id)
+        # Load the new markdown output and connection string
+        markdown_output = await file_manager.load_markdown_output(company_id)
+        connection_string = await file_manager.load_connection_string(company_id)
         
-        if not all([scraped_data_dict, schema_dict, sample_data, prompt_dict]):
+        if not markdown_output:
             raise HTTPException(
                 status_code=404, 
                 detail="Results not found or processing not complete"
             )
         
-        # Convert scraped data to camelCase for frontend
-        scraped_data_frontend = {
-            "company": scraped_data_dict['company'],
-            "websiteContent": scraped_data_dict['website_content'],
-            "businessType": scraped_data_dict['business_type'], 
-            "keyFeatures": scraped_data_dict['key_features'],
-            "description": scraped_data_dict['description'],
-            "timestamp": scraped_data_dict['timestamp']
-        }
-        
-        # Return data directly with correct camelCase field names for frontend
         result = {
-            "company": scraped_data_dict['company'],
-            "scrapedData": scraped_data_frontend,
-            "schema": schema_dict,
-            "sampleData": sample_data,
-            "generatedPrompt": prompt_dict
+            "company_id": company_id,
+            "markdown_output": markdown_output,
+            "connection_string": connection_string,
+            "status": "completed"
         }
         
-        # Include database info if available
-        if database_info:
-            result["databaseInfo"] = database_info
-            
         return result
         
     except Exception as e:
         logger.error("Error fetching results", e)
         raise HTTPException(status_code=500, detail="Internal server error")
 
-async def process_company_async(company: CompanyDict):
-    """Background task to process a company through the entire GTM pipeline."""
+@router.get("/olive-info/{company_id}")
+async def get_olive_info(company_id: str):
+    """Get Olive integration information for a company."""
     try:
-        # Check existing data and resume from last successful stage
-        scraped_data = None
-        schema = None
-        sample_data = None
-        generated_prompt = None
+        olive_info = await file_manager.load_json_file(company_id, "olive_integration.json")
         
-        # Step 1: Check/Scrape website
-        scraped_data_dict = await file_manager.load_scraped_data(company["name"])
-        if scraped_data_dict:
-            try:
-                logger.info(f"Found existing scraped data for {company['name']}, skipping scraping")
-                scraped_data = scraped_data_dict
-                update_status(company["id"], "Loaded existing scraped data", 10)
-            except Exception as e:
-                logger.warn(f"Failed to load existing scraped data for {company['name']}: {e}")
-                scraped_data_dict = None
-        
-        if not scraped_data_dict:
-            update_status(company["id"], "Scraping website...", 10)
-            scraped_data = await company_scraper.scrape_company(company)
-            await file_manager.save_scraped_data(company["name"], scraped_data)
-            logger.info(f"Scraped and saved data for {company['name']}")
-        
-        # Step 2: Check/Infer schema
-        schema_dict = await file_manager.load_schema(company["name"])
-        if schema_dict:
-            try:
-                logger.info(f"Found existing schema for {company['name']}, skipping schema inference")
-                schema = schema_dict
-                update_status(company["id"], "Loaded existing schema", 30)
-            except Exception as e:
-                logger.warn(f"Failed to load existing schema for {company['name']}: {e}")
-                schema_dict = None
-        
-        if not schema_dict:
-            update_status(company["id"], "Inferring database schema...", 30)
-            schema = await schema_service.infer_schema(scraped_data)
-            await file_manager.save_schema(company["name"], schema)
-            logger.info(f"Generated and saved schema for {company['name']}")
-        
-        # Step 3: Check/Generate sample data
-        sample_data = await file_manager.load_sample_data(company["name"])
-        if sample_data:
-            logger.info(f"Found existing sample data for {company['name']}, skipping sample data generation")
-            update_status(company["id"], "Loaded existing sample data", 50)
-        else:
-            update_status(company["id"], "Generating sample data...", 50)
-            sample_data = await sample_data_generator.generate_sample_data(schema, scraped_data)
-            await file_manager.save_sample_data(company["name"], sample_data)
-            logger.info(f"Generated and saved sample data for {company['name']}")
-        
-        # Step 4: Check/Create PostgreSQL database
-        database_info = await file_manager.load_database_info(company["name"])
-        if database_info:
-            logger.info(f"Found existing database info for {company['name']}, skipping database creation")
-            update_status(company["id"], "Loaded existing database", 70)
-        else:
-            update_status(company["id"], "Creating PostgreSQL database...", 70)
-            database_info = await database_service.create_company_database(
-                company["name"], schema, sample_data, scraped_data
+        if not olive_info:
+            raise HTTPException(
+                status_code=404, 
+                detail="Olive integration data not found or not yet completed"
             )
-            if database_info:
-                await file_manager.save_database_info(company["name"], database_info)
-                logger.info(f"Created and saved database for {company['name']}")
-            else:
-                logger.warn(f"Failed to create database for {company['name']}, continuing without database")
         
-        # Step 5: Check/Generate prompt
-        prompt_dict = await file_manager.load_generated_prompt(company["name"])
-        if prompt_dict:
-            try:
-                logger.info(f"Found existing generated prompt for {company['name']}, skipping prompt generation")
-                generated_prompt = prompt_dict
-                update_status(company["id"], "Loaded existing prompt", 90)
-            except Exception as e:
-                logger.warn(f"Failed to load existing prompt for {company['name']}: {e}")
-                prompt_dict = None
+        # Add quick status check if database_id is available
+        if olive_info.get('success') and olive_info.get('database_id'):
+            return {
+                "company_id": company_id,
+                "olive_integration": olive_info,
+                "frontend_url": olive_info.get('frontend_url'),
+                "admin_url": olive_info.get('admin_url'),
+                "suggestions": olive_info.get('suggestions', []),
+                "database_id": olive_info.get('database_id')
+            }
+        else:
+            return {
+                "company_id": company_id,
+                "olive_integration": olive_info,
+                "error": "Olive integration failed"
+            }
         
-        if not prompt_dict:
-            update_status(company["id"], "Creating Olive prompt...", 90)
-            generated_prompt = await prompt_generator.generate_prompt(schema, sample_data, scraped_data)
-            await file_manager.save_generated_prompt(company["name"], generated_prompt)
-            logger.info(f"Generated and saved prompt for {company['name']}")
+    except Exception as e:
+        logger.error("Error fetching Olive info", e)
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+async def process_company_async(
+    company: CompanyDict, 
+    olive_backend_url: str = "http://localhost:3000",
+    olive_frontend_url: str = "http://localhost:3001"
+):
+    """Background task to process a company through the new unified GTM pipeline."""
+    try:
+        # Check if we already have a completed result
+        existing_markdown = await file_manager.load_markdown_output(company["name"])
+        if existing_markdown:
+            logger.info(f"Found existing completed result for {company['name']}, skipping processing")
+            update_status(company["id"], "Completed!", 100)
+            return
+        
+        # Step 1: Company research and analysis
+        update_status(company["id"], "Researching company...", 20)
+        
+        # Step 2: Generate schema, sample data, and recommendations
+        update_status(company["id"], "Generating database schema and sample data...", 50)
+        
+        # Step 3: Create Neon database
+        update_status(company["id"], "Creating Neon database...", 60)
+        
+        # Step 4: Integrate with Olive
+        update_status(company["id"], "Integrating with Olive platform...", 80)
+        
+        # Run the unified GTM processing with Olive integration
+        gtm_service_with_olive = GTMService(olive_backend_url, olive_frontend_url)
+        result = await gtm_service_with_olive.process_company(company)
+        
+        # Save the results including Olive integration data
+        await file_manager.save_markdown_output(company["name"], result['markdown_output'])
+        await file_manager.save_connection_string(company["name"], result['connection_string'])
+        
+        # Save Olive integration info for later retrieval
+        if result.get('olive_integration'):
+            await file_manager.save_json_file(
+                company["name"], 
+                "olive_integration.json", 
+                result['olive_integration']
+            )
         
         # Complete
         update_status(company["id"], "Completed!", 100)
