@@ -7,24 +7,15 @@ export interface Company {
 }
 
 export interface ProcessingStatus {
-  companyId: string;
-  currentStep: string;
+  company_id: string;
+  current_step: string;
   progress: number;
   error?: string;
 }
 
 export interface GTMResult {
-  company: Company;
-  scrapedData: any;
-  schema: any;
-  sampleData: any;
-  generatedPrompt: {
-    prompt: string;
-    expectedDashboard: string;
-    confidence: number;
-    reasoning: string;
-  };
-  databaseInfo?: {
-    connection_string: string;
-  };
+  company_id: string;
+  markdown_output: string;
+  connection_string: string;
+  status: string;
 }

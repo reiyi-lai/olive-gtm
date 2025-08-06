@@ -129,7 +129,7 @@ export const Dashboard: React.FC = () => {
                 {status && company.status !== 'completed' && company.status !== 'failed' && (
                   <ProgressBar
                     progress={status.progress}
-                    currentStep={status.currentStep}
+                    currentStep={status.current_step}
                     error={status.error}
                   />
                 )}
