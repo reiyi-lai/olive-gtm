@@ -31,24 +31,6 @@ async function main() {
       })) {
         messages.push(message);
         console.dir(message, { depth: null });
-        
-        // Try to extract JSON from assistant messages
-        if (message.type === 'assistant' && message.message?.content) {
-          const content = typeof message.message.content === 'string' 
-            ? message.message.content 
-            : message.message.content.map(c => c.type === 'text' ? c.text : '').join('');
-          
-          // Look for JSON in the message
-          const jsonMatch = content.match(/\{[\s\S]*\}/);
-          if (jsonMatch) {
-            try {
-              claudeOutput = JSON.parse(jsonMatch[0]);
-              console.log("📊 Extracted Claude Output:", claudeOutput);
-            } catch (e) {
-              console.log("Failed to parse JSON from Claude response");
-            }
-          }
-        }
       }
 
       // Step 2: Process with OpenAI structured output (if custom prompt is provided)
@@ -56,8 +38,7 @@ async function main() {
         console.log("🤖 Processing with OpenAI structured output...");
         
         const structuredResult = await processWithStructuredOutput(
-          claudeOutput, 
-          process.env.CUSTOM_PROMPT
+          claudeOutput
         );
         
         console.log("✅ Final Structured Output:");
