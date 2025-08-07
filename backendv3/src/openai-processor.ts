@@ -1,36 +1,61 @@
 import OpenAI from "openai";
+import { z } from "zod";
 
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, // Make sure to set this in your environment
+
+const StructuredOutput = z.object({
+  tool_suggestions: z.array(z.object({
+    title: z.string(),
+    prompt: z.string(),
+    features: z.array(z.string()),
+  })),
+  connection_string: z.string(),
 });
 
-interface ToolSuggestion {
-  title: string;
-  prompt: string;
-  features: string[];
-}
-
-interface StructuredOutput {
-  tool_suggestions: ToolSuggestion[];
-  connection_string: string;
-}
-
-// ClaudeOutput is now just the raw output from Claude Code SDK
 type ClaudeOutput = any;
 
 export async function processWithStructuredOutput(
   claudeOutput: ClaudeOutput,
   count: number = 2
-): Promise<StructuredOutput> {
-  const response = await client.beta.chat.completions.parse({
-    model: "gpt-4o",
-    messages: [
+): Promise<z.infer<typeof StructuredOutput>> {
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+
+  const jsonSchema = {
+    type: "object",
+    properties: {
+      tool_suggestions: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            title: { type: "string" },
+            prompt: { type: "string" },
+            features: {
+              type: "array",
+              items: { type: "string" }
+            }
+          },
+          required: ["title", "prompt", "features"],
+          additionalProperties: false
+        }
+      },
+      connection_string: { type: "string" }
+    },
+    required: ["tool_suggestions", "connection_string"],
+    additionalProperties: false
+  };
+  
+  console.log('jsonSchema', jsonSchema);
+
+  const response = await openai.responses.parse({
+    model: "gpt-4o-2024-08-06",
+    input: [
       {
         role: "user",
         content: `You are a tool for Olive, an app which lets companies plug in their database, and generate internal tools using prompts through LLMs. Olive's goal is to let companies build internal tools quickly and easily, and allow for the possibility of having many different types of insight into their product(s).
 
-Your job is to generate some prompts to pass to the LLM to generate an internal tool each, based on the company information and database context as shown below.
-
+Your job is to generate some prompts to pass to the LLM to generate an internal tool each, based on the company information and database context as shown below:
 ${JSON.stringify(claudeOutput, null, 2)}
 
 Each tool should:
@@ -65,38 +90,16 @@ Output a list of ${count} ideas. Each should have:
     - features: 4-5 real, UI-level actions or components it would contain`
       }
     ],
-    response_format: {
-      type: "json_schema",
-      json_schema: {
-        name: "tool_suggestions_response",
-        strict: true,
-        schema: {
-          type: "object",
-          properties: {
-            tool_suggestions: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  title: { type: "string" },
-                  prompt: { type: "string" },
-                  features: {
-                    type: "array",
-                    items: { type: "string" }
-                  }
-                },
-                required: ["title", "prompt", "features"],
-                additionalProperties: false
-              }
-            },
-            connection_string: { type: "string" }
-          },
-          required: ["tool_suggestions", "connection_string"],
-          additionalProperties: false
-        }
-      }
+    text: {
+      format: {
+        type: 'json_schema',
+        name: 'output',
+        schema: jsonSchema,
+      },
     }
   });
 
-  return response.choices[0].message.parsed as StructuredOutput;
+  console.log('output_parsed', response.output_parsed);
+
+  return response.output_parsed!;
 }
