@@ -5,9 +5,26 @@ import { query, type SDKMessage } from "@anthropic-ai/claude-code";
 import { systemPrompt, testOutputClaude, userPrompt } from "./constants.js";
 import { processWithStructuredOutput } from "./openai-processor.js";
 import { createOliveIntegration } from "./olive-integration.js";
+import fs from "fs";
+import path from "path";
 
-export const company_name = "Workweave"
-const website_to_build = "https://www.vecflow.ai/"
+export const company_name = "Zocdoc"
+const website_to_build = "https://www.zocdoc.com/"
+
+function saveClaudeOutput(claudeOutput: any, companyName: string) {
+  try {
+    const dataDir = path.join(process.cwd(), "data");
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
+    }
+    const fileName = `${companyName.toLowerCase()}.json`;
+    const filePath = path.join(dataDir, fileName);
+
+    fs.writeFileSync(filePath, JSON.stringify(claudeOutput, null, 2));
+  } catch (error) {
+    console.error("Error saving Claude output:", error);
+  }
+}
 
 async function main() {
     const messages: SDKMessage[] = [];
@@ -48,7 +65,7 @@ async function main() {
           if (jsonMatch) {
             try {
               claudeOutput = JSON.parse(jsonMatch[0]);
-              console.log("📊 Extracted Claude Output:", claudeOutput);
+              console.log("Extracted Claude Output:", claudeOutput);
             } catch (e) {
               console.log("Failed to parse JSON from Claude response");
             }
@@ -58,14 +75,19 @@ async function main() {
 
       // Step 2: Process with OpenAI structured output
       if (claudeOutput) {
-        console.log("🤖 Processing with OpenAI structured output...");
+        saveClaudeOutput(claudeOutput, company_name);
+        console.log("Processing with OpenAI structured output...");
         
         const structuredResult = await processWithStructuredOutput(
           claudeOutput
         );
         
-        console.log("✅ Final Structured Output:");
+        console.log("Final Structured Output:");
         console.log(JSON.stringify(structuredResult, null, 2));
+        
+        // Step 3: Create Olive Integration
+        console.log("Starting Olive integration...");
+        await createOliveIntegration(structuredResult);
         
         return structuredResult;
       } else {
@@ -79,8 +101,8 @@ async function main() {
     }
 }
 
-// main();
-(async () => {
-  const structuredOutput = await processWithStructuredOutput(testOutputClaude);
-  await createOliveIntegration(structuredOutput);
-})();
+main();
+// (async () => {
+//   const structuredOutput = await processWithStructuredOutput(testOutputClaude);
+//   await createOliveIntegration(structuredOutput);
+// })();
