@@ -14,9 +14,6 @@ const website_to_build = "https://www.zocdoc.com/"
 function saveClaudeOutput(claudeOutput: any, companyName: string) {
   try {
     const dataDir = path.join(process.cwd(), "data");
-    if (!fs.existsSync(dataDir)) {
-      fs.mkdirSync(dataDir, { recursive: true });
-    }
     const fileName = `${companyName.toLowerCase()}.json`;
     const filePath = path.join(dataDir, fileName);
 
