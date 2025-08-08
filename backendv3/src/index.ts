@@ -1,6 +1,10 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import { query, type SDKMessage } from "@anthropic-ai/claude-code";
-import { systemPrompt, userPrompt } from "./constants.js";
+import { systemPrompt, testOutputClaude, userPrompt } from "./constants.js";
 import { processWithStructuredOutput } from "./openai-processor.js";
+import { createOliveIntegration } from "./olive-integration.js";
 
 const website_to_build = "workweave.dev"
 
@@ -31,10 +35,28 @@ async function main() {
       })) {
         messages.push(message);
         console.dir(message, { depth: null });
+        
+        // Try to extract JSON from assistant messages
+        if (message.type === 'assistant' && message.message?.content) {
+          const content = typeof message.message.content === 'string' 
+            ? message.message.content 
+            : message.message.content.map((c: any) => c.type === 'text' ? c.text : '').join('');
+          
+          // Look for JSON in the message
+          const jsonMatch = content.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            try {
+              claudeOutput = JSON.parse(jsonMatch[0]);
+              console.log("📊 Extracted Claude Output:", claudeOutput);
+            } catch (e) {
+              console.log("Failed to parse JSON from Claude response");
+            }
+          }
+        }
       }
 
-      // Step 2: Process with OpenAI structured output (if custom prompt is provided)
-      if (claudeOutput && process.env.CUSTOM_PROMPT) {
+      // Step 2: Process with OpenAI structured output
+      if (claudeOutput) {
         console.log("🤖 Processing with OpenAI structured output...");
         
         const structuredResult = await processWithStructuredOutput(
@@ -46,7 +68,7 @@ async function main() {
         
         return structuredResult;
       } else {
-        console.log("ℹ️ No custom prompt provided, returning Claude output only");
+        console.log("ℹ️ Error processing with OpenAI structured output, returning Claude output only");
         return claudeOutput;
       }
 
@@ -56,4 +78,8 @@ async function main() {
     }
 }
 
-main();
+// main();
+(async () => {
+  const structuredOutput = await processWithStructuredOutput(testOutputClaude);
+  await createOliveIntegration(structuredOutput);
+})();

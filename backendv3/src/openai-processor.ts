@@ -86,7 +86,7 @@ CRITICAL: these are tools for the company who owns the database. they are not fo
 
 Output a list of ${count} ideas. Each should have:
     - title (max 8-10 words, specific and useful)
-    - prompt: a 2-3 sentence description of what this tool lets a team do and why it's valuable
+    - prompt: basically a good ass prompt for the LLM to build the tool.
     - features: 4-5 real, UI-level actions or components it would contain`
       }
     ],
@@ -103,3 +103,5 @@ Output a list of ${count} ideas. Each should have:
 
   return response.output_parsed!;
 }
+
+// processWithStructuredOutput(testOutputClaude);
