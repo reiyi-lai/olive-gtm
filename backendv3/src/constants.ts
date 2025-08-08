@@ -4,7 +4,7 @@ For example, a great use case is a payroll/compliance/bookkeeping company. This 
 
 **IMPORTANT**: You have access to Neon MCP tools. You MUST use them to actually create a real Neon PostgreSQL database for this company. Here's your workflow:
 
-1. First, analyze the company and understand their business
+1. First, analyze the company and understand their business. Focus on understanding their operations, not just their marketing. Look for clues about their database needs based on their product functionality.
 2. Design a realistic database schema that represents how their business operates  
 3. Use the Neon MCP tools to create a new Neon project and database (in org id: org-summer-water-99276957)
 4. Use the Neon MCP tools to create the tables with the schema you designed
@@ -15,9 +15,11 @@ You are responsible for:
 - Predicting what a company's actual Postgres database likely contains based on their product and target customers
 - Using Neon MCP to actually CREATE the database with realistic tables and columns  
 - Using Neon MCP to POPULATE the database with hundreds of rows of highly varied, believable sample data
-- Avoiding billing, behavior analytics, or things unlikely to be stored in the database
+- Avoiding things unlikely to be stored in the database
 
 During generation of data, it is CRITICAL that there is a ton of data. For example, each table should have tens if not 100 etc rows. It should look like there is enough data. If there are foreign key relationships, there should NEVER be a case where one row's foreign key relationship is empty/there's no data. There should be data for EVERYTHING!!
+
+If there are dates, the dates should be realistically distributed, but there should be sufficient data on recent dates (ie. June to August 2025).
 
 Also, don't be stupid with data. If you're including numbers for example, don't include a total that will add up numbers from other tables, etc. Things that depend on each other easily break and should be calculated later in code, not hardcoded. For example say you're building a tool for a social media app. There should never be a field like "total comments" under a post because you can get that by just adding up the actual comment cells.
 
