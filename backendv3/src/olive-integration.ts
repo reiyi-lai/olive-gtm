@@ -1,22 +1,83 @@
+import { company_name } from "./index.js";
+
 export async function createOliveIntegration(structuredOutput: any) {
   const { tool_suggestions, connection_string } = structuredOutput;
-  const wosSession = 'Fe26.2*1*02a629a83ed010d7f2cc79ac08c403a51cf45da747d146ad0d857024e30f3963*-MicGr3pmmf_zOPyNh2yAQ*R2uSPRBgebgjWxCLSrPBt_oheblFG-gvdSSQ4ubzB1N-m_Hy8Ik9rqDgLLR43kyxcVY6G70lTFluJI4n0L3JD9tKNXqnWpKISnof8zZZclCdlqZLyfRnzV6vgW6c2ibOmVrR8RL_wElmjiecN8HVX0KqPs9yVT-3Ev1hV-OdoaUVRNPFNFP3kwJ4oID0WLoK9l0PLVrqWUkD5KUX54uhQCfjDRWjRnpJ02HM6ia2eQ_xBgFQR2p1wXvDguEBvq1KJp1sWEPv_EM65O6viHTNcz4-geGC9xfX2KbQGgQLTdSM3Wa9NQRFGCfnYYxg7dxnO6S7KP0LX_hdRJCiJBgt6RMSrQY90Kvh1prYr1AdBka3uYoxHmsL3WoLTNWCfI6fFQSfebnw09eCs_6aSvoMFhVWkAKawIPvS827RBAQz65mZnWsVuPxrRsE1eKvzMIuhpNVGXklT9hblpmRWbUyB2qvgvkh825wEMjHQL4DNwK8mdJykWCVj1-lo5t8DNeCBA66xH_TLncDi-cb7u_Er5IYlrGUSmXnqPS27Uf9qVwZ1Rk_HJCHh1L1sXhwTx8KdQ88gXLbu30IwU6cpuf5mLBdjmBsnSAJFdk1IxVqia7H6SLHNV7mp2uP9jb59ZVPiEdlrDo6Jg8aC72c6dN4JCWubam1ZV4h4M8k5LwL8uCMv813nkg6Qlco8R_R490VOPCTrYI1uqvFSdZa6ZBxPP5zigNzObhvLew7F1DTpPYGxmgp94UGWGHeE-ZJemEJl_ZeglmGjShviRoh98-T03Fa5TnYOnXH1azjxUe4iEV2TTcgX60RxD7Eajsp1O_htMisl-kBFser_1nNzXnzuQkeMQ3TpxheSdK5ZbtD-fNlv0h7qPaAqDAWT8HUl0cCB1scSCgmM8hGxvLprQ9A4_BHcUij4lmcTQ5QMbtZGv_R-OaD4EX2wZyn7hYqFyDkSS86ex1FwVLLtyYWjOSMWMYGu-tSLV7r_VERhrtW0odjPDpl9bc5OjWSr3ce5P9jv5eJf0-0Bqqt4wxa2Mno4OhHbeOhLSrag0eMQZZBOrn0Cso3nKvAcdCcUq3QV8Lk7U_uzExNSzIbfuROqDynCH5MoKoFYGg2ngOHfbq6s2rH2yek6pNcQ87Va8-wz5pIimrOQIARWbSe_uu2pzhEuBoizBeWTu5unMNcyjJ078UCDqFiRb2R6UpT8FkpSLy1D2okKLCpPrZwSOIKktlCwI-92ab0hhSCesSNMq9oIzlqkS6m2EivrxqUEP4twGX3m7hnILhqWE1cc6X5Q7MvuOUqMLs1beaHq8ipSUoLmQf8oZntZ7wzTMySbD3MfHHTtPwmzz5ClaV5Yh75rRewsKX3maAhlkbNEXYZVDeExF3NIU0gpcDYAqGjlqGm5fIT362pDLKlynHFOKhaCsdbrf6hFhKKgPDPINumXaND3AwjyYs8RkqwOhn4-sACZBVGF5JwaQZmCwboDUyqZby-1gUHG03JVx36-YyWWfL7TihXbXoz76pZgKwsZGXRPcP-PTo06OnTk6UnQWs61WyLBF-TknqhSu7fV_0l1lgjiquMhHO4yK6sgJIe7ASZBBJRsQGUhwZtmbUde2qIKLAVM_umltHFDtSR9dv2rGkxdQfU_UtYqr3tm24gKXHyousgZRyckUO19aqC7YiUGmKIAfA3HRDLQL-jlBCRSEbHsddh38ZTjCQieJ7Ypr58lMxn1e7xwLKPooSUlZvXfDljxZBt5-nXBtQWegBhamNqP0owxMzPYVW5xwBbQnmHck3Gc-ibF_kZrZY8NSAaAZqN9-P18RW8EdWtPfDhQ2s6m44pwHxEqyTgxsZStXbzaVov9z8GsSb2TeILd-m3xpE3-g**0f35c606cfd3db060fd8a9aecfb4c0ac8f0128c3852de92728312dbb736b61ea*XhoCoTPpBPgTKJia7ywtEtmAWTFQKHXEBCAWJmQtz2U~2';
-  const oliveAuth = '1754620032116';
+  // const wosSession = 'Fe26.2*1*02a629a83ed010d7f2cc79ac08c403a51cf45da747d146ad0d857024e30f3963*-MicGr3pmmf_zOPyNh2yAQ*R2uSPRBgebgjWxCLSrPBt_oheblFG-gvdSSQ4ubzB1N-m_Hy8Ik9rqDgLLR43kyxcVY6G70lTFluJI4n0L3JD9tKNXqnWpKISnof8zZZclCdlqZLyfRnzV6vgW6c2ibOmVrR8RL_wElmjiecN8HVX0KqPs9yVT-3Ev1hV-OdoaUVRNPFNFP3kwJ4oID0WLoK9l0PLVrqWUkD5KUX54uhQCfjDRWjRnpJ02HM6ia2eQ_xBgFQR2p1wXvDguEBvq1KJp1sWEPv_EM65O6viHTNcz4-geGC9xfX2KbQGgQLTdSM3Wa9NQRFGCfnYYxg7dxnO6S7KP0LX_hdRJCiJBgt6RMSrQY90Kvh1prYr1AdBka3uYoxHmsL3WoLTNWCfI6fFQSfebnw09eCs_6aSvoMFhVWkAKawIPvS827RBAQz65mZnWsVuPxrRsE1eKvzMIuhpNVGXklT9hblpmRWbUyB2qvgvkh825wEMjHQL4DNwK8mdJykWCVj1-lo5t8DNeCBA66xH_TLncDi-cb7u_Er5IYlrGUSmXnqPS27Uf9qVwZ1Rk_HJCHh1L1sXhwTx8KdQ88gXLbu30IwU6cpuf5mLBdjmBsnSAJFdk1IxVqia7H6SLHNV7mp2uP9jb59ZVPiEdlrDo6Jg8aC72c6dN4JCWubam1ZV4h4M8k5LwL8uCMv813nkg6Qlco8R_R490VOPCTrYI1uqvFSdZa6ZBxPP5zigNzObhvLew7F1DTpPYGxmgp94UGWGHeE-ZJemEJl_ZeglmGjShviRoh98-T03Fa5TnYOnXH1azjxUe4iEV2TTcgX60RxD7Eajsp1O_htMisl-kBFser_1nNzXnzuQkeMQ3TpxheSdK5ZbtD-fNlv0h7qPaAqDAWT8HUl0cCB1scSCgmM8hGxvLprQ9A4_BHcUij4lmcTQ5QMbtZGv_R-OaD4EX2wZyn7hYqFyDkSS86ex1FwVLLtyYWjOSMWMYGu-tSLV7r_VERhrtW0odjPDpl9bc5OjWSr3ce5P9jv5eJf0-0Bqqt4wxa2Mno4OhHbeOhLSrag0eMQZZBOrn0Cso3nKvAcdCcUq3QV8Lk7U_uzExNSzIbfuROqDynCH5MoKoFYGg2ngOHfbq6s2rH2yek6pNcQ87Va8-wz5pIimrOQIARWbSe_uu2pzhEuBoizBeWTu5unMNcyjJ078UCDqFiRb2R6UpT8FkpSLy1D2okKLCpPrZwSOIKktlCwI-92ab0hhSCesSNMq9oIzlqkS6m2EivrxqUEP4twGX3m7hnILhqWE1cc6X5Q7MvuOUqMLs1beaHq8ipSUoLmQf8oZntZ7wzTMySbD3MfHHTtPwmzz5ClaV5Yh75rRewsKX3maAhlkbNEXYZVDeExF3NIU0gpcDYAqGjlqGm5fIT362pDLKlynHFOKhaCsdbrf6hFhKKgPDPINumXaND3AwjyYs8RkqwOhn4-sACZBVGF5JwaQZmCwboDUyqZby-1gUHG03JVx36-YyWWfL7TihXbXoz76pZgKwsZGXRPcP-PTo06OnTk6UnQWs61WyLBF-TknqhSu7fV_0l1lgjiquMhHO4yK6sgJIe7ASZBBJRsQGUhwZtmbUde2qIKLAVM_umltHFDtSR9dv2rGkxdQfU_UtYqr3tm24gKXHyousgZRyckUO19aqC7YiUGmKIAfA3HRDLQL-jlBCRSEbHsddh38ZTjCQieJ7Ypr58lMxn1e7xwLKPooSUlZvXfDljxZBt5-nXBtQWegBhamNqP0owxMzPYVW5xwBbQnmHck3Gc-ibF_kZrZY8NSAaAZqN9-P18RW8EdWtPfDhQ2s6m44pwHxEqyTgxsZStXbzaVov9z8GsSb2TeILd-m3xpE3-g**0f35c606cfd3db060fd8a9aecfb4c0ac8f0128c3852de92728312dbb736b61ea*XhoCoTPpBPgTKJia7ywtEtmAWTFQKHXEBCAWJmQtz2U~2';
+  // const oliveAuth = '1754620032116';
 
-  console.log("🫒 Starting Olive integration...");
-
-  // Step 1: Create database connection
-  console.log("Creating database connection...");
-  const dbResponse = await fetch('http://dev.fromolive.com:3001/trpc/database.create?batch=1', {
+  // Step 1: Create organization
+  console.log("Creating organization...");
+  const orgResponse = await fetch('https://api.soon.fromolive.com/trpc/organization.create?batch=1', {
     method: 'POST',
     headers: {
+      'Accept': '*/*',
+      'Accept-Language': 'en-US,en;q=0.9',
+      'Connection': 'keep-alive',
       'Content-Type': 'application/json',
-      'Cookie': `wos-session=${wosSession}; olive-auth=${oliveAuth}`
+      'x-olive-api-key': '2UfFdhoaD6QB23cLwp8Sw8tPFdu3g5naoiH4qEMBkjjYm7',
+      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36'
     },
     body: JSON.stringify({
       "0": {
         json: {
-          name: `${tool_suggestions[0]?.title} Database`,
+          name: `${company_name}`
+        }
+      }
+    })
+  });
+
+  if (!orgResponse.ok) {
+    const errorText = await orgResponse.text();
+    throw new Error(`Organization creation failed: ${orgResponse.status} ${orgResponse.statusText} - ${errorText}`);
+  }
+
+  const organization = await orgResponse.json();
+  const orgId = organization[0].result.data.json.id;
+  console.log(`✅ Organization created with ID: ${orgId}`);
+
+  // Step 2: Create API key
+  console.log("Creating API key...");
+  const apiKeyResponse = await fetch('https://api.soon.fromolive.com/trpc/user.createApiKey?batch=1', {
+    method: 'POST',
+    headers: {
+      'Accept': '*/*',
+      'Accept-Language': 'en-US,en;q=0.9',
+      'Connection': 'keep-alive',
+      'Content-Type': 'application/json',
+      'x-olive-api-key': '2UfFdhoaD6QB23cLwp8Sw8tPFdu3g5naoiH4qEMBkjjYm7',
+      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36'
+    },
+    body: JSON.stringify({
+      "0": {
+        json: {
+          organizationId: orgId
+        }
+      }
+    })
+  });
+
+  if (!apiKeyResponse.ok) {
+    const errorText = await apiKeyResponse.text();
+    throw new Error(`API key creation failed: ${apiKeyResponse.status} ${apiKeyResponse.statusText} - ${errorText}`);
+  }
+
+  const apiKeyResult = await apiKeyResponse.json();
+  const apiKey = apiKeyResult[0].result.data.json.key;
+  console.log(`✅ API key created: ${apiKey}`);
+
+  // Step 3: Create database connection
+  console.log("Creating database connection...");
+  const dbResponse = await fetch('https://api.soon.fromolive.com/trpc/database.create?batch=1', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      // 'Cookie': `wos-session=${wosSession}; olive-auth=${oliveAuth}`
+      'x-olive-api-key': apiKey
+    },
+    body: JSON.stringify({
+      "0": {
+        json: {
+          name: tool_suggestions[0]?.title,
           connectionString: connection_string,
           sslMode: "require"
         }
@@ -26,7 +87,6 @@ export async function createOliveIntegration(structuredOutput: any) {
 
   if (!dbResponse.ok) {
     const errorText = await dbResponse.text();
-    console.error("🔍 Database creation error response:", errorText);
     throw new Error(`Database creation failed: ${dbResponse.status} ${dbResponse.statusText} - ${errorText}`);
   }
 
@@ -36,16 +96,17 @@ export async function createOliveIntegration(structuredOutput: any) {
   const dbId = database[0].result.data.json.id;
   console.log(`✅ Database created with ID: ${dbId}`);
 
-  // Step 2: Create apps for each tool suggestion
+  // Step 4: Create apps for each tool suggestion
   for (let i = 0; i < tool_suggestions.length; i++) {
     const tool = tool_suggestions[i];
     console.log(`Creating app ${i + 1}/${tool_suggestions.length}: ${tool.title}`);
 
-    const appResponse = await fetch('http://dev.fromolive.com:3001/trpc/app.create?batch=1', {
+    const appResponse = await fetch('http://api.soon.fromolive.com/trpc/app.create?batch=1', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Cookie': `wos-session=${wosSession}; olive-auth=${oliveAuth}`
+        // 'Cookie': `wos-session=${wosSession}; olive-auth=${oliveAuth}`,
+        'x-olive-api-key': apiKey
       },
       body: JSON.stringify({
         "0": {

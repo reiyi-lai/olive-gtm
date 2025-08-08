@@ -6,7 +6,8 @@ import { systemPrompt, testOutputClaude, userPrompt } from "./constants.js";
 import { processWithStructuredOutput } from "./openai-processor.js";
 import { createOliveIntegration } from "./olive-integration.js";
 
-const website_to_build = "workweave.dev"
+export const company_name = "Workweave"
+const website_to_build = "https://www.vecflow.ai/"
 
 async function main() {
     const messages: SDKMessage[] = [];
@@ -68,7 +69,7 @@ async function main() {
         
         return structuredResult;
       } else {
-        console.log("ℹ️ Error processing with OpenAI structured output, returning Claude output only");
+        console.log("Error processing with OpenAI structured output, returning Claude output only");
         return claudeOutput;
       }
 
