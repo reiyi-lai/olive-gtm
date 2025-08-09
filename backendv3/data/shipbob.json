@@ -1,0 +1,248 @@
+{
+  "company_analysis": {
+    "website": "https://www.shipbob.com/",
+    "business_description": "ShipBob is a full-stack third-party logistics (3PL) fulfillment platform that provides end-to-end e-commerce logistics solutions. They help DTC brands manage warehousing, inventory, order processing, and shipping through their proprietary software across a global network of 50+ fulfillment centers.",
+    "business_model": "ShipBob generates revenue through a structured pricing model covering setup fees, receiving inventory fees, storage fees (monthly), and order fulfillment fees. They also earn from shipping costs and value-added services like their 2-Day Express Shipping Program and AI-powered inventory placement optimization.",
+    "target_customers": "Small to mid-market e-commerce brands, DTC companies, Shopify merchants, Amazon sellers, and growing startups that need scalable fulfillment solutions. Target brands typically process 1,000-50,000+ orders per month.",
+    "key_features": [
+      "Global fulfillment network (50+ centers across US, Canada, UK, Europe, Australia)",
+      "AI-powered Inventory Placement Program (IPP) for optimal stock distribution",
+      "2-Day Express Shipping Program",
+      "Multi-channel integration (Shopify, Amazon, BigCommerce, WooCommerce)",
+      "Real-time inventory management and analytics dashboard",
+      "Automated order routing and processing",
+      "White glove delivery for large items",
+      "Returns processing and management"
+    ],
+    "likely_data_needs": [
+      "Merchant/client management with subscription tiers and volumes",
+      "Product catalog with SKUs, dimensions, weights, and costs",
+      "Multi-location inventory tracking across fulfillment centers",
+      "Order processing from multiple sales channels",
+      "Shipment tracking with carrier integrations",
+      "Customer shipping addresses and delivery preferences",
+      "Billing records for storage, fulfillment, and shipping fees",
+      "Inventory movements for stock transfers and adjustments",
+      "Performance analytics for delivery times and costs"
+    ],
+    "industry": "Third-Party Logistics (3PL) / E-commerce Fulfillment Services"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_0rK4lhuFzVdn@ep-cool-moon-aeobum79-pooler.c-2.us-east-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+  "database_info": {
+    "project_id": "delicate-mouse-58871767",
+    "database_name": "neondb",
+    "schema": [
+      {
+        "table_name": "merchants",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "company_name": "VARCHAR(255) NOT NULL",
+          "contact_email": "VARCHAR(255) NOT NULL",
+          "contact_phone": "VARCHAR(50)",
+          "address": "TEXT",
+          "city": "VARCHAR(100)",
+          "state": "VARCHAR(50)",
+          "country": "VARCHAR(50)",
+          "postal_code": "VARCHAR(20)",
+          "subscription_plan": "VARCHAR(50)",
+          "monthly_volume": "INTEGER",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "status": "VARCHAR(50) DEFAULT 'active'"
+        },
+        "foreign_keys": {},
+        "record_count": 20
+      },
+      {
+        "table_name": "fulfillment_centers",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(255) NOT NULL",
+          "code": "VARCHAR(10) UNIQUE NOT NULL",
+          "address": "TEXT NOT NULL",
+          "city": "VARCHAR(100) NOT NULL",
+          "state": "VARCHAR(50)",
+          "country": "VARCHAR(50) NOT NULL",
+          "postal_code": "VARCHAR(20)",
+          "timezone": "VARCHAR(50)",
+          "capacity_cubic_feet": "INTEGER",
+          "is_active": "BOOLEAN DEFAULT true",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {},
+        "record_count": 15
+      },
+      {
+        "table_name": "products",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "merchant_id": "INTEGER REFERENCES merchants(id)",
+          "sku": "VARCHAR(255) NOT NULL",
+          "name": "VARCHAR(255) NOT NULL",
+          "description": "TEXT",
+          "weight_oz": "DECIMAL(8,2)",
+          "length_in": "DECIMAL(8,2)",
+          "width_in": "DECIMAL(8,2)",
+          "height_in": "DECIMAL(8,2)",
+          "cost_per_unit": "DECIMAL(10,2)",
+          "retail_price": "DECIMAL(10,2)",
+          "category": "VARCHAR(100)",
+          "is_active": "BOOLEAN DEFAULT true",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "merchant_id": "merchants(id)"
+        },
+        "record_count": 53
+      },
+      {
+        "table_name": "inventory",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "product_id": "INTEGER REFERENCES products(id)",
+          "fulfillment_center_id": "INTEGER REFERENCES fulfillment_centers(id)",
+          "available_quantity": "INTEGER DEFAULT 0",
+          "reserved_quantity": "INTEGER DEFAULT 0",
+          "total_quantity": "INTEGER DEFAULT 0",
+          "last_updated": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "product_id": "products(id)",
+          "fulfillment_center_id": "fulfillment_centers(id)"
+        },
+        "record_count": 160
+      },
+      {
+        "table_name": "customers",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "first_name": "VARCHAR(100) NOT NULL",
+          "last_name": "VARCHAR(100) NOT NULL",
+          "email": "VARCHAR(255) NOT NULL",
+          "phone": "VARCHAR(50)",
+          "shipping_address": "TEXT",
+          "shipping_city": "VARCHAR(100)",
+          "shipping_state": "VARCHAR(50)",
+          "shipping_country": "VARCHAR(50)",
+          "shipping_postal_code": "VARCHAR(20)",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {},
+        "record_count": 300
+      },
+      {
+        "table_name": "carriers",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(100) NOT NULL",
+          "code": "VARCHAR(10) UNIQUE NOT NULL",
+          "tracking_url_template": "VARCHAR(500)",
+          "is_active": "BOOLEAN DEFAULT true",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {},
+        "record_count": 10
+      },
+      {
+        "table_name": "orders",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "merchant_id": "INTEGER REFERENCES merchants(id)",
+          "customer_id": "INTEGER REFERENCES customers(id)",
+          "order_number": "VARCHAR(100) NOT NULL",
+          "sales_channel": "VARCHAR(100)",
+          "order_status": "VARCHAR(50) DEFAULT 'pending'",
+          "order_date": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "requested_ship_date": "DATE",
+          "total_amount": "DECIMAL(10,2)",
+          "shipping_method": "VARCHAR(100)",
+          "priority": "VARCHAR(20) DEFAULT 'standard'",
+          "fulfillment_center_id": "INTEGER REFERENCES fulfillment_centers(id)",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "merchant_id": "merchants(id)",
+          "customer_id": "customers(id)",
+          "fulfillment_center_id": "fulfillment_centers(id)"
+        },
+        "record_count": 210
+      },
+      {
+        "table_name": "order_items",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "order_id": "INTEGER REFERENCES orders(id)",
+          "product_id": "INTEGER REFERENCES products(id)",
+          "quantity": "INTEGER NOT NULL",
+          "unit_price": "DECIMAL(10,2)",
+          "total_price": "DECIMAL(10,2)",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "order_id": "orders(id)",
+          "product_id": "products(id)"
+        },
+        "record_count": 121
+      },
+      {
+        "table_name": "shipments",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "order_id": "INTEGER REFERENCES orders(id)",
+          "carrier_id": "INTEGER REFERENCES carriers(id)",
+          "tracking_number": "VARCHAR(255)",
+          "shipment_status": "VARCHAR(50) DEFAULT 'preparing'",
+          "ship_date": "TIMESTAMP",
+          "delivery_date": "TIMESTAMP",
+          "weight_oz": "DECIMAL(8,2)",
+          "shipping_cost": "DECIMAL(10,2)",
+          "dimensions": "VARCHAR(100)",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "order_id": "orders(id)",
+          "carrier_id": "carriers(id)"
+        },
+        "record_count": 150
+      },
+      {
+        "table_name": "inventory_movements",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "product_id": "INTEGER REFERENCES products(id)",
+          "fulfillment_center_id": "INTEGER REFERENCES fulfillment_centers(id)",
+          "movement_type": "VARCHAR(50) NOT NULL",
+          "quantity": "INTEGER NOT NULL",
+          "reference_id": "INTEGER",
+          "reference_type": "VARCHAR(50)",
+          "notes": "TEXT",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "product_id": "products(id)",
+          "fulfillment_center_id": "fulfillment_centers(id)"
+        },
+        "record_count": 300
+      },
+      {
+        "table_name": "billing_records",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "merchant_id": "INTEGER REFERENCES merchants(id)",
+          "billing_period_start": "DATE NOT NULL",
+          "billing_period_end": "DATE NOT NULL",
+          "storage_fee": "DECIMAL(10,2) DEFAULT 0",
+          "fulfillment_fee": "DECIMAL(10,2) DEFAULT 0",
+          "shipping_fee": "DECIMAL(10,2) DEFAULT 0",
+          "total_amount": "DECIMAL(10,2)",
+          "invoice_date": "DATE",
+          "payment_status": "VARCHAR(50) DEFAULT 'pending'",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "merchant_id": "merchants(id)"
+        },
+        "record_count": 40
+      }
+    ]
+  }
+}

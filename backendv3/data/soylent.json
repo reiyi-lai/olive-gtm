@@ -1,0 +1,187 @@
+{
+  "company_analysis": {
+    "website": "https://soylent.com/",
+    "business_description": "Soylent is a nutrition technology company that produces scientifically-designed meal replacement products. They offer complete nutrition solutions in powder and ready-to-drink formats, targeting busy professionals and health-conscious consumers who need convenient, nutritionally balanced meals.",
+    "business_model": "Direct-to-consumer e-commerce with subscription and one-time purchase options. Revenue through product sales with tiered pricing that incentivizes subscription purchases (discounts of 10-28% for subscribers). Built on Shopify platform.",
+    "target_customers": "Busy professionals, health-conscious consumers, students, fitness enthusiasts, and anyone seeking convenient nutrition solutions. Primary demographic appears to be tech workers and urban professionals aged 25-45.",
+    "key_features": [
+      "Complete nutrition meal replacement",
+      "Subscription delivery service",
+      "Multiple product formats (powder, ready-to-drink, bars)",
+      "Science-backed nutrition profiles",
+      "Flexible purchasing options",
+      "Direct-to-consumer fulfillment"
+    ],
+    "likely_data_needs": [
+      "Customer management and profiles",
+      "Subscription management and billing",
+      "Product catalog and inventory",
+      "Order processing and fulfillment",
+      "Shipping and logistics",
+      "Customer support interactions",
+      "Product reviews and feedback",
+      "Marketing campaign tracking",
+      "Nutritional data management"
+    ],
+    "industry": "Nutrition Technology / Food & Beverage E-commerce"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_mTqRyhI9u3PL@ep-lingering-wildflower-affhm0s4-pooler.c-2.us-west-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+  "database_info": {
+    "project_id": "misty-frost-33259039",
+    "database_name": "neondb",
+    "schema": [
+      {
+        "table_name": "customers",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "email": "VARCHAR(255) UNIQUE NOT NULL",
+          "first_name": "VARCHAR(100) NOT NULL",
+          "last_name": "VARCHAR(100) NOT NULL",
+          "phone": "VARCHAR(20)",
+          "date_of_birth": "DATE",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "is_active": "BOOLEAN DEFAULT true",
+          "total_orders": "INTEGER DEFAULT 0",
+          "lifetime_value": "DECIMAL(10,2) DEFAULT 0.00"
+        },
+        "foreign_keys": {},
+        "record_count": 100
+      },
+      {
+        "table_name": "customer_addresses",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "customer_id": "INTEGER",
+          "address_type": "VARCHAR(20) DEFAULT 'shipping'",
+          "street_address": "VARCHAR(255) NOT NULL",
+          "city": "VARCHAR(100) NOT NULL",
+          "state": "VARCHAR(50) NOT NULL",
+          "zip_code": "VARCHAR(10) NOT NULL",
+          "country": "VARCHAR(50) DEFAULT 'US'",
+          "is_default": "BOOLEAN DEFAULT false",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "customer_id": "customers(id)"
+        },
+        "record_count": 102
+      },
+      {
+        "table_name": "products",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "category_id": "INTEGER",
+          "name": "VARCHAR(200) NOT NULL",
+          "description": "TEXT",
+          "sku": "VARCHAR(50) UNIQUE NOT NULL",
+          "base_price": "DECIMAL(10,2) NOT NULL",
+          "current_price": "DECIMAL(10,2) NOT NULL",
+          "cost_per_unit": "DECIMAL(10,2) NOT NULL",
+          "weight_grams": "INTEGER",
+          "dimensions_cm": "VARCHAR(50)",
+          "nutrition_facts": "JSONB",
+          "ingredients": "TEXT",
+          "allergens": "VARCHAR(255)"
+        },
+        "foreign_keys": {
+          "category_id": "product_categories(id)"
+        },
+        "record_count": 8
+      },
+      {
+        "table_name": "orders",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "customer_id": "INTEGER",
+          "order_number": "VARCHAR(50) UNIQUE NOT NULL",
+          "order_status": "VARCHAR(30) DEFAULT 'pending'",
+          "order_type": "VARCHAR(20) DEFAULT 'one_time'",
+          "subtotal": "DECIMAL(10,2) NOT NULL",
+          "shipping_cost": "DECIMAL(10,2) DEFAULT 0.00",
+          "tax_amount": "DECIMAL(10,2) DEFAULT 0.00",
+          "total_amount": "DECIMAL(10,2) NOT NULL",
+          "payment_status": "VARCHAR(20) DEFAULT 'pending'",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "customer_id": "customers(id)",
+          "shipping_address_id": "customer_addresses(id)",
+          "billing_address_id": "customer_addresses(id)"
+        },
+        "record_count": 80
+      },
+      {
+        "table_name": "subscriptions",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "customer_id": "INTEGER",
+          "subscription_plan_id": "INTEGER",
+          "product_id": "INTEGER",
+          "quantity": "INTEGER NOT NULL",
+          "status": "VARCHAR(20) DEFAULT 'active'",
+          "billing_frequency": "VARCHAR(20) NOT NULL",
+          "unit_price": "DECIMAL(10,2) NOT NULL",
+          "discount_amount": "DECIMAL(10,2) DEFAULT 0.00"
+        },
+        "foreign_keys": {
+          "customer_id": "customers(id)",
+          "subscription_plan_id": "subscription_plans(id)",
+          "product_id": "products(id)"
+        },
+        "record_count": 30
+      },
+      {
+        "table_name": "product_reviews",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "product_id": "INTEGER",
+          "customer_id": "INTEGER",
+          "rating": "INTEGER CHECK (rating >= 1 AND rating <= 5)",
+          "title": "VARCHAR(200)",
+          "review_text": "TEXT",
+          "is_verified_purchase": "BOOLEAN DEFAULT false",
+          "helpful_votes": "INTEGER DEFAULT 0"
+        },
+        "foreign_keys": {
+          "product_id": "products(id)",
+          "customer_id": "customers(id)",
+          "order_id": "orders(id)"
+        },
+        "record_count": 20
+      },
+      {
+        "table_name": "inventory",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "product_id": "INTEGER",
+          "warehouse_location": "VARCHAR(100)",
+          "quantity_available": "INTEGER NOT NULL DEFAULT 0",
+          "quantity_reserved": "INTEGER NOT NULL DEFAULT 0",
+          "reorder_level": "INTEGER DEFAULT 10"
+        },
+        "foreign_keys": {
+          "product_id": "products(id)"
+        },
+        "record_count": 12
+      },
+      {
+        "table_name": "shipments",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "order_id": "INTEGER",
+          "carrier_id": "INTEGER",
+          "tracking_number": "VARCHAR(100)",
+          "shipping_method": "VARCHAR(50)",
+          "shipping_cost": "DECIMAL(10,2)",
+          "status": "VARCHAR(30) DEFAULT 'preparing'"
+        },
+        "foreign_keys": {
+          "order_id": "orders(id)",
+          "carrier_id": "shipping_carriers(id)"
+        },
+        "record_count": 30
+      }
+    ]
+  }
+}

@@ -1,0 +1,216 @@
+{
+  "company_analysis": {
+    "website": "https://www.ridehealth.com/",
+    "business_description": "RideHealth is a HIPAA-compliant healthcare transportation coordination platform that connects patients with a 50-state network of transportation partners for non-emergency medical transportation (NEMT). They coordinate rides across multiple transportation modes including rideshare, taxi, public transit, wheelchair-accessible vehicles, and ambulance services.",
+    "business_model": "B2B2C transportation coordination platform generating revenue through service fees from healthcare stakeholders and partnerships with transportation providers. They likely charge health plans, healthcare providers, and clinical trial organizations per trip or through subscription models.",
+    "target_customers": "Health Plans, Healthcare Providers, Hospitals, Life Sciences companies conducting clinical trials, Transportation Providers seeking to participate in medical transport network, and indirectly the patients who need medical transportation",
+    "key_features": [
+      "HIPAA compliant cloud-based platform",
+      "Real-time trip tracking",
+      "Automated ride assignment",
+      "Multi-modal transportation coordination",
+      "Billing and payment integration",
+      "50-state coverage network",
+      "COVID-19 patient transport support",
+      "Clinical trial participant transportation"
+    ],
+    "likely_data_needs": [
+      "Patient demographics and medical conditions",
+      "Healthcare facility information",
+      "Transportation provider network",
+      "Trip scheduling and tracking",
+      "Real-time vehicle location",
+      "Insurance and billing data",
+      "Driver credentials and certifications",
+      "Vehicle accessibility features"
+    ],
+    "industry": "Healthcare Technology - Transportation Coordination"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_GfUMVXuJ1n4p@ep-jolly-silence-aejn6ach-pooler.c-2.us-east-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+  "database_info": {
+    "project_id": "orange-leaf-77159501",
+    "database_name": "neondb",
+    "schema": [
+      {
+        "table_name": "patients",
+        "columns": {
+          "patient_id": "SERIAL PRIMARY KEY",
+          "first_name": "VARCHAR(100) NOT NULL",
+          "last_name": "VARCHAR(100) NOT NULL",
+          "date_of_birth": "DATE NOT NULL",
+          "phone_number": "VARCHAR(15)",
+          "email": "VARCHAR(255)",
+          "address_street": "VARCHAR(255)",
+          "address_city": "VARCHAR(100)",
+          "address_state": "VARCHAR(50)",
+          "address_zip": "VARCHAR(10)",
+          "emergency_contact_name": "VARCHAR(200)",
+          "emergency_contact_phone": "VARCHAR(15)",
+          "medical_record_number": "VARCHAR(50)",
+          "insurance_provider": "VARCHAR(100)",
+          "insurance_id": "VARCHAR(50)",
+          "mobility_requirements": "TEXT",
+          "medical_conditions": "TEXT"
+        },
+        "foreign_keys": {},
+        "record_count": 45
+      },
+      {
+        "table_name": "healthcare_facilities",
+        "columns": {
+          "facility_id": "SERIAL PRIMARY KEY",
+          "facility_name": "VARCHAR(200) NOT NULL",
+          "facility_type": "VARCHAR(50) NOT NULL",
+          "address_street": "VARCHAR(255) NOT NULL",
+          "address_city": "VARCHAR(100) NOT NULL",
+          "address_state": "VARCHAR(50) NOT NULL",
+          "address_zip": "VARCHAR(10) NOT NULL",
+          "phone_number": "VARCHAR(15)",
+          "contact_email": "VARCHAR(255)",
+          "wheelchair_accessible": "BOOLEAN DEFAULT true",
+          "operating_hours": "TEXT",
+          "is_active": "BOOLEAN DEFAULT true"
+        },
+        "foreign_keys": {},
+        "record_count": 25
+      },
+      {
+        "table_name": "transportation_providers",
+        "columns": {
+          "provider_id": "SERIAL PRIMARY KEY",
+          "provider_name": "VARCHAR(200) NOT NULL",
+          "provider_type": "VARCHAR(50) NOT NULL",
+          "contact_phone": "VARCHAR(15)",
+          "contact_email": "VARCHAR(255)",
+          "service_area_states": "TEXT[]",
+          "vehicle_types": "TEXT[]",
+          "wheelchair_accessible": "BOOLEAN DEFAULT false",
+          "stretcher_capable": "BOOLEAN DEFAULT false",
+          "accepts_medicaid": "BOOLEAN DEFAULT false",
+          "base_rate_per_mile": "DECIMAL(10,2)",
+          "base_rate_flat": "DECIMAL(10,2)",
+          "rating": "DECIMAL(3,2) DEFAULT 5.0",
+          "is_active": "BOOLEAN DEFAULT true"
+        },
+        "foreign_keys": {},
+        "record_count": 20
+      },
+      {
+        "table_name": "health_plans",
+        "columns": {
+          "plan_id": "SERIAL PRIMARY KEY",
+          "plan_name": "VARCHAR(200) NOT NULL",
+          "insurance_company": "VARCHAR(200) NOT NULL",
+          "plan_type": "VARCHAR(50)",
+          "coverage_states": "TEXT[]",
+          "transportation_benefit": "BOOLEAN DEFAULT false",
+          "max_trips_per_month": "INTEGER",
+          "max_miles_per_trip": "INTEGER",
+          "copay_amount": "DECIMAL(10,2) DEFAULT 0.00",
+          "prior_authorization_required": "BOOLEAN DEFAULT false"
+        },
+        "foreign_keys": {},
+        "record_count": 15
+      },
+      {
+        "table_name": "trips",
+        "columns": {
+          "trip_id": "SERIAL PRIMARY KEY",
+          "patient_id": "INTEGER REFERENCES patients(patient_id)",
+          "health_plan_id": "INTEGER REFERENCES health_plans(plan_id)",
+          "pickup_facility_id": "INTEGER REFERENCES healthcare_facilities(facility_id)",
+          "dropoff_facility_id": "INTEGER REFERENCES healthcare_facilities(facility_id)",
+          "scheduled_pickup_time": "TIMESTAMP NOT NULL",
+          "actual_pickup_time": "TIMESTAMP",
+          "scheduled_dropoff_time": "TIMESTAMP",
+          "actual_dropoff_time": "TIMESTAMP",
+          "trip_purpose": "VARCHAR(100)",
+          "trip_status": "VARCHAR(50) DEFAULT 'scheduled'",
+          "transportation_provider_id": "INTEGER REFERENCES transportation_providers(provider_id)",
+          "vehicle_type": "VARCHAR(50)",
+          "wheelchair_required": "BOOLEAN DEFAULT false",
+          "stretcher_required": "BOOLEAN DEFAULT false",
+          "attendant_required": "BOOLEAN DEFAULT false",
+          "estimated_distance_miles": "DECIMAL(10,2)",
+          "actual_distance_miles": "DECIMAL(10,2)",
+          "base_cost": "DECIMAL(10,2)",
+          "total_cost": "DECIMAL(10,2)",
+          "patient_copay": "DECIMAL(10,2) DEFAULT 0.00"
+        },
+        "foreign_keys": {
+          "patient_id": "patients.patient_id",
+          "health_plan_id": "health_plans.plan_id",
+          "pickup_facility_id": "healthcare_facilities.facility_id",
+          "dropoff_facility_id": "healthcare_facilities.facility_id",
+          "transportation_provider_id": "transportation_providers.provider_id"
+        },
+        "record_count": 31
+      },
+      {
+        "table_name": "trip_tracking",
+        "columns": {
+          "tracking_id": "SERIAL PRIMARY KEY",
+          "trip_id": "INTEGER REFERENCES trips(trip_id)",
+          "latitude": "DECIMAL(10, 8)",
+          "longitude": "DECIMAL(11, 8)",
+          "tracking_status": "VARCHAR(50)",
+          "timestamp": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "driver_notes": "TEXT"
+        },
+        "foreign_keys": {
+          "trip_id": "trips.trip_id"
+        },
+        "record_count": 27
+      },
+      {
+        "table_name": "billing_records",
+        "columns": {
+          "billing_id": "SERIAL PRIMARY KEY",
+          "trip_id": "INTEGER REFERENCES trips(trip_id)",
+          "health_plan_id": "INTEGER REFERENCES health_plans(plan_id)",
+          "transportation_provider_id": "INTEGER REFERENCES transportation_providers(provider_id)",
+          "invoice_number": "VARCHAR(100)",
+          "billing_date": "DATE DEFAULT CURRENT_DATE",
+          "service_date": "DATE NOT NULL",
+          "billed_amount": "DECIMAL(10,2) NOT NULL",
+          "approved_amount": "DECIMAL(10,2)",
+          "patient_responsibility": "DECIMAL(10,2) DEFAULT 0.00",
+          "payment_status": "VARCHAR(50) DEFAULT 'pending'",
+          "payment_date": "DATE",
+          "claim_number": "VARCHAR(100)"
+        },
+        "foreign_keys": {
+          "trip_id": "trips.trip_id",
+          "health_plan_id": "health_plans.plan_id",
+          "transportation_provider_id": "transportation_providers.provider_id"
+        },
+        "record_count": 15
+      },
+      {
+        "table_name": "drivers",
+        "columns": {
+          "driver_id": "SERIAL PRIMARY KEY",
+          "transportation_provider_id": "INTEGER REFERENCES transportation_providers(provider_id)",
+          "first_name": "VARCHAR(100) NOT NULL",
+          "last_name": "VARCHAR(100) NOT NULL",
+          "license_number": "VARCHAR(50) NOT NULL",
+          "phone_number": "VARCHAR(15)",
+          "email": "VARCHAR(255)",
+          "vehicle_make": "VARCHAR(50)",
+          "vehicle_model": "VARCHAR(50)",
+          "vehicle_year": "INTEGER",
+          "vehicle_license_plate": "VARCHAR(20)",
+          "wheelchair_accessible_vehicle": "BOOLEAN DEFAULT false",
+          "background_check_status": "VARCHAR(50) DEFAULT 'pending'",
+          "medical_transport_certified": "BOOLEAN DEFAULT false",
+          "cpr_certified": "BOOLEAN DEFAULT false",
+          "rating": "DECIMAL(3,2) DEFAULT 5.0"
+        },
+        "foreign_keys": {
+          "transportation_provider_id": "transportation_providers.provider_id"
+        },
+        "record_count": 20
+      }
+    ]
+  }
+}

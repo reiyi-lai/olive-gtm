@@ -1,0 +1,276 @@
+{
+  "company_analysis": {
+    "website": "https://loadsmart.com/",
+    "business_description": "LoadSmart is a digital logistics platform that provides comprehensive transportation and freight management solutions. They operate as both a freight broker and technology provider, offering AI-powered logistics intelligence through their FreightIntel AI platform and ShipperGuide TMS system.",
+    "business_model": "Technology-enabled freight brokerage with SaaS TMS platform. Revenue from freight transactions, managed transportation services, and software subscriptions. They leverage AI and machine learning to optimize pricing, capacity matching, and route optimization.",
+    "target_customers": "Shippers across various industries (Alcoa, Amazon, Halliburton), carriers seeking load optimization, and warehouses needing dock/yard management solutions. Focus on mid-to-large enterprises requiring scalable logistics solutions.",
+    "key_features": [
+      "Instant freight pricing and booking",
+      "Real-time tracking and visibility",
+      "AI-powered route optimization",
+      "Automated invoicing",
+      "Carrier network vetting",
+      "Dock and yard scheduling",
+      "Multimodal freight capabilities",
+      "FreightIntel AI analytics"
+    ],
+    "likely_data_needs": [
+      "Shipment tracking and management",
+      "Carrier performance analytics",
+      "Pricing and quote management",
+      "Invoice and billing processing",
+      "Equipment and fleet tracking",
+      "Facility and dock scheduling",
+      "Route optimization data",
+      "Customer and user management"
+    ],
+    "industry": "Transportation and Logistics Technology"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_Hr6pwnjT3MXz@ep-spring-flower-adtymvu6-pooler.c-2.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+  "database_info": {
+    "project_id": "jolly-snow-52110035",
+    "database_name": "neondb",
+    "schema": [
+      {
+        "table_name": "companies",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(255)",
+          "company_type": "VARCHAR(20)",
+          "email": "VARCHAR(255)",
+          "phone": "VARCHAR(20)",
+          "address_line1": "VARCHAR(255)",
+          "city": "VARCHAR(100)",
+          "state": "VARCHAR(50)",
+          "zip_code": "VARCHAR(20)",
+          "dot_number": "VARCHAR(20)",
+          "mc_number": "VARCHAR(20)",
+          "credit_score": "INTEGER",
+          "insurance_rating": "VARCHAR(10)"
+        },
+        "foreign_keys": {},
+        "record_count": 40
+      },
+      {
+        "table_name": "facilities",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "company_id": "INTEGER",
+          "name": "VARCHAR(255)",
+          "facility_type": "VARCHAR(50)",
+          "address_line1": "VARCHAR(255)",
+          "city": "VARCHAR(100)",
+          "state": "VARCHAR(50)",
+          "latitude": "DECIMAL(10,8)",
+          "longitude": "DECIMAL(11,8)",
+          "dock_count": "INTEGER",
+          "yard_capacity": "INTEGER"
+        },
+        "foreign_keys": {
+          "company_id": "companies(id)"
+        },
+        "record_count": 30
+      },
+      {
+        "table_name": "equipment_types",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(100)",
+          "description": "TEXT",
+          "max_weight": "INTEGER",
+          "max_length": "INTEGER",
+          "max_width": "INTEGER",
+          "max_height": "INTEGER"
+        },
+        "foreign_keys": {},
+        "record_count": 10
+      },
+      {
+        "table_name": "carrier_equipment",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "carrier_id": "INTEGER",
+          "equipment_type_id": "INTEGER",
+          "unit_number": "VARCHAR(50)",
+          "vin": "VARCHAR(50)",
+          "year": "INTEGER",
+          "make": "VARCHAR(50)",
+          "model": "VARCHAR(50)",
+          "status": "VARCHAR(20)",
+          "current_location_lat": "DECIMAL(10,8)",
+          "current_location_lng": "DECIMAL(11,8)"
+        },
+        "foreign_keys": {
+          "carrier_id": "companies(id)",
+          "equipment_type_id": "equipment_types(id)"
+        },
+        "record_count": 40
+      },
+      {
+        "table_name": "shipments",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "shipper_id": "INTEGER",
+          "carrier_id": "INTEGER",
+          "shipment_number": "VARCHAR(50)",
+          "service_type": "VARCHAR(20)",
+          "status": "VARCHAR(20)",
+          "origin_facility_id": "INTEGER",
+          "destination_facility_id": "INTEGER",
+          "pickup_date": "DATE",
+          "delivery_date": "DATE",
+          "total_weight": "INTEGER",
+          "total_pieces": "INTEGER",
+          "commodity": "VARCHAR(255)",
+          "temperature_controlled": "BOOLEAN",
+          "hazmat": "BOOLEAN"
+        },
+        "foreign_keys": {
+          "shipper_id": "companies(id)",
+          "carrier_id": "companies(id)",
+          "origin_facility_id": "facilities(id)",
+          "destination_facility_id": "facilities(id)"
+        },
+        "record_count": 120
+      },
+      {
+        "table_name": "loads",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "shipment_id": "INTEGER",
+          "load_number": "VARCHAR(50)",
+          "equipment_type_id": "INTEGER",
+          "assigned_equipment_id": "INTEGER",
+          "driver_name": "VARCHAR(255)",
+          "driver_phone": "VARCHAR(20)",
+          "load_status": "VARCHAR(20)",
+          "miles": "INTEGER",
+          "estimated_transit_time": "INTEGER"
+        },
+        "foreign_keys": {
+          "shipment_id": "shipments(id)",
+          "equipment_type_id": "equipment_types(id)",
+          "assigned_equipment_id": "carrier_equipment(id)"
+        },
+        "record_count": 100
+      },
+      {
+        "table_name": "shipment_quotes",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "shipment_id": "INTEGER",
+          "carrier_id": "INTEGER",
+          "quote_type": "VARCHAR(20)",
+          "base_rate": "DECIMAL(10,2)",
+          "fuel_surcharge": "DECIMAL(8,2)",
+          "accessorial_charges": "DECIMAL(8,2)",
+          "total_cost": "DECIMAL(10,2)",
+          "currency": "VARCHAR(5)",
+          "valid_until": "TIMESTAMP",
+          "accepted": "BOOLEAN"
+        },
+        "foreign_keys": {
+          "shipment_id": "shipments(id)",
+          "carrier_id": "companies(id)"
+        },
+        "record_count": 100
+      },
+      {
+        "table_name": "tracking_events",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "shipment_id": "INTEGER",
+          "load_id": "INTEGER",
+          "event_type": "VARCHAR(50)",
+          "event_description": "TEXT",
+          "location_name": "VARCHAR(255)",
+          "latitude": "DECIMAL(10,8)",
+          "longitude": "DECIMAL(11,8)",
+          "event_timestamp": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "shipment_id": "shipments(id)",
+          "load_id": "loads(id)"
+        },
+        "record_count": 220
+      },
+      {
+        "table_name": "invoices",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "shipment_id": "INTEGER",
+          "invoice_number": "VARCHAR(50)",
+          "from_company_id": "INTEGER",
+          "to_company_id": "INTEGER",
+          "invoice_date": "DATE",
+          "due_date": "DATE",
+          "subtotal": "DECIMAL(10,2)",
+          "tax_amount": "DECIMAL(8,2)",
+          "total_amount": "DECIMAL(10,2)",
+          "payment_status": "VARCHAR(20)",
+          "payment_date": "DATE"
+        },
+        "foreign_keys": {
+          "shipment_id": "shipments(id)",
+          "from_company_id": "companies(id)",
+          "to_company_id": "companies(id)"
+        },
+        "record_count": 60
+      },
+      {
+        "table_name": "lanes",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "origin_city": "VARCHAR(100)",
+          "origin_state": "VARCHAR(50)",
+          "destination_city": "VARCHAR(100)",
+          "destination_state": "VARCHAR(50)",
+          "distance_miles": "INTEGER",
+          "average_transit_days": "INTEGER",
+          "volume_last_30_days": "INTEGER",
+          "avg_rate_per_mile": "DECIMAL(8,2)"
+        },
+        "foreign_keys": {},
+        "record_count": 20
+      },
+      {
+        "table_name": "dock_appointments",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "facility_id": "INTEGER",
+          "shipment_id": "INTEGER",
+          "dock_number": "INTEGER",
+          "appointment_type": "VARCHAR(20)",
+          "scheduled_time": "TIMESTAMP",
+          "actual_arrival_time": "TIMESTAMP",
+          "actual_departure_time": "TIMESTAMP",
+          "status": "VARCHAR(20)",
+          "duration_minutes": "INTEGER"
+        },
+        "foreign_keys": {
+          "facility_id": "facilities(id)",
+          "shipment_id": "shipments(id)"
+        },
+        "record_count": 20
+      },
+      {
+        "table_name": "users",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "company_id": "INTEGER",
+          "email": "VARCHAR(255)",
+          "first_name": "VARCHAR(100)",
+          "last_name": "VARCHAR(100)",
+          "role": "VARCHAR(50)",
+          "phone": "VARCHAR(20)",
+          "active": "BOOLEAN",
+          "last_login": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "company_id": "companies(id)"
+        },
+        "record_count": 80
+      }
+    ]
+  }
+}

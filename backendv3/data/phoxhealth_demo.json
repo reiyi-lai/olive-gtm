@@ -1,0 +1,242 @@
+{
+  "company_analysis": {
+    "website": "https://phoxhealth.com/",
+    "business_description": "Phox Health is a tech-enabled healthcare logistics company that modernizes shipping logistics for healthcare organizations. They provide both software and managed courier services specifically designed for healthcare delivery, focusing on prescription medications, lab results, and medical supplies with HIPAA compliance and SOC 2 certification.",
+    "business_model": "Hybrid software + service model - they provide both the logistics management platform and the actual courier services. Revenue comes from delivery fees, technology licensing to health systems, and premium services like cold chain monitoring and specialized handling.",
+    "target_customers": "Major health systems (Kaiser Permanente, Ochsner, Trinity Health, Cleveland Clinic), specialty pharmacies, telehealth providers, hospital-at-home services, and healthcare organizations offering prescription delivery and medical logistics.",
+    "key_features": [
+      "99.4% first attempt delivery rate",
+      "90+ NPS score",
+      "HIPAA/SOC 2 compliant platform",
+      "Real-time tracking",
+      "Cold chain monitoring",
+      "Temperature-controlled transport",
+      "Controlled substance handling",
+      "White-label patient notifications",
+      "24/7 operations support"
+    ],
+    "likely_data_needs": [
+      "Health system partnerships",
+      "Patient delivery information",
+      "Courier network management",
+      "Medication inventory tracking",
+      "Real-time delivery tracking",
+      "Temperature monitoring",
+      "Patient feedback collection",
+      "Performance analytics",
+      "Exception handling",
+      "Regulatory compliance data"
+    ],
+    "industry": "Healthcare Technology / Medical Logistics"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_lrcFwCG78pQP@ep-noisy-forest-afllqigx-pooler.c-2.us-west-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+  "database_info": {
+    "project_id": "withered-lake-99682245",
+    "database_name": "neondb",
+    "schema": [
+      {
+        "table_name": "health_systems",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(255) NOT NULL",
+          "type": "VARCHAR(100) NOT NULL",
+          "address": "TEXT",
+          "city": "VARCHAR(100)",
+          "state": "VARCHAR(50)",
+          "zip_code": "VARCHAR(20)",
+          "contact_email": "VARCHAR(255)",
+          "contact_phone": "VARCHAR(50)",
+          "contract_start_date": "DATE",
+          "monthly_volume_estimate": "INTEGER",
+          "status": "VARCHAR(50) DEFAULT 'active'"
+        },
+        "foreign_keys": {},
+        "record_count": 15
+      },
+      {
+        "table_name": "pharmacies",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "health_system_id": "INTEGER REFERENCES health_systems(id)",
+          "name": "VARCHAR(255) NOT NULL",
+          "pharmacy_license_number": "VARCHAR(100) UNIQUE",
+          "address": "TEXT",
+          "operating_hours": "JSONB",
+          "specialty_services": "TEXT[]",
+          "cold_chain_capable": "BOOLEAN DEFAULT false"
+        },
+        "foreign_keys": {
+          "health_system_id": "health_systems(id)"
+        },
+        "record_count": 15
+      },
+      {
+        "table_name": "patients",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "patient_hash": "VARCHAR(255) UNIQUE",
+          "health_system_id": "INTEGER REFERENCES health_systems(id)",
+          "first_name_encrypted": "VARCHAR(255)",
+          "last_name_encrypted": "VARCHAR(255)",
+          "date_of_birth_encrypted": "VARCHAR(255)",
+          "preferred_delivery_time": "VARCHAR(100)",
+          "special_instructions": "TEXT",
+          "requires_refrigeration": "BOOLEAN DEFAULT false",
+          "mobility_assistance_needed": "BOOLEAN DEFAULT false"
+        },
+        "foreign_keys": {
+          "health_system_id": "health_systems(id)"
+        },
+        "record_count": 28
+      },
+      {
+        "table_name": "couriers",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "courier_company": "VARCHAR(255) NOT NULL",
+          "driver_name": "VARCHAR(255)",
+          "vehicle_type": "VARCHAR(100)",
+          "hipaa_certified": "BOOLEAN DEFAULT false",
+          "cold_chain_certified": "BOOLEAN DEFAULT false",
+          "service_areas": "TEXT[]",
+          "average_rating": "DECIMAL(3,2)",
+          "total_deliveries": "INTEGER DEFAULT 0",
+          "on_time_percentage": "DECIMAL(5,2)"
+        },
+        "foreign_keys": {},
+        "record_count": 24
+      },
+      {
+        "table_name": "medications",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(255) NOT NULL",
+          "generic_name": "VARCHAR(255)",
+          "ndc_number": "VARCHAR(50)",
+          "drug_class": "VARCHAR(100)",
+          "requires_refrigeration": "BOOLEAN DEFAULT false",
+          "controlled_substance_schedule": "INTEGER",
+          "high_value": "BOOLEAN DEFAULT false",
+          "storage_temperature_min": "INTEGER",
+          "storage_temperature_max": "INTEGER",
+          "special_handling_requirements": "TEXT[]"
+        },
+        "foreign_keys": {},
+        "record_count": 30
+      },
+      {
+        "table_name": "delivery_orders",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "order_number": "VARCHAR(100) UNIQUE NOT NULL",
+          "health_system_id": "INTEGER REFERENCES health_systems(id)",
+          "pharmacy_id": "INTEGER REFERENCES pharmacies(id)",
+          "patient_id": "INTEGER REFERENCES patients(id)",
+          "courier_id": "INTEGER REFERENCES couriers(id)",
+          "medication_id": "INTEGER REFERENCES medications(id)",
+          "order_type": "VARCHAR(100) NOT NULL",
+          "priority_level": "VARCHAR(50) DEFAULT 'standard'",
+          "temperature_controlled": "BOOLEAN DEFAULT false",
+          "order_status": "VARCHAR(100) DEFAULT 'pending'",
+          "delivery_attempt_count": "INTEGER DEFAULT 0"
+        },
+        "foreign_keys": {
+          "health_system_id": "health_systems(id)",
+          "pharmacy_id": "pharmacies(id)",
+          "patient_id": "patients(id)",
+          "courier_id": "couriers(id)",
+          "medication_id": "medications(id)"
+        },
+        "record_count": 36
+      },
+      {
+        "table_name": "delivery_tracking",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "delivery_order_id": "INTEGER REFERENCES delivery_orders(id)",
+          "latitude": "DECIMAL(10, 8)",
+          "longitude": "DECIMAL(11, 8)",
+          "tracking_status": "VARCHAR(100)",
+          "temperature_reading": "DECIMAL(5,2)",
+          "photo_url": "TEXT"
+        },
+        "foreign_keys": {
+          "delivery_order_id": "delivery_orders(id)"
+        },
+        "record_count": 25
+      },
+      {
+        "table_name": "delivery_feedback",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "delivery_order_id": "INTEGER REFERENCES delivery_orders(id)",
+          "patient_id": "INTEGER REFERENCES patients(id)",
+          "courier_id": "INTEGER REFERENCES couriers(id)",
+          "rating": "INTEGER CHECK (rating >= 1 AND rating <= 5)",
+          "nps_score": "INTEGER CHECK (nps_score >= 0 AND nps_score <= 10)",
+          "comments": "TEXT",
+          "would_recommend": "BOOLEAN"
+        },
+        "foreign_keys": {
+          "delivery_order_id": "delivery_orders(id)",
+          "patient_id": "patients(id)",
+          "courier_id": "couriers(id)"
+        },
+        "record_count": 33
+      },
+      {
+        "table_name": "temperature_logs",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "delivery_order_id": "INTEGER REFERENCES delivery_orders(id)",
+          "sensor_id": "VARCHAR(100)",
+          "temperature": "DECIMAL(5,2)",
+          "humidity": "DECIMAL(5,2)",
+          "location_type": "VARCHAR(50)",
+          "alert_triggered": "BOOLEAN DEFAULT false"
+        },
+        "foreign_keys": {
+          "delivery_order_id": "delivery_orders(id)"
+        },
+        "record_count": 38
+      },
+      {
+        "table_name": "system_notifications",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "delivery_order_id": "INTEGER REFERENCES delivery_orders(id)",
+          "health_system_id": "INTEGER REFERENCES health_systems(id)",
+          "notification_type": "VARCHAR(100)",
+          "recipient_type": "VARCHAR(50)",
+          "channel": "VARCHAR(50)",
+          "message_content": "TEXT",
+          "status": "VARCHAR(50) DEFAULT 'pending'"
+        },
+        "foreign_keys": {
+          "delivery_order_id": "delivery_orders(id)",
+          "health_system_id": "health_systems(id)"
+        },
+        "record_count": 25
+      },
+      {
+        "table_name": "delivery_analytics",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "date": "DATE NOT NULL",
+          "health_system_id": "INTEGER REFERENCES health_systems(id)",
+          "total_orders": "INTEGER DEFAULT 0",
+          "successful_deliveries": "INTEGER DEFAULT 0",
+          "first_attempt_success_rate": "DECIMAL(5,2)",
+          "average_delivery_time_minutes": "INTEGER",
+          "average_rating": "DECIMAL(3,2)",
+          "nps_score": "DECIMAL(5,2)",
+          "revenue_generated": "DECIMAL(12,2)"
+        },
+        "foreign_keys": {
+          "health_system_id": "health_systems(id)"
+        },
+        "record_count": 33
+      }
+    ]
+  }
+}

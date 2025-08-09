@@ -1,0 +1,346 @@
+{
+  "company_analysis": {
+    "website": "https://www.healthjoy.com/",
+    "business_description": "HealthJoy is a healthcare navigation platform that helps employees access healthcare services more efficiently through their 'Where Benefits Come to Life' platform. They provide virtual care services, benefits navigation, cost optimization, and care coordination to reduce healthcare costs and improve employee health outcomes.",
+    "business_model": "B2B SaaS platform serving employers, HR departments, TPAs, and benefits consultants. Revenue comes from annual contracts with companies who provide HealthJoy's platform to their employees as a healthcare benefit.",
+    "target_customers": "Mid to large employers (300-2500+ employees), Third-party administrators (TPAs), Benefits consultants, Companies seeking to optimize healthcare spending and improve employee satisfaction",
+    "key_features": [
+      "Connected Navigation Platform",
+      "Virtual Care (MSK, Urgent Care, Primary Care, Behavioral Health, Chronic Care)",
+      "Employee Assistance Programs (EAP)",
+      "Surgery Centers of Excellence",
+      "Benefits navigation and cost comparison",
+      "Provider search and appointment scheduling",
+      "Claims assistance and cost savings tracking"
+    ],
+    "likely_data_needs": [
+      "Employee health profiles and demographics",
+      "Benefits enrollment and plan management",
+      "Healthcare provider networks and ratings",
+      "Care navigation sessions and outcomes",
+      "Virtual appointment scheduling and records",
+      "Claims processing and cost analysis",
+      "Health assessments and biometric data",
+      "Cost savings tracking and ROI metrics",
+      "Behavioral health and EAP usage",
+      "Chronic care program management"
+    ],
+    "industry": "Healthcare Technology / Digital Health"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_i0yPCqsTI3bz@ep-rough-union-afzuc5an-pooler.c-2.us-west-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+  "database_info": {
+    "project_id": "blue-cherry-91515245",
+    "database_name": "neondb",
+    "schema": [
+      {
+        "table_name": "companies",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(255)",
+          "industry": "VARCHAR(100)",
+          "employee_count": "INTEGER",
+          "contract_start_date": "DATE",
+          "contract_end_date": "DATE",
+          "annual_contract_value": "DECIMAL(12,2)",
+          "account_manager": "VARCHAR(255)",
+          "status": "VARCHAR(50)"
+        },
+        "foreign_keys": {},
+        "record_count": 12
+      },
+      {
+        "table_name": "employees",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "company_id": "INTEGER",
+          "employee_id": "VARCHAR(100)",
+          "first_name": "VARCHAR(100)",
+          "last_name": "VARCHAR(100)",
+          "email": "VARCHAR(255)",
+          "phone": "VARCHAR(20)",
+          "date_of_birth": "DATE",
+          "gender": "VARCHAR(20)",
+          "department": "VARCHAR(100)",
+          "job_title": "VARCHAR(150)",
+          "hire_date": "DATE",
+          "is_active": "BOOLEAN"
+        },
+        "foreign_keys": {
+          "company_id": "companies(id)"
+        },
+        "record_count": 1000
+      },
+      {
+        "table_name": "health_profiles",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "employee_id": "INTEGER",
+          "height_inches": "INTEGER",
+          "weight_lbs": "INTEGER",
+          "blood_type": "VARCHAR(5)",
+          "allergies": "TEXT",
+          "chronic_conditions": "TEXT",
+          "medications": "TEXT",
+          "emergency_contact_name": "VARCHAR(255)",
+          "emergency_contact_phone": "VARCHAR(20)",
+          "primary_care_physician": "VARCHAR(255)",
+          "preferred_pharmacy": "VARCHAR(255)"
+        },
+        "foreign_keys": {
+          "employee_id": "employees(id)"
+        },
+        "record_count": 787
+      },
+      {
+        "table_name": "benefits_plans",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "company_id": "INTEGER",
+          "plan_name": "VARCHAR(255)",
+          "plan_type": "VARCHAR(100)",
+          "insurance_carrier": "VARCHAR(255)",
+          "monthly_premium": "DECIMAL(8,2)",
+          "deductible": "DECIMAL(8,2)",
+          "out_of_pocket_max": "DECIMAL(8,2)",
+          "copay_primary": "DECIMAL(6,2)",
+          "copay_specialist": "DECIMAL(6,2)",
+          "copay_urgent_care": "DECIMAL(6,2)",
+          "coverage_start_date": "DATE",
+          "coverage_end_date": "DATE",
+          "is_active": "BOOLEAN"
+        },
+        "foreign_keys": {
+          "company_id": "companies(id)"
+        },
+        "record_count": 16
+      },
+      {
+        "table_name": "employee_benefits",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "employee_id": "INTEGER",
+          "benefits_plan_id": "INTEGER",
+          "enrollment_date": "DATE",
+          "coverage_tier": "VARCHAR(50)",
+          "dependents_count": "INTEGER",
+          "monthly_contribution": "DECIMAL(8,2)",
+          "status": "VARCHAR(50)"
+        },
+        "foreign_keys": {
+          "employee_id": "employees(id)",
+          "benefits_plan_id": "benefits_plans(id)"
+        },
+        "record_count": 598
+      },
+      {
+        "table_name": "healthcare_providers",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(255)",
+          "specialty": "VARCHAR(150)",
+          "provider_type": "VARCHAR(100)",
+          "network_tier": "VARCHAR(50)",
+          "address": "TEXT",
+          "city": "VARCHAR(100)",
+          "state": "VARCHAR(50)",
+          "zip_code": "VARCHAR(20)",
+          "phone": "VARCHAR(20)",
+          "rating": "DECIMAL(3,2)",
+          "accepts_new_patients": "BOOLEAN",
+          "is_virtual": "BOOLEAN",
+          "cost_tier": "VARCHAR(50)"
+        },
+        "foreign_keys": {},
+        "record_count": 10
+      },
+      {
+        "table_name": "care_navigation_sessions",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "employee_id": "INTEGER",
+          "session_type": "VARCHAR(100)",
+          "issue_category": "VARCHAR(150)",
+          "issue_description": "TEXT",
+          "navigator_name": "VARCHAR(255)",
+          "session_start_time": "TIMESTAMP",
+          "session_end_time": "TIMESTAMP",
+          "resolution_status": "VARCHAR(50)",
+          "follow_up_required": "BOOLEAN",
+          "satisfaction_score": "INTEGER",
+          "cost_savings_estimated": "DECIMAL(10,2)"
+        },
+        "foreign_keys": {
+          "employee_id": "employees(id)"
+        },
+        "record_count": 400
+      },
+      {
+        "table_name": "virtual_appointments",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "employee_id": "INTEGER",
+          "provider_id": "INTEGER",
+          "appointment_type": "VARCHAR(100)",
+          "scheduled_date": "DATE",
+          "scheduled_time": "TIME",
+          "duration_minutes": "INTEGER",
+          "status": "VARCHAR(50)",
+          "chief_complaint": "TEXT",
+          "diagnosis": "TEXT",
+          "treatment_plan": "TEXT",
+          "prescription_issued": "BOOLEAN",
+          "follow_up_required": "BOOLEAN",
+          "cost": "DECIMAL(8,2)"
+        },
+        "foreign_keys": {
+          "employee_id": "employees(id)",
+          "provider_id": "healthcare_providers(id)"
+        },
+        "record_count": 300
+      },
+      {
+        "table_name": "health_claims",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "employee_id": "INTEGER",
+          "claim_number": "VARCHAR(100)",
+          "service_date": "DATE",
+          "provider_id": "INTEGER",
+          "service_type": "VARCHAR(150)",
+          "procedure_codes": "TEXT",
+          "billed_amount": "DECIMAL(10,2)",
+          "allowed_amount": "DECIMAL(10,2)",
+          "paid_amount": "DECIMAL(10,2)",
+          "patient_responsibility": "DECIMAL(10,2)",
+          "claim_status": "VARCHAR(50)",
+          "processed_date": "DATE"
+        },
+        "foreign_keys": {
+          "employee_id": "employees(id)",
+          "provider_id": "healthcare_providers(id)"
+        },
+        "record_count": 800
+      },
+      {
+        "table_name": "health_assessments",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "employee_id": "INTEGER",
+          "assessment_type": "VARCHAR(100)",
+          "assessment_date": "DATE",
+          "blood_pressure_systolic": "INTEGER",
+          "blood_pressure_diastolic": "INTEGER",
+          "cholesterol_total": "INTEGER",
+          "glucose_level": "INTEGER",
+          "bmi": "DECIMAL(4,2)",
+          "health_score": "INTEGER",
+          "risk_factors": "TEXT",
+          "recommendations": "TEXT"
+        },
+        "foreign_keys": {
+          "employee_id": "employees(id)"
+        },
+        "record_count": 500
+      },
+      {
+        "table_name": "cost_savings",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "employee_id": "INTEGER",
+          "company_id": "INTEGER",
+          "savings_category": "VARCHAR(150)",
+          "original_cost": "DECIMAL(10,2)",
+          "healthjoy_cost": "DECIMAL(10,2)",
+          "savings_amount": "DECIMAL(10,2)",
+          "savings_date": "DATE",
+          "description": "TEXT",
+          "verified": "BOOLEAN"
+        },
+        "foreign_keys": {
+          "employee_id": "employees(id)",
+          "company_id": "companies(id)"
+        },
+        "record_count": 255
+      },
+      {
+        "table_name": "behavioral_health_sessions",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "employee_id": "INTEGER",
+          "provider_id": "INTEGER",
+          "session_type": "VARCHAR(100)",
+          "session_date": "DATE",
+          "duration_minutes": "INTEGER",
+          "session_notes": "TEXT",
+          "progress_rating": "INTEGER",
+          "next_session_date": "DATE",
+          "status": "VARCHAR(50)"
+        },
+        "foreign_keys": {
+          "employee_id": "employees(id)",
+          "provider_id": "healthcare_providers(id)"
+        },
+        "record_count": 150
+      },
+      {
+        "table_name": "chronic_care_programs",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "employee_id": "INTEGER",
+          "program_name": "VARCHAR(255)",
+          "condition": "VARCHAR(150)",
+          "enrollment_date": "DATE",
+          "care_manager": "VARCHAR(255)",
+          "program_status": "VARCHAR(50)",
+          "goals": "TEXT",
+          "progress_metrics": "JSONB",
+          "last_contact_date": "DATE"
+        },
+        "foreign_keys": {
+          "employee_id": "employees(id)"
+        },
+        "record_count": 118
+      },
+      {
+        "table_name": "surgery_procedures",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "employee_id": "INTEGER",
+          "provider_id": "INTEGER",
+          "procedure_name": "VARCHAR(255)",
+          "procedure_code": "VARCHAR(50)",
+          "scheduled_date": "DATE",
+          "procedure_status": "VARCHAR(50)",
+          "estimated_cost": "DECIMAL(12,2)",
+          "actual_cost": "DECIMAL(12,2)",
+          "cost_savings": "DECIMAL(10,2)",
+          "quality_rating": "INTEGER",
+          "recovery_notes": "TEXT"
+        },
+        "foreign_keys": {
+          "employee_id": "employees(id)",
+          "provider_id": "healthcare_providers(id)"
+        },
+        "record_count": 80
+      },
+      {
+        "table_name": "eap_sessions",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "employee_id": "INTEGER",
+          "session_type": "VARCHAR(150)",
+          "issue_category": "VARCHAR(150)",
+          "session_date": "DATE",
+          "duration_minutes": "INTEGER",
+          "counselor_name": "VARCHAR(255)",
+          "follow_up_required": "BOOLEAN",
+          "satisfaction_rating": "INTEGER"
+        },
+        "foreign_keys": {
+          "employee_id": "employees(id)"
+        },
+        "record_count": 158
+      }
+    ]
+  }
+}

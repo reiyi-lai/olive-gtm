@@ -1,0 +1,270 @@
+{
+  "company_analysis": {
+    "website": "https://www.syncware.com/",
+    "business_description": "Syncware is a comprehensive e-commerce automation platform that streamlines multi-channel order management and integration for product brands. They provide automated synchronization between 200+ apps and platforms including marketplaces, shopping carts, 3PLs, warehouse systems, and ERPs.",
+    "business_model": "SaaS subscription platform with pricing based on order volume and system integrations. Revenue generated through monthly/annual subscriptions with tiered plans based on processing capacity.",
+    "target_customers": "Product brands, multi-channel e-commerce sellers, wholesale businesses, and companies processing significant order volumes (demonstrated capability of 4.5 million orders processed in 2024).",
+    "key_features": [
+      "Automated order processing across 200+ platforms",
+      "Multi-channel inventory synchronization",
+      "EDI support for enterprise clients",
+      "Wholesale marketplace integration (Faire, MarketTime partnerships)",
+      "Real-time data synchronization",
+      "Advanced data manipulation configurations"
+    ],
+    "likely_data_needs": [
+      "Customer account management",
+      "Product catalog with multi-channel listings",
+      "Order processing and fulfillment tracking",
+      "Inventory management across warehouses",
+      "Integration configuration and monitoring",
+      "API usage tracking and billing",
+      "Sync logs for troubleshooting",
+      "Webhook event management"
+    ],
+    "industry": "E-commerce Technology / SaaS"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_bsoflmBrcC75@ep-quiet-glade-aeiz3o14-pooler.c-2.us-east-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+  "database_info": {
+    "project_id": "shiny-scene-90806973",
+    "database_name": "neondb",
+    "schema": [
+      {
+        "table_name": "customers",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "company_name": "VARCHAR(255) NOT NULL",
+          "contact_name": "VARCHAR(255)",
+          "email": "VARCHAR(255) UNIQUE NOT NULL",
+          "phone": "VARCHAR(50)",
+          "address": "TEXT",
+          "city": "VARCHAR(100)",
+          "state": "VARCHAR(50)",
+          "zip_code": "VARCHAR(20)",
+          "country": "VARCHAR(100)",
+          "customer_type": "VARCHAR(50) DEFAULT 'retail'",
+          "subscription_plan": "VARCHAR(100)",
+          "monthly_order_limit": "INTEGER",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {},
+        "record_count": 50
+      },
+      {
+        "table_name": "integrations",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "customer_id": "INTEGER",
+          "integration_type": "VARCHAR(100) NOT NULL",
+          "platform_name": "VARCHAR(255) NOT NULL",
+          "api_endpoint": "VARCHAR(500)",
+          "auth_type": "VARCHAR(50)",
+          "is_active": "BOOLEAN DEFAULT true",
+          "sync_frequency": "VARCHAR(50) DEFAULT 'real-time'",
+          "last_sync_at": "TIMESTAMP",
+          "error_count": "INTEGER DEFAULT 0",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "customer_id": "REFERENCES customers(id)"
+        },
+        "record_count": 71
+      },
+      {
+        "table_name": "products",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "customer_id": "INTEGER",
+          "sku": "VARCHAR(255) NOT NULL",
+          "product_name": "VARCHAR(500) NOT NULL",
+          "description": "TEXT",
+          "category": "VARCHAR(255)",
+          "brand": "VARCHAR(255)",
+          "weight": "DECIMAL(10,2)",
+          "dimensions": "VARCHAR(100)",
+          "cost_price": "DECIMAL(10,2)",
+          "retail_price": "DECIMAL(10,2)",
+          "wholesale_price": "DECIMAL(10,2)",
+          "is_active": "BOOLEAN DEFAULT true",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "customer_id": "REFERENCES customers(id)"
+        },
+        "record_count": 65
+      },
+      {
+        "table_name": "inventory",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "product_id": "INTEGER",
+          "warehouse_location": "VARCHAR(255)",
+          "quantity_on_hand": "INTEGER DEFAULT 0",
+          "quantity_reserved": "INTEGER DEFAULT 0",
+          "quantity_available": "INTEGER GENERATED ALWAYS AS (quantity_on_hand - quantity_reserved) STORED",
+          "reorder_point": "INTEGER DEFAULT 10",
+          "max_stock_level": "INTEGER",
+          "last_count_date": "DATE",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "product_id": "REFERENCES products(id)"
+        },
+        "record_count": 65
+      },
+      {
+        "table_name": "orders",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "customer_id": "INTEGER",
+          "order_number": "VARCHAR(255) UNIQUE NOT NULL",
+          "channel": "VARCHAR(100) NOT NULL",
+          "order_status": "VARCHAR(50) DEFAULT 'pending'",
+          "order_date": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "ship_to_name": "VARCHAR(255)",
+          "ship_to_address": "TEXT",
+          "ship_to_city": "VARCHAR(100)",
+          "ship_to_state": "VARCHAR(50)",
+          "ship_to_zip": "VARCHAR(20)",
+          "ship_to_country": "VARCHAR(100)",
+          "subtotal": "DECIMAL(10,2)",
+          "tax_amount": "DECIMAL(10,2)",
+          "shipping_amount": "DECIMAL(10,2)",
+          "discount_amount": "DECIMAL(10,2) DEFAULT 0",
+          "total_amount": "DECIMAL(10,2)",
+          "payment_status": "VARCHAR(50) DEFAULT 'pending'",
+          "fulfillment_status": "VARCHAR(50) DEFAULT 'unfulfilled'",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "customer_id": "REFERENCES customers(id)"
+        },
+        "record_count": 40
+      },
+      {
+        "table_name": "order_items",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "order_id": "INTEGER",
+          "product_id": "INTEGER",
+          "quantity": "INTEGER NOT NULL",
+          "unit_price": "DECIMAL(10,2) NOT NULL",
+          "line_total": "DECIMAL(10,2) GENERATED ALWAYS AS (quantity * unit_price) STORED",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "order_id": "REFERENCES orders(id)",
+          "product_id": "REFERENCES products(id)"
+        },
+        "record_count": 60
+      },
+      {
+        "table_name": "shipments",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "order_id": "INTEGER",
+          "carrier": "VARCHAR(100)",
+          "service_type": "VARCHAR(100)",
+          "tracking_number": "VARCHAR(255)",
+          "shipping_cost": "DECIMAL(10,2)",
+          "ship_date": "DATE",
+          "estimated_delivery": "DATE",
+          "actual_delivery": "DATE",
+          "shipment_status": "VARCHAR(50) DEFAULT 'pending'",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "order_id": "REFERENCES orders(id)"
+        },
+        "record_count": 36
+      },
+      {
+        "table_name": "sync_logs",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "integration_id": "INTEGER",
+          "sync_type": "VARCHAR(100)",
+          "sync_direction": "VARCHAR(20)",
+          "record_count": "INTEGER",
+          "success_count": "INTEGER",
+          "error_count": "INTEGER",
+          "sync_status": "VARCHAR(50)",
+          "error_message": "TEXT",
+          "started_at": "TIMESTAMP",
+          "completed_at": "TIMESTAMP",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "integration_id": "REFERENCES integrations(id)"
+        },
+        "record_count": 30
+      },
+      {
+        "table_name": "marketplace_listings",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "product_id": "INTEGER",
+          "marketplace": "VARCHAR(100) NOT NULL",
+          "listing_id": "VARCHAR(255)",
+          "listing_title": "VARCHAR(500)",
+          "listing_price": "DECIMAL(10,2)",
+          "listing_status": "VARCHAR(50) DEFAULT 'active'",
+          "last_synced": "TIMESTAMP",
+          "sync_errors": "TEXT",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "product_id": "REFERENCES products(id)"
+        },
+        "record_count": 42
+      },
+      {
+        "table_name": "api_usage",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "customer_id": "INTEGER",
+          "integration_id": "INTEGER",
+          "endpoint": "VARCHAR(255)",
+          "method": "VARCHAR(10)",
+          "request_count": "INTEGER DEFAULT 1",
+          "response_time_ms": "INTEGER",
+          "status_code": "INTEGER",
+          "error_message": "TEXT",
+          "usage_date": "DATE DEFAULT CURRENT_DATE",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "customer_id": "REFERENCES customers(id)",
+          "integration_id": "REFERENCES integrations(id)"
+        },
+        "record_count": 43
+      },
+      {
+        "table_name": "webhooks",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "customer_id": "INTEGER",
+          "integration_id": "INTEGER",
+          "webhook_url": "VARCHAR(500) NOT NULL",
+          "event_type": "VARCHAR(100) NOT NULL",
+          "is_active": "BOOLEAN DEFAULT true",
+          "secret_key": "VARCHAR(255)",
+          "retry_count": "INTEGER DEFAULT 3",
+          "last_triggered": "TIMESTAMP",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "customer_id": "REFERENCES customers(id)",
+          "integration_id": "REFERENCES integrations(id)"
+        },
+        "record_count": 24
+      }
+    ]
+  }
+}

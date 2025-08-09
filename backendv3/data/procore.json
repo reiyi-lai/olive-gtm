@@ -1,0 +1,433 @@
+{
+  "company_analysis": {
+    "website": "https://www.procore.com/",
+    "business_description": "Procore is a comprehensive construction management software platform that unites all stakeholders on construction projects. They provide an integrated platform covering the entire construction lifecycle from preconstruction through project completion, serving general contractors, subcontractors, owners, and public agencies across multiple construction sectors including commercial, healthcare, education, infrastructure, and industrial projects.",
+    "business_model": "SaaS subscription model targeting construction companies with comprehensive project management tools, charging based on project size, user count, and feature tiers. Revenue comes from monthly/annual subscriptions, implementation services, and premium support packages.",
+    "target_customers": "General contractors, specialty subcontractors, construction owners, public agencies, and architecture/engineering firms across commercial, residential, infrastructure, healthcare, education, energy, and industrial construction sectors.",
+    "key_features": [
+      "Project Management",
+      "Bid Management",
+      "BIM Integration",
+      "Estimating",
+      "Quality & Safety Management",
+      "Resource Planning & Tracking",
+      "Equipment Management",
+      "Project Financials",
+      "Analytics & Reporting",
+      "Document Management",
+      "Daily Reports",
+      "RFI Management",
+      "Change Order Management",
+      "Inspection Management"
+    ],
+    "likely_data_needs": [
+      "Project tracking and scheduling",
+      "Subcontractor management",
+      "Cost tracking and budgeting",
+      "Document version control",
+      "Safety incident reporting",
+      "Equipment utilization",
+      "Daily progress reports",
+      "Quality inspections",
+      "Change order management",
+      "RFI workflow",
+      "Financial reporting",
+      "Resource allocation"
+    ],
+    "industry": "Construction Management Software / PropTech"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_wUWNu7dKvF2Q@ep-restless-smoke-adg14e1d-pooler.c-2.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+  "database_info": {
+    "project_id": "small-dust-05314651",
+    "database_name": "neondb",
+    "schema": [
+      {
+        "table_name": "companies",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(255) NOT NULL",
+          "company_type": "VARCHAR(50) NOT NULL",
+          "address": "TEXT",
+          "city": "VARCHAR(100)",
+          "state": "VARCHAR(50)",
+          "zip_code": "VARCHAR(20)",
+          "phone": "VARCHAR(20)",
+          "email": "VARCHAR(255)",
+          "website": "VARCHAR(255)",
+          "license_number": "VARCHAR(100)",
+          "insurance_expiry": "DATE",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {},
+        "record_count": 20
+      },
+      {
+        "table_name": "users",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "company_id": "INTEGER REFERENCES companies(id)",
+          "first_name": "VARCHAR(100) NOT NULL",
+          "last_name": "VARCHAR(100) NOT NULL",
+          "email": "VARCHAR(255) UNIQUE NOT NULL",
+          "role": "VARCHAR(50) NOT NULL",
+          "phone": "VARCHAR(20)",
+          "is_active": "BOOLEAN DEFAULT true",
+          "last_login": "TIMESTAMP",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "company_id": "companies(id)"
+        },
+        "record_count": 31
+      },
+      {
+        "table_name": "projects",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(255) NOT NULL",
+          "project_number": "VARCHAR(50) UNIQUE",
+          "owner_company_id": "INTEGER REFERENCES companies(id)",
+          "general_contractor_id": "INTEGER REFERENCES companies(id)",
+          "project_manager_id": "INTEGER REFERENCES users(id)",
+          "project_type": "VARCHAR(50)",
+          "status": "VARCHAR(30) DEFAULT 'planning'",
+          "start_date": "DATE",
+          "planned_completion_date": "DATE",
+          "actual_completion_date": "DATE",
+          "budget_amount": "DECIMAL(15,2)",
+          "contract_amount": "DECIMAL(15,2)",
+          "address": "TEXT",
+          "city": "VARCHAR(100)",
+          "state": "VARCHAR(50)",
+          "zip_code": "VARCHAR(20)",
+          "description": "TEXT",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "owner_company_id": "companies(id)",
+          "general_contractor_id": "companies(id)",
+          "project_manager_id": "users(id)"
+        },
+        "record_count": 18
+      },
+      {
+        "table_name": "project_phases",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "project_id": "INTEGER REFERENCES projects(id)",
+          "name": "VARCHAR(255) NOT NULL",
+          "description": "TEXT",
+          "planned_start_date": "DATE",
+          "planned_end_date": "DATE",
+          "actual_start_date": "DATE",
+          "actual_end_date": "DATE",
+          "status": "VARCHAR(30) DEFAULT 'not_started'",
+          "budget_amount": "DECIMAL(12,2)",
+          "phase_order": "INTEGER",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "project_id": "projects(id)"
+        },
+        "record_count": 30
+      },
+      {
+        "table_name": "bids",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "project_id": "INTEGER REFERENCES projects(id)",
+          "bidding_company_id": "INTEGER REFERENCES companies(id)",
+          "trade_category": "VARCHAR(100)",
+          "bid_amount": "DECIMAL(15,2)",
+          "status": "VARCHAR(30) DEFAULT 'submitted'",
+          "submission_date": "TIMESTAMP",
+          "bid_due_date": "TIMESTAMP",
+          "scope_description": "TEXT",
+          "bond_required": "BOOLEAN DEFAULT false",
+          "insurance_required": "BOOLEAN DEFAULT true",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "project_id": "projects(id)",
+          "bidding_company_id": "companies(id)"
+        },
+        "record_count": 24
+      },
+      {
+        "table_name": "subcontracts",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "project_id": "INTEGER REFERENCES projects(id)",
+          "subcontractor_id": "INTEGER REFERENCES companies(id)",
+          "bid_id": "INTEGER REFERENCES bids(id)",
+          "contract_number": "VARCHAR(100)",
+          "trade_category": "VARCHAR(100)",
+          "contract_amount": "DECIMAL(15,2)",
+          "status": "VARCHAR(30) DEFAULT 'draft'",
+          "start_date": "DATE",
+          "completion_date": "DATE",
+          "scope_of_work": "TEXT",
+          "payment_terms": "VARCHAR(100)",
+          "retention_percentage": "DECIMAL(5,2) DEFAULT 10.00",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "project_id": "projects(id)",
+          "subcontractor_id": "companies(id)",
+          "bid_id": "bids(id)"
+        },
+        "record_count": 22
+      },
+      {
+        "table_name": "tasks",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "project_id": "INTEGER REFERENCES projects(id)",
+          "phase_id": "INTEGER REFERENCES project_phases(id)",
+          "subcontract_id": "INTEGER REFERENCES subcontracts(id)",
+          "assigned_to_user_id": "INTEGER REFERENCES users(id)",
+          "title": "VARCHAR(255) NOT NULL",
+          "description": "TEXT",
+          "priority": "VARCHAR(20) DEFAULT 'medium'",
+          "status": "VARCHAR(30) DEFAULT 'not_started'",
+          "planned_start_date": "DATE",
+          "planned_end_date": "DATE",
+          "actual_start_date": "DATE",
+          "actual_end_date": "DATE",
+          "estimated_hours": "DECIMAL(8,2)",
+          "actual_hours": "DECIMAL(8,2)",
+          "completion_percentage": "INTEGER DEFAULT 0",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "project_id": "projects(id)",
+          "phase_id": "project_phases(id)",
+          "subcontract_id": "subcontracts(id)",
+          "assigned_to_user_id": "users(id)"
+        },
+        "record_count": 23
+      },
+      {
+        "table_name": "daily_reports",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "project_id": "INTEGER REFERENCES projects(id)",
+          "report_date": "DATE NOT NULL",
+          "reported_by_user_id": "INTEGER REFERENCES users(id)",
+          "weather_conditions": "VARCHAR(100)",
+          "temperature_high": "INTEGER",
+          "temperature_low": "INTEGER",
+          "work_performed": "TEXT",
+          "safety_incidents": "INTEGER DEFAULT 0",
+          "workers_on_site": "INTEGER",
+          "visitors_count": "INTEGER DEFAULT 0",
+          "delays_description": "TEXT",
+          "notes": "TEXT",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "project_id": "projects(id)",
+          "reported_by_user_id": "users(id)"
+        },
+        "record_count": 21
+      },
+      {
+        "table_name": "documents",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "project_id": "INTEGER REFERENCES projects(id)",
+          "task_id": "INTEGER REFERENCES tasks(id)",
+          "uploaded_by_user_id": "INTEGER REFERENCES users(id)",
+          "document_type": "VARCHAR(50)",
+          "title": "VARCHAR(255) NOT NULL",
+          "file_name": "VARCHAR(255)",
+          "file_path": "VARCHAR(500)",
+          "file_size_kb": "INTEGER",
+          "version": "VARCHAR(20) DEFAULT '1.0'",
+          "is_current_version": "BOOLEAN DEFAULT true",
+          "access_level": "VARCHAR(20) DEFAULT 'project'",
+          "tags": "TEXT[]",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "project_id": "projects(id)",
+          "task_id": "tasks(id)",
+          "uploaded_by_user_id": "users(id)"
+        },
+        "record_count": 10
+      },
+      {
+        "table_name": "inspections",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "project_id": "INTEGER REFERENCES projects(id)",
+          "task_id": "INTEGER REFERENCES tasks(id)",
+          "inspector_user_id": "INTEGER REFERENCES users(id)",
+          "inspection_type": "VARCHAR(50)",
+          "scheduled_date": "TIMESTAMP",
+          "completed_date": "TIMESTAMP",
+          "status": "VARCHAR(30) DEFAULT 'scheduled'",
+          "checklist_items": "JSONB",
+          "deficiencies_found": "INTEGER DEFAULT 0",
+          "notes": "TEXT",
+          "follow_up_required": "BOOLEAN DEFAULT false",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "project_id": "projects(id)",
+          "task_id": "tasks(id)",
+          "inspector_user_id": "users(id)"
+        },
+        "record_count": 8
+      },
+      {
+        "table_name": "project_costs",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "project_id": "INTEGER REFERENCES projects(id)",
+          "subcontract_id": "INTEGER REFERENCES subcontracts(id)",
+          "cost_category": "VARCHAR(50)",
+          "cost_type": "VARCHAR(30)",
+          "amount": "DECIMAL(12,2) NOT NULL",
+          "description": "VARCHAR(255)",
+          "cost_date": "DATE",
+          "invoice_number": "VARCHAR(100)",
+          "vendor": "VARCHAR(255)",
+          "approved_by_user_id": "INTEGER REFERENCES users(id)",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "project_id": "projects(id)",
+          "subcontract_id": "subcontracts(id)",
+          "approved_by_user_id": "users(id)"
+        },
+        "record_count": 21
+      },
+      {
+        "table_name": "change_orders",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "project_id": "INTEGER REFERENCES projects(id)",
+          "subcontract_id": "INTEGER REFERENCES subcontracts(id)",
+          "change_order_number": "VARCHAR(50)",
+          "title": "VARCHAR(255) NOT NULL",
+          "description": "TEXT",
+          "reason": "VARCHAR(100)",
+          "cost_impact": "DECIMAL(12,2)",
+          "schedule_impact_days": "INTEGER DEFAULT 0",
+          "status": "VARCHAR(30) DEFAULT 'draft'",
+          "requested_by_user_id": "INTEGER REFERENCES users(id)",
+          "approved_by_user_id": "INTEGER REFERENCES users(id)",
+          "requested_date": "DATE",
+          "approved_date": "DATE",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "project_id": "projects(id)",
+          "subcontract_id": "subcontracts(id)",
+          "requested_by_user_id": "users(id)",
+          "approved_by_user_id": "users(id)"
+        },
+        "record_count": 14
+      },
+      {
+        "table_name": "equipment",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "equipment_type": "VARCHAR(100) NOT NULL",
+          "make": "VARCHAR(100)",
+          "model": "VARCHAR(100)",
+          "year": "INTEGER",
+          "serial_number": "VARCHAR(100)",
+          "owner_company_id": "INTEGER REFERENCES companies(id)",
+          "status": "VARCHAR(30) DEFAULT 'available'",
+          "hourly_rate": "DECIMAL(8,2)",
+          "daily_rate": "DECIMAL(8,2)",
+          "maintenance_due_date": "DATE",
+          "last_inspection_date": "DATE",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "owner_company_id": "companies(id)"
+        },
+        "record_count": 20
+      },
+      {
+        "table_name": "equipment_usage",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "equipment_id": "INTEGER REFERENCES equipment(id)",
+          "project_id": "INTEGER REFERENCES projects(id)",
+          "operator_user_id": "INTEGER REFERENCES users(id)",
+          "usage_date": "DATE NOT NULL",
+          "start_time": "TIME",
+          "end_time": "TIME",
+          "hours_used": "DECIMAL(6,2)",
+          "fuel_consumed": "DECIMAL(8,2)",
+          "maintenance_notes": "TEXT",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "equipment_id": "equipment(id)",
+          "project_id": "projects(id)",
+          "operator_user_id": "users(id)"
+        },
+        "record_count": 26
+      },
+      {
+        "table_name": "rfis",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "project_id": "INTEGER REFERENCES projects(id)",
+          "rfi_number": "VARCHAR(50)",
+          "submitted_by_user_id": "INTEGER REFERENCES users(id)",
+          "assigned_to_user_id": "INTEGER REFERENCES users(id)",
+          "trade_category": "VARCHAR(100)",
+          "subject": "VARCHAR(255) NOT NULL",
+          "question": "TEXT NOT NULL",
+          "response": "TEXT",
+          "priority": "VARCHAR(20) DEFAULT 'medium'",
+          "status": "VARCHAR(30) DEFAULT 'open'",
+          "due_date": "DATE",
+          "submitted_date": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "response_date": "TIMESTAMP",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "project_id": "projects(id)",
+          "submitted_by_user_id": "users(id)",
+          "assigned_to_user_id": "users(id)"
+        },
+        "record_count": 11
+      },
+      {
+        "table_name": "safety_incidents",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "project_id": "INTEGER REFERENCES projects(id)",
+          "reported_by_user_id": "INTEGER REFERENCES users(id)",
+          "incident_date": "TIMESTAMP NOT NULL",
+          "incident_type": "VARCHAR(50)",
+          "severity": "VARCHAR(20)",
+          "location_description": "TEXT",
+          "description": "TEXT NOT NULL",
+          "injuries_count": "INTEGER DEFAULT 0",
+          "medical_attention_required": "BOOLEAN DEFAULT false",
+          "work_stopped": "BOOLEAN DEFAULT false",
+          "corrective_actions": "TEXT",
+          "investigation_completed": "BOOLEAN DEFAULT false",
+          "osha_reportable": "BOOLEAN DEFAULT false",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "project_id": "projects(id)",
+          "reported_by_user_id": "users(id)"
+        },
+        "record_count": 11
+      }
+    ]
+  }
+}

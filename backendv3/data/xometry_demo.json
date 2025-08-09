@@ -1,0 +1,223 @@
+{
+  "company_analysis": {
+    "website": "https://www.xometry.com/",
+    "business_description": "Xometry operates an AI-powered digital marketplace that connects manufacturers with buyers seeking production parts and prototypes. They digitize manufacturing supply chains by providing flexible, on-demand manufacturing capacity across multiple production technologies including CNC machining, 3D printing, sheet metal fabrication, injection molding, and die casting.",
+    "business_model": "Technology-enabled marketplace that acts as an intermediary between buyers and manufacturers. Revenue likely comes from transaction fees, premium services, and potentially subscription tiers for manufacturers and buyers.",
+    "target_customers": "Aerospace and Defense companies, Automotive manufacturers, Consumer Products companies, Design Agencies, Educational Institutions, Engineers and Product Designers",
+    "key_features": [
+      "AI-powered Instant Quoting Engine",
+      "Real-time part analysis and pricing",
+      "Global supplier network matching",
+      "Multiple manufacturing technologies",
+      "Rapid prototyping and high-volume production",
+      "Quality assurance and certification tracking"
+    ],
+    "likely_data_needs": [
+      "User profiles and company information",
+      "Manufacturer capabilities and certifications",
+      "Part specifications and CAD files",
+      "Pricing algorithms and quote data",
+      "Order tracking and fulfillment",
+      "Quality ratings and reviews",
+      "Material properties and availability",
+      "Production scheduling and capacity"
+    ],
+    "industry": "Manufacturing Technology / Industrial Marketplace"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_gEFht0cyTM1W@ep-winter-bonus-afn75iyc-pooler.c-2.us-west-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+  "database_info": {
+    "project_id": "small-union-96431065",
+    "database_name": "neondb",
+    "schema": [
+      {
+        "table_name": "users",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "email": "VARCHAR(255) UNIQUE NOT NULL",
+          "password_hash": "VARCHAR(255) NOT NULL",
+          "first_name": "VARCHAR(100) NOT NULL",
+          "last_name": "VARCHAR(100) NOT NULL",
+          "company_name": "VARCHAR(255)",
+          "phone": "VARCHAR(20)",
+          "account_type": "VARCHAR(20) CHECK (buyer/manufacturer/admin)",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "is_verified": "BOOLEAN DEFAULT FALSE",
+          "subscription_tier": "VARCHAR(20) CHECK (basic/professional/enterprise)"
+        },
+        "foreign_keys": {},
+        "record_count": 30
+      },
+      {
+        "table_name": "manufacturers",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "user_id": "INTEGER REFERENCES users(id)",
+          "company_name": "VARCHAR(255) NOT NULL",
+          "description": "TEXT",
+          "website": "VARCHAR(255)",
+          "address_line1": "VARCHAR(255)",
+          "city": "VARCHAR(100)",
+          "state": "VARCHAR(50)",
+          "country": "VARCHAR(100)",
+          "postal_code": "VARCHAR(20)",
+          "phone": "VARCHAR(20)",
+          "certification_iso9001": "BOOLEAN DEFAULT FALSE",
+          "certification_as9100": "BOOLEAN DEFAULT FALSE",
+          "certification_iso13485": "BOOLEAN DEFAULT FALSE",
+          "min_order_value": "DECIMAL(10,2)",
+          "lead_time_days_min": "INTEGER",
+          "lead_time_days_max": "INTEGER",
+          "rating": "DECIMAL(3,2) DEFAULT 0.00",
+          "total_orders": "INTEGER DEFAULT 0"
+        },
+        "foreign_keys": {
+          "user_id": "users(id)"
+        },
+        "record_count": 15
+      },
+      {
+        "table_name": "manufacturing_capabilities",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "manufacturer_id": "INTEGER REFERENCES manufacturers(id)",
+          "capability_type": "VARCHAR(50) CHECK (cnc_machining/3d_printing_plastic/3d_printing_metal/sheet_metal/injection_molding/die_casting/assembly/finishing)",
+          "material_types": "TEXT[]",
+          "max_part_size_x": "DECIMAL(10,2)",
+          "max_part_size_y": "DECIMAL(10,2)",
+          "max_part_size_z": "DECIMAL(10,2)",
+          "tolerance_capability": "VARCHAR(20)",
+          "surface_finish_options": "TEXT[]"
+        },
+        "foreign_keys": {
+          "manufacturer_id": "manufacturers(id)"
+        },
+        "record_count": 18
+      },
+      {
+        "table_name": "materials",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(100) NOT NULL UNIQUE",
+          "category": "VARCHAR(50) CHECK (metal/plastic/ceramic/composite)",
+          "properties": "JSONB",
+          "density": "DECIMAL(8,4)",
+          "tensile_strength": "DECIMAL(10,2)",
+          "yield_strength": "DECIMAL(10,2)",
+          "hardness": "VARCHAR(20)",
+          "temperature_resistance_max": "DECIMAL(6,2)",
+          "cost_per_kg": "DECIMAL(8,2)",
+          "availability_score": "INTEGER CHECK (1-10)"
+        },
+        "foreign_keys": {},
+        "record_count": 20
+      },
+      {
+        "table_name": "projects",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "user_id": "INTEGER REFERENCES users(id)",
+          "project_name": "VARCHAR(255) NOT NULL",
+          "description": "TEXT",
+          "part_name": "VARCHAR(255)",
+          "quantity": "INTEGER NOT NULL",
+          "material": "VARCHAR(100)",
+          "manufacturing_process": "VARCHAR(50)",
+          "tolerance_requirements": "VARCHAR(100)",
+          "surface_finish": "VARCHAR(100)",
+          "file_formats": "TEXT[]",
+          "cad_file_url": "VARCHAR(500)",
+          "status": "VARCHAR(20) CHECK (draft/quoted/in_production/completed/cancelled)",
+          "target_delivery_date": "DATE"
+        },
+        "foreign_keys": {
+          "user_id": "users(id)"
+        },
+        "record_count": 15
+      },
+      {
+        "table_name": "quotes",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "project_id": "INTEGER REFERENCES projects(id)",
+          "manufacturer_id": "INTEGER REFERENCES manufacturers(id)",
+          "unit_price": "DECIMAL(10,2) NOT NULL",
+          "total_price": "DECIMAL(12,2) NOT NULL",
+          "lead_time_days": "INTEGER NOT NULL",
+          "valid_until": "DATE NOT NULL",
+          "material_cost": "DECIMAL(10,2)",
+          "labor_cost": "DECIMAL(10,2)",
+          "overhead_cost": "DECIMAL(10,2)",
+          "notes": "TEXT",
+          "status": "VARCHAR(20) CHECK (pending/accepted/rejected/expired)",
+          "quoted_at": "TIMESTAMP",
+          "responded_at": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "project_id": "projects(id)",
+          "manufacturer_id": "manufacturers(id)"
+        },
+        "record_count": 18
+      },
+      {
+        "table_name": "orders",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "project_id": "INTEGER REFERENCES projects(id)",
+          "quote_id": "INTEGER REFERENCES quotes(id)",
+          "manufacturer_id": "INTEGER REFERENCES manufacturers(id)",
+          "user_id": "INTEGER REFERENCES users(id)",
+          "order_number": "VARCHAR(50) UNIQUE NOT NULL",
+          "total_amount": "DECIMAL(12,2) NOT NULL",
+          "status": "VARCHAR(20) CHECK (placed/confirmed/in_production/quality_check/shipped/delivered/cancelled)",
+          "payment_status": "VARCHAR(20) CHECK (pending/authorized/captured/refunded/failed)",
+          "expected_delivery_date": "DATE",
+          "actual_delivery_date": "DATE",
+          "tracking_number": "VARCHAR(100)"
+        },
+        "foreign_keys": {
+          "project_id": "projects(id)",
+          "quote_id": "quotes(id)",
+          "manufacturer_id": "manufacturers(id)",
+          "user_id": "users(id)"
+        },
+        "record_count": 9
+      },
+      {
+        "table_name": "order_tracking",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "order_id": "INTEGER REFERENCES orders(id)",
+          "status": "VARCHAR(50) NOT NULL",
+          "notes": "TEXT",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "created_by": "INTEGER REFERENCES users(id)"
+        },
+        "foreign_keys": {
+          "order_id": "orders(id)",
+          "created_by": "users(id)"
+        },
+        "record_count": 38
+      },
+      {
+        "table_name": "reviews",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "order_id": "INTEGER REFERENCES orders(id)",
+          "user_id": "INTEGER REFERENCES users(id)",
+          "manufacturer_id": "INTEGER REFERENCES manufacturers(id)",
+          "rating": "INTEGER CHECK (1-5)",
+          "quality_rating": "INTEGER CHECK (1-5)",
+          "delivery_rating": "INTEGER CHECK (1-5)",
+          "communication_rating": "INTEGER CHECK (1-5)",
+          "review_text": "TEXT"
+        },
+        "foreign_keys": {
+          "order_id": "orders(id)",
+          "user_id": "users(id)",
+          "manufacturer_id": "manufacturers(id)"
+        },
+        "record_count": 4
+      }
+    ]
+  }
+}

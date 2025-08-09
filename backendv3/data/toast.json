@@ -1,0 +1,320 @@
+{
+  "company_analysis": {
+    "website": "https://pos.toasttab.com/",
+    "business_description": "Toast is a comprehensive cloud-based restaurant point-of-sale and management system that helps restaurants improve operations, increase sales, and create better guest experiences. They provide an all-in-one platform including POS terminals, online ordering, delivery management, payroll processing, inventory management, customer engagement, and analytics for restaurants of all sizes.",
+    "business_model": "SaaS subscription model with hardware sales. Revenue streams include: monthly software subscriptions ($79+ per terminal), hardware sales ($899+ upfront), payment processing fees (avg $0.15 + 1.8% per transaction), installation services ($499), and additional services like Toast Capital lending. They use a 'land and expand' strategy, starting with POS then adding modules.",
+    "target_customers": "Small to medium-sized restaurants, including independent restaurants, restaurant chains, quick-service restaurants, full-service dining establishments, bars, cafes, and food trucks. Over 120,000 US restaurants currently use Toast, representing 21% of the restaurant market.",
+    "key_features": [
+      "Point of Sale Systems",
+      "Online Ordering & Delivery",
+      "Kitchen Display Systems",
+      "Inventory Management",
+      "Payroll & Employee Management",
+      "Customer Loyalty Programs",
+      "Sales Analytics & Reporting",
+      "Multi-location Management",
+      "Payment Processing",
+      "Table Management"
+    ],
+    "likely_data_needs": [
+      "Order transactions and history",
+      "Menu items and pricing",
+      "Customer information and loyalty data",
+      "Employee schedules and payroll",
+      "Inventory tracking and costs",
+      "Sales analytics and reporting",
+      "Table management and reservations",
+      "Payment processing records",
+      "Supplier and vendor information",
+      "Multi-location restaurant data"
+    ],
+    "industry": "Restaurant Technology / Point of Sale Systems"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_ic86pfrOCgWm@ep-lively-star-aev83e01-pooler.c-2.us-east-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+  "database_info": {
+    "project_id": "gentle-waterfall-75443963",
+    "database_name": "neondb",
+    "schema": [
+      {
+        "table_name": "restaurants",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(255)",
+          "address": "TEXT",
+          "city": "VARCHAR(100)",
+          "state": "VARCHAR(50)",
+          "zip_code": "VARCHAR(20)",
+          "phone": "VARCHAR(20)",
+          "email": "VARCHAR(255)",
+          "timezone": "VARCHAR(50)",
+          "created_at": "TIMESTAMP",
+          "is_active": "BOOLEAN"
+        },
+        "foreign_keys": {},
+        "record_count": 5
+      },
+      {
+        "table_name": "employees",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "restaurant_id": "INTEGER",
+          "employee_id": "VARCHAR(50)",
+          "first_name": "VARCHAR(100)",
+          "last_name": "VARCHAR(100)",
+          "email": "VARCHAR(255)",
+          "phone": "VARCHAR(20)",
+          "role": "VARCHAR(50)",
+          "hourly_wage": "DECIMAL(10,2)",
+          "hire_date": "DATE",
+          "is_active": "BOOLEAN",
+          "pin_code": "VARCHAR(10)",
+          "created_at": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "restaurant_id": "restaurants(id)"
+        },
+        "record_count": 20
+      },
+      {
+        "table_name": "tables",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "restaurant_id": "INTEGER",
+          "table_number": "VARCHAR(20)",
+          "section": "VARCHAR(50)",
+          "seats": "INTEGER",
+          "is_active": "BOOLEAN"
+        },
+        "foreign_keys": {
+          "restaurant_id": "restaurants(id)"
+        },
+        "record_count": 40
+      },
+      {
+        "table_name": "menu_categories",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "restaurant_id": "INTEGER",
+          "name": "VARCHAR(255)",
+          "description": "TEXT",
+          "sort_order": "INTEGER",
+          "is_active": "BOOLEAN"
+        },
+        "foreign_keys": {
+          "restaurant_id": "restaurants(id)"
+        },
+        "record_count": 23
+      },
+      {
+        "table_name": "menu_items",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "restaurant_id": "INTEGER",
+          "category_id": "INTEGER",
+          "name": "VARCHAR(255)",
+          "description": "TEXT",
+          "price": "DECIMAL(10,2)",
+          "cost": "DECIMAL(10,2)",
+          "calories": "INTEGER",
+          "prep_time_minutes": "INTEGER",
+          "is_active": "BOOLEAN",
+          "created_at": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "restaurant_id": "restaurants(id)",
+          "category_id": "menu_categories(id)"
+        },
+        "record_count": 38
+      },
+      {
+        "table_name": "modifiers",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "restaurant_id": "INTEGER",
+          "name": "VARCHAR(255)",
+          "price": "DECIMAL(10,2)",
+          "is_active": "BOOLEAN"
+        },
+        "foreign_keys": {
+          "restaurant_id": "restaurants(id)"
+        },
+        "record_count": 18
+      },
+      {
+        "table_name": "orders",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "restaurant_id": "INTEGER",
+          "order_number": "VARCHAR(50)",
+          "table_id": "INTEGER",
+          "employee_id": "INTEGER",
+          "order_type": "VARCHAR(20)",
+          "status": "VARCHAR(20)",
+          "subtotal": "DECIMAL(10,2)",
+          "tax_amount": "DECIMAL(10,2)",
+          "tip_amount": "DECIMAL(10,2)",
+          "total_amount": "DECIMAL(10,2)",
+          "customer_name": "VARCHAR(255)",
+          "customer_phone": "VARCHAR(20)",
+          "customer_email": "VARCHAR(255)",
+          "special_instructions": "TEXT",
+          "created_at": "TIMESTAMP",
+          "completed_at": "TIMESTAMP",
+          "paid_at": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "restaurant_id": "restaurants(id)",
+          "table_id": "tables(id)",
+          "employee_id": "employees(id)"
+        },
+        "record_count": 20
+      },
+      {
+        "table_name": "order_items",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "order_id": "INTEGER",
+          "menu_item_id": "INTEGER",
+          "quantity": "INTEGER",
+          "unit_price": "DECIMAL(10,2)",
+          "total_price": "DECIMAL(10,2)",
+          "special_instructions": "TEXT",
+          "status": "VARCHAR(20)"
+        },
+        "foreign_keys": {
+          "order_id": "orders(id)",
+          "menu_item_id": "menu_items(id)"
+        },
+        "record_count": 45
+      },
+      {
+        "table_name": "payments",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "order_id": "INTEGER",
+          "payment_method": "VARCHAR(50)",
+          "amount": "DECIMAL(10,2)",
+          "tip_amount": "DECIMAL(10,2)",
+          "transaction_id": "VARCHAR(255)",
+          "card_last_four": "VARCHAR(4)",
+          "payment_processor": "VARCHAR(50)",
+          "processed_at": "TIMESTAMP",
+          "status": "VARCHAR(20)"
+        },
+        "foreign_keys": {
+          "order_id": "orders(id)"
+        },
+        "record_count": 20
+      },
+      {
+        "table_name": "customers",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "first_name": "VARCHAR(100)",
+          "last_name": "VARCHAR(100)",
+          "email": "VARCHAR(255)",
+          "phone": "VARCHAR(20)",
+          "birthday": "DATE",
+          "loyalty_points": "INTEGER",
+          "total_spent": "DECIMAL(10,2)",
+          "visit_count": "INTEGER",
+          "last_visit": "DATE",
+          "created_at": "TIMESTAMP",
+          "is_active": "BOOLEAN"
+        },
+        "foreign_keys": {},
+        "record_count": 10
+      },
+      {
+        "table_name": "inventory_items",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "restaurant_id": "INTEGER",
+          "name": "VARCHAR(255)",
+          "category": "VARCHAR(100)",
+          "unit_of_measure": "VARCHAR(20)",
+          "current_stock": "DECIMAL(10,2)",
+          "min_stock_level": "DECIMAL(10,2)",
+          "max_stock_level": "DECIMAL(10,2)",
+          "unit_cost": "DECIMAL(10,2)",
+          "supplier_name": "VARCHAR(255)",
+          "last_updated": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "restaurant_id": "restaurants(id)"
+        },
+        "record_count": 18
+      },
+      {
+        "table_name": "suppliers",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(255)",
+          "contact_name": "VARCHAR(255)",
+          "email": "VARCHAR(255)",
+          "phone": "VARCHAR(20)",
+          "address": "TEXT",
+          "payment_terms": "VARCHAR(100)",
+          "is_active": "BOOLEAN"
+        },
+        "foreign_keys": {},
+        "record_count": 10
+      },
+      {
+        "table_name": "employee_schedules",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "employee_id": "INTEGER",
+          "schedule_date": "DATE",
+          "shift_start": "TIME",
+          "shift_end": "TIME",
+          "position": "VARCHAR(50)",
+          "status": "VARCHAR(20)"
+        },
+        "foreign_keys": {
+          "employee_id": "employees(id)"
+        },
+        "record_count": 19
+      },
+      {
+        "table_name": "time_punches",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "employee_id": "INTEGER",
+          "punch_date": "DATE",
+          "clock_in": "TIME",
+          "clock_out": "TIME",
+          "break_minutes": "INTEGER",
+          "total_hours": "DECIMAL(4,2)",
+          "hourly_rate": "DECIMAL(10,2)",
+          "tips_earned": "DECIMAL(10,2)"
+        },
+        "foreign_keys": {
+          "employee_id": "employees(id)"
+        },
+        "record_count": 16
+      },
+      {
+        "table_name": "daily_sales",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "restaurant_id": "INTEGER",
+          "sales_date": "DATE",
+          "total_orders": "INTEGER",
+          "gross_sales": "DECIMAL(10,2)",
+          "net_sales": "DECIMAL(10,2)",
+          "total_tips": "DECIMAL(10,2)",
+          "total_tax": "DECIMAL(10,2)",
+          "cash_sales": "DECIMAL(10,2)",
+          "card_sales": "DECIMAL(10,2)",
+          "refunds": "DECIMAL(10,2)",
+          "average_order_value": "DECIMAL(10,2)"
+        },
+        "foreign_keys": {
+          "restaurant_id": "restaurants(id)"
+        },
+        "record_count": 12
+      }
+    ]
+  }
+}

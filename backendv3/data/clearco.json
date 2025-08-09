@@ -1,0 +1,253 @@
+{
+  "company_analysis": {
+    "website": "https://clear.co/",
+    "business_description": "Clearco provides non-dilutive working capital funding for ecommerce businesses through invoice and receipt financing. They help online merchants manage cash flow without giving up equity by advancing funds against outstanding invoices and future receipts.",
+    "business_model": "Revenue-based financing - generates income through fees on advances (typically 7-9.25% of advanced amount) with capped weekly repayments based on merchant revenue",
+    "target_customers": "Ecommerce businesses with 12+ months of operation, $10,000+ monthly revenue, US incorporation, and presence on platforms like Shopify, Amazon, BigCommerce, Square, Stripe, PayPal",
+    "key_features": [
+      "24-hour invoice processing",
+      "No personal guarantees",
+      "No collateral required",
+      "Capped weekly repayments",
+      "Revenue-based underwriting",
+      "Multi-platform integration"
+    ],
+    "likely_data_needs": [
+      "Merchant financial data",
+      "Revenue tracking across platforms",
+      "Invoice and receipt management",
+      "Risk assessment metrics",
+      "Repayment tracking",
+      "Platform integration data",
+      "Underwriting documentation"
+    ],
+    "industry": "Financial Technology (FinTech) - Alternative Business Lending"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_i6Agtcom5znO@ep-little-thunder-afs8of00-pooler.c-2.us-west-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+  "database_info": {
+    "project_id": "plain-glitter-90243576",
+    "database_name": "neondb",
+    "schema": [
+      {
+        "table_name": "merchants",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "business_name": "VARCHAR(255)",
+          "legal_name": "VARCHAR(255)",
+          "email": "VARCHAR(255) UNIQUE",
+          "phone": "VARCHAR(20)",
+          "website_url": "VARCHAR(500)",
+          "industry": "VARCHAR(100)",
+          "ecommerce_platform": "VARCHAR(50)",
+          "monthly_revenue": "DECIMAL(12,2)",
+          "business_age_months": "INTEGER",
+          "incorporation_state": "VARCHAR(2)",
+          "tax_id": "VARCHAR(20)",
+          "bank_account_verified": "BOOLEAN",
+          "credit_score": "INTEGER",
+          "risk_score": "DECIMAL(5,2)",
+          "status": "VARCHAR(20)",
+          "created_at": "TIMESTAMP",
+          "updated_at": "TIMESTAMP"
+        },
+        "foreign_keys": {},
+        "record_count": 20
+      },
+      {
+        "table_name": "funding_applications",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "merchant_id": "INTEGER",
+          "application_type": "VARCHAR(50)",
+          "requested_amount": "DECIMAL(12,2)",
+          "purpose": "VARCHAR(100)",
+          "status": "VARCHAR(30)",
+          "approved_amount": "DECIMAL(12,2)",
+          "approval_date": "TIMESTAMP",
+          "rejection_reason": "TEXT",
+          "underwriter_notes": "TEXT",
+          "created_at": "TIMESTAMP",
+          "updated_at": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "merchant_id": "merchants(id)"
+        },
+        "record_count": 20
+      },
+      {
+        "table_name": "funding_offers",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "application_id": "INTEGER",
+          "merchant_id": "INTEGER",
+          "offer_amount": "DECIMAL(12,2)",
+          "fee_rate": "DECIMAL(5,4)",
+          "total_repayment": "DECIMAL(12,2)",
+          "weekly_cap_percentage": "DECIMAL(5,2)",
+          "estimated_term_weeks": "INTEGER",
+          "status": "VARCHAR(20)",
+          "expires_at": "TIMESTAMP",
+          "accepted_at": "TIMESTAMP",
+          "created_at": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "application_id": "funding_applications(id)",
+          "merchant_id": "merchants(id)"
+        },
+        "record_count": 19
+      },
+      {
+        "table_name": "invoices",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "merchant_id": "INTEGER",
+          "invoice_number": "VARCHAR(100)",
+          "customer_name": "VARCHAR(255)",
+          "invoice_amount": "DECIMAL(12,2)",
+          "invoice_date": "DATE",
+          "due_date": "DATE",
+          "payment_status": "VARCHAR(20)",
+          "payment_date": "DATE",
+          "financing_requested": "BOOLEAN",
+          "financing_approved": "BOOLEAN",
+          "advance_amount": "DECIMAL(12,2)",
+          "advance_date": "TIMESTAMP",
+          "fee_amount": "DECIMAL(10,2)",
+          "created_at": "TIMESTAMP",
+          "updated_at": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "merchant_id": "merchants(id)"
+        },
+        "record_count": 20
+      },
+      {
+        "table_name": "receipts",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "merchant_id": "INTEGER",
+          "receipt_number": "VARCHAR(100)",
+          "transaction_date": "DATE",
+          "amount": "DECIMAL(12,2)",
+          "payment_method": "VARCHAR(50)",
+          "customer_email": "VARCHAR(255)",
+          "product_category": "VARCHAR(100)",
+          "platform": "VARCHAR(50)",
+          "financing_eligible": "BOOLEAN",
+          "advance_requested": "BOOLEAN",
+          "advance_amount": "DECIMAL(12,2)",
+          "advance_date": "TIMESTAMP",
+          "fee_amount": "DECIMAL(10,2)",
+          "created_at": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "merchant_id": "merchants(id)"
+        },
+        "record_count": 20
+      },
+      {
+        "table_name": "repayments",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "merchant_id": "INTEGER",
+          "offer_id": "INTEGER",
+          "payment_date": "DATE",
+          "amount": "DECIMAL(12,2)",
+          "payment_method": "VARCHAR(50)",
+          "week_number": "INTEGER",
+          "is_automatic": "BOOLEAN",
+          "transaction_id": "VARCHAR(100)",
+          "status": "VARCHAR(20)",
+          "created_at": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "merchant_id": "merchants(id)",
+          "offer_id": "funding_offers(id)"
+        },
+        "record_count": 20
+      },
+      {
+        "table_name": "merchant_integrations",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "merchant_id": "INTEGER",
+          "platform_name": "VARCHAR(50)",
+          "integration_status": "VARCHAR(20)",
+          "api_key_last_4": "VARCHAR(4)",
+          "last_sync_at": "TIMESTAMP",
+          "sync_status": "VARCHAR(20)",
+          "revenue_sync_enabled": "BOOLEAN",
+          "created_at": "TIMESTAMP",
+          "updated_at": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "merchant_id": "merchants(id)"
+        },
+        "record_count": 29
+      },
+      {
+        "table_name": "revenue_data",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "merchant_id": "INTEGER",
+          "integration_id": "INTEGER",
+          "date": "DATE",
+          "gross_revenue": "DECIMAL(12,2)",
+          "net_revenue": "DECIMAL(12,2)",
+          "order_count": "INTEGER",
+          "average_order_value": "DECIMAL(10,2)",
+          "refund_amount": "DECIMAL(12,2)",
+          "chargeback_amount": "DECIMAL(12,2)",
+          "platform": "VARCHAR(50)",
+          "created_at": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "merchant_id": "merchants(id)",
+          "integration_id": "merchant_integrations(id)"
+        },
+        "record_count": 30
+      },
+      {
+        "table_name": "underwriting_documents",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "merchant_id": "INTEGER",
+          "application_id": "INTEGER",
+          "document_type": "VARCHAR(50)",
+          "document_name": "VARCHAR(255)",
+          "file_path": "VARCHAR(500)",
+          "upload_date": "TIMESTAMP",
+          "verification_status": "VARCHAR(20)",
+          "verified_date": "TIMESTAMP",
+          "verified_by": "VARCHAR(100)"
+        },
+        "foreign_keys": {
+          "merchant_id": "merchants(id)",
+          "application_id": "funding_applications(id)"
+        },
+        "record_count": 10
+      },
+      {
+        "table_name": "risk_assessments",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "merchant_id": "INTEGER",
+          "assessment_date": "DATE",
+          "revenue_stability_score": "DECIMAL(5,2)",
+          "platform_diversification_score": "DECIMAL(5,2)",
+          "payment_history_score": "DECIMAL(5,2)",
+          "industry_risk_score": "DECIMAL(5,2)",
+          "overall_risk_score": "DECIMAL(5,2)",
+          "risk_category": "VARCHAR(20)",
+          "notes": "TEXT",
+          "assessed_by": "VARCHAR(100)",
+          "created_at": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "merchant_id": "merchants(id)"
+        },
+        "record_count": 10
+      }
+    ]
+  }
+}

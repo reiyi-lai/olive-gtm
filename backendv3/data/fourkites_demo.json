@@ -1,0 +1,293 @@
+{
+  "company_analysis": {
+    "website": "https://www.fourkites.com/",
+    "business_description": "FourKites is the leading AI-powered supply chain visibility platform that provides real-time tracking, predictive insights, and automated execution capabilities. They serve over 1,600 global brands including Fortune 500 companies, processing 3+ million shipments daily across 200+ countries through their Intelligent Control Tower platform with AI-powered Digital Workers.",
+    "business_model": "B2B SaaS platform providing supply chain visibility and optimization services through annual enterprise contracts, serving large retailers, manufacturers, food & beverage companies, pharmaceuticals, and logistics providers with tiered pricing based on shipment volume and feature sets.",
+    "target_customers": "Fortune 500 companies and large enterprises in retail (Walmart, Target, Best Buy), food & beverage (Coca-Cola, Nestle, Kraft Heinz, Tyson), consumer goods (P&G, Unilever), pharmaceuticals (J&J, Pfizer), manufacturing (3M, Dow Chemical), and logistics providers (FedEx, UPS, C.H. Robinson).",
+    "key_features": [
+      "Real-time shipment visibility across all transportation modes",
+      "AI-powered Digital Workers for automation",
+      "Predictive analytics and exception management",
+      "Temperature and cold chain monitoring",
+      "Carrier performance analytics",
+      "Digital twin technology",
+      "Multi-modal transportation tracking",
+      "Supply chain orchestration"
+    ],
+    "likely_data_needs": [
+      "Customer and facility management",
+      "Carrier network and performance data",
+      "Real-time shipment tracking and status updates",
+      "Supply chain KPIs and metrics",
+      "Inventory levels and movement",
+      "Alert and exception management",
+      "Digital worker automation rules",
+      "API integrations with customer systems"
+    ],
+    "industry": "Supply Chain Technology / Logistics SaaS"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_fQJP9myLX4IS@ep-old-sky-ae9tqyyd-pooler.c-2.us-east-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+  "database_info": {
+    "project_id": "frosty-tooth-66928419",
+    "database_name": "neondb",
+    "schema": [
+      {
+        "table_name": "customers",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "company_name": "VARCHAR(255) NOT NULL",
+          "industry": "VARCHAR(100)",
+          "tier": "VARCHAR(50)",
+          "contract_type": "VARCHAR(50)",
+          "annual_revenue": "BIGINT",
+          "headquarters_location": "VARCHAR(255)",
+          "contact_email": "VARCHAR(255)",
+          "account_manager": "VARCHAR(255)",
+          "onboarded_date": "DATE",
+          "status": "VARCHAR(50)",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {},
+        "record_count": 50
+      },
+      {
+        "table_name": "carriers",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "carrier_name": "VARCHAR(255) NOT NULL",
+          "carrier_type": "VARCHAR(100)",
+          "scac_code": "VARCHAR(10)",
+          "dot_number": "VARCHAR(20)",
+          "mc_number": "VARCHAR(20)",
+          "fleet_size": "INTEGER",
+          "coverage_area": "TEXT",
+          "headquarters_location": "VARCHAR(255)",
+          "contact_email": "VARCHAR(255)",
+          "phone": "VARCHAR(50)",
+          "rating": "DECIMAL(3,2)",
+          "insurance_verified": "BOOLEAN",
+          "api_integrated": "BOOLEAN",
+          "status": "VARCHAR(50)",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {},
+        "record_count": 51
+      },
+      {
+        "table_name": "facilities",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "customer_id": "INTEGER",
+          "facility_name": "VARCHAR(255) NOT NULL",
+          "facility_type": "VARCHAR(100)",
+          "address": "TEXT",
+          "city": "VARCHAR(100)",
+          "state": "VARCHAR(50)",
+          "zip_code": "VARCHAR(20)",
+          "country": "VARCHAR(100)",
+          "latitude": "DECIMAL(10, 8)",
+          "longitude": "DECIMAL(11, 8)",
+          "capacity_sqft": "INTEGER",
+          "dock_doors": "INTEGER",
+          "operating_hours": "VARCHAR(100)",
+          "facility_manager": "VARCHAR(255)",
+          "phone": "VARCHAR(50)",
+          "status": "VARCHAR(50)",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "customer_id": "REFERENCES customers(id)"
+        },
+        "record_count": 63
+      },
+      {
+        "table_name": "shipments",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "customer_id": "INTEGER",
+          "carrier_id": "INTEGER",
+          "origin_facility_id": "INTEGER",
+          "destination_facility_id": "INTEGER",
+          "shipment_number": "VARCHAR(100) UNIQUE NOT NULL",
+          "purchase_order_number": "VARCHAR(100)",
+          "bill_of_lading": "VARCHAR(100)",
+          "pro_number": "VARCHAR(100)",
+          "container_number": "VARCHAR(100)",
+          "shipment_type": "VARCHAR(50)",
+          "mode": "VARCHAR(50)",
+          "service_level": "VARCHAR(50)",
+          "total_weight": "DECIMAL(10,2)",
+          "total_value": "DECIMAL(12,2)",
+          "piece_count": "INTEGER",
+          "planned_pickup_date": "TIMESTAMP",
+          "actual_pickup_date": "TIMESTAMP",
+          "planned_delivery_date": "TIMESTAMP",
+          "actual_delivery_date": "TIMESTAMP",
+          "estimated_delivery_date": "TIMESTAMP",
+          "current_status": "VARCHAR(100)",
+          "current_location": "VARCHAR(255)",
+          "current_lat": "DECIMAL(10, 8)",
+          "current_lng": "DECIMAL(11, 8)",
+          "distance_remaining_miles": "INTEGER",
+          "temperature_controlled": "BOOLEAN",
+          "hazmat": "BOOLEAN",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "customer_id": "REFERENCES customers(id)",
+          "carrier_id": "REFERENCES carriers(id)",
+          "origin_facility_id": "REFERENCES facilities(id)",
+          "destination_facility_id": "REFERENCES facilities(id)"
+        },
+        "record_count": 42
+      },
+      {
+        "table_name": "shipment_events",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "shipment_id": "INTEGER",
+          "event_type": "VARCHAR(100)",
+          "event_code": "VARCHAR(50)",
+          "event_description": "TEXT",
+          "event_timestamp": "TIMESTAMP",
+          "location": "VARCHAR(255)",
+          "latitude": "DECIMAL(10, 8)",
+          "longitude": "DECIMAL(11, 8)",
+          "data_source": "VARCHAR(100)",
+          "confidence_score": "DECIMAL(3,2)",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "shipment_id": "REFERENCES shipments(id)"
+        },
+        "record_count": 43
+      },
+      {
+        "table_name": "inventory",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "customer_id": "INTEGER",
+          "facility_id": "INTEGER",
+          "sku": "VARCHAR(100)",
+          "product_name": "VARCHAR(255)",
+          "product_category": "VARCHAR(100)",
+          "upc": "VARCHAR(50)",
+          "current_quantity": "INTEGER",
+          "reserved_quantity": "INTEGER",
+          "available_quantity": "INTEGER",
+          "reorder_point": "INTEGER",
+          "max_stock_level": "INTEGER",
+          "unit_cost": "DECIMAL(10,2)",
+          "last_count_date": "DATE",
+          "last_movement_date": "TIMESTAMP",
+          "abc_classification": "CHAR(1)",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "customer_id": "REFERENCES customers(id)",
+          "facility_id": "REFERENCES facilities(id)"
+        },
+        "record_count": 42
+      },
+      {
+        "table_name": "supply_chain_metrics",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "customer_id": "INTEGER",
+          "metric_date": "DATE",
+          "metric_type": "VARCHAR(100)",
+          "metric_category": "VARCHAR(50)",
+          "metric_value": "DECIMAL(12,4)",
+          "metric_unit": "VARCHAR(50)",
+          "benchmark_value": "DECIMAL(12,4)",
+          "variance_percentage": "DECIMAL(5,2)",
+          "facility_id": "INTEGER",
+          "carrier_id": "INTEGER",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "customer_id": "REFERENCES customers(id)",
+          "facility_id": "REFERENCES facilities(id)",
+          "carrier_id": "REFERENCES carriers(id)"
+        },
+        "record_count": 51
+      },
+      {
+        "table_name": "alerts",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "customer_id": "INTEGER",
+          "shipment_id": "INTEGER",
+          "alert_type": "VARCHAR(100)",
+          "severity": "VARCHAR(50)",
+          "title": "VARCHAR(255)",
+          "description": "TEXT",
+          "recommended_action": "TEXT",
+          "status": "VARCHAR(50)",
+          "triggered_at": "TIMESTAMP",
+          "acknowledged_at": "TIMESTAMP",
+          "resolved_at": "TIMESTAMP",
+          "acknowledged_by": "VARCHAR(255)",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "customer_id": "REFERENCES customers(id)",
+          "shipment_id": "REFERENCES shipments(id)"
+        },
+        "record_count": 20
+      },
+      {
+        "table_name": "digital_workers",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "customer_id": "INTEGER",
+          "worker_name": "VARCHAR(255)",
+          "worker_type": "VARCHAR(100)",
+          "function_description": "TEXT",
+          "automation_rules": "TEXT",
+          "trigger_conditions": "TEXT",
+          "success_rate": "DECIMAL(5,2)",
+          "tasks_completed": "INTEGER",
+          "tasks_failed": "INTEGER",
+          "last_execution": "TIMESTAMP",
+          "status": "VARCHAR(50)",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "customer_id": "REFERENCES customers(id)"
+        },
+        "record_count": 16
+      },
+      {
+        "table_name": "api_integrations",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "customer_id": "INTEGER",
+          "integration_name": "VARCHAR(255)",
+          "integration_type": "VARCHAR(100)",
+          "system_name": "VARCHAR(255)",
+          "api_endpoint": "VARCHAR(500)",
+          "authentication_type": "VARCHAR(50)",
+          "data_sync_frequency": "VARCHAR(50)",
+          "last_sync_time": "TIMESTAMP",
+          "sync_status": "VARCHAR(50)",
+          "records_synced": "INTEGER",
+          "error_count": "INTEGER",
+          "status": "VARCHAR(50)",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "customer_id": "REFERENCES customers(id)"
+        },
+        "record_count": 22
+      }
+    ]
+  }
+}

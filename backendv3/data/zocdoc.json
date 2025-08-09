@@ -1,0 +1,211 @@
+{
+  "company_analysis": {
+    "website": "https://www.zocdoc.com/",
+    "business_description": "Zocdoc is a billion-dollar online healthcare platform that connects patients with healthcare professionals, allowing people to find and book in-person or telemedicine appointments for medical or dental care. Founded in 2007, this digital health marketplace facilitates 6 million users monthly to book appointments with doctors in 2000+ cities across the United States.",
+    "business_model": "Two-sided marketplace model where the service is free for patients, and healthcare providers pay subscription and booking fees. Current pricing is $300 annual subscription fee plus $35 per booking. Previously used a $300/month subscription model.",
+    "target_customers": "Healthcare providers (doctors, dentists, specialists) who want to increase patient volume and reduce administrative burden, and patients seeking convenient appointment booking with insurance verification.",
+    "key_features": [
+      "Real-time appointment booking",
+      "Insurance compatibility matching",
+      "Provider search by specialty/location",
+      "Patient reviews and ratings",
+      "Telemedicine support",
+      "Automated scheduling",
+      "Profile verification",
+      "Calendar sync technology"
+    ],
+    "likely_data_needs": [
+      "Provider profiles and specialties",
+      "Patient demographics and insurance",
+      "Appointment scheduling and history",
+      "Insurance provider relationships",
+      "Reviews and ratings",
+      "Provider availability schedules",
+      "Location and practice information",
+      "Payment and booking tracking"
+    ],
+    "industry": "Healthcare Technology / Digital Health Marketplace"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_k35mDjpTAQEV@ep-snowy-block-adzm2uv4-pooler.c-2.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+  "database_info": {
+    "project_id": "divine-term-00444568",
+    "database_name": "neondb",
+    "schema": [
+      {
+        "table_name": "specialties",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(100) UNIQUE",
+          "description": "TEXT",
+          "created_at": "TIMESTAMP"
+        },
+        "foreign_keys": {},
+        "record_count": 20
+      },
+      {
+        "table_name": "insurance_providers",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(100) UNIQUE",
+          "type": "VARCHAR(50)",
+          "created_at": "TIMESTAMP"
+        },
+        "foreign_keys": {},
+        "record_count": 20
+      },
+      {
+        "table_name": "providers",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "first_name": "VARCHAR(50)",
+          "last_name": "VARCHAR(50)",
+          "email": "VARCHAR(100) UNIQUE",
+          "phone": "VARCHAR(20)",
+          "specialty_id": "INTEGER",
+          "license_number": "VARCHAR(50)",
+          "years_experience": "INTEGER",
+          "education": "TEXT",
+          "bio": "TEXT",
+          "rating": "DECIMAL(3,2)",
+          "total_reviews": "INTEGER",
+          "subscription_active": "BOOLEAN",
+          "subscription_fee_paid": "DECIMAL(10,2)"
+        },
+        "foreign_keys": {
+          "specialty_id": "specialties(id)"
+        },
+        "record_count": 20
+      },
+      {
+        "table_name": "provider_locations",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "provider_id": "INTEGER",
+          "name": "VARCHAR(100)",
+          "address_line1": "VARCHAR(255)",
+          "city": "VARCHAR(100)",
+          "state": "VARCHAR(50)",
+          "zip_code": "VARCHAR(10)",
+          "phone": "VARCHAR(20)",
+          "accepts_new_patients": "BOOLEAN",
+          "telemedicine_available": "BOOLEAN"
+        },
+        "foreign_keys": {
+          "provider_id": "providers(id)"
+        },
+        "record_count": 20
+      },
+      {
+        "table_name": "patients",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "first_name": "VARCHAR(50)",
+          "last_name": "VARCHAR(50)",
+          "email": "VARCHAR(100) UNIQUE",
+          "phone": "VARCHAR(20)",
+          "date_of_birth": "DATE",
+          "gender": "VARCHAR(20)",
+          "address_line1": "VARCHAR(255)",
+          "city": "VARCHAR(100)",
+          "state": "VARCHAR(50)",
+          "zip_code": "VARCHAR(10)",
+          "insurance_provider_id": "INTEGER",
+          "insurance_member_id": "VARCHAR(50)",
+          "emergency_contact_name": "VARCHAR(100)",
+          "emergency_contact_phone": "VARCHAR(20)"
+        },
+        "foreign_keys": {
+          "insurance_provider_id": "insurance_providers(id)"
+        },
+        "record_count": 150
+      },
+      {
+        "table_name": "appointments",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "patient_id": "INTEGER",
+          "provider_id": "INTEGER",
+          "provider_location_id": "INTEGER",
+          "appointment_type_id": "INTEGER",
+          "appointment_date": "DATE",
+          "appointment_time": "TIME",
+          "duration_minutes": "INTEGER",
+          "status": "VARCHAR(50)",
+          "visit_type": "VARCHAR(20)",
+          "booking_fee_paid": "DECIMAL(8,2)",
+          "reason_for_visit": "TEXT"
+        },
+        "foreign_keys": {
+          "patient_id": "patients(id)",
+          "provider_id": "providers(id)",
+          "provider_location_id": "provider_locations(id)",
+          "appointment_type_id": "appointment_types(id)"
+        },
+        "record_count": 200
+      },
+      {
+        "table_name": "reviews",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "patient_id": "INTEGER",
+          "provider_id": "INTEGER",
+          "appointment_id": "INTEGER",
+          "rating": "INTEGER CHECK (1-5)",
+          "title": "VARCHAR(200)",
+          "comment": "TEXT",
+          "would_recommend": "BOOLEAN",
+          "wait_time_rating": "INTEGER CHECK (1-5)",
+          "bedside_manner_rating": "INTEGER CHECK (1-5)",
+          "is_verified": "BOOLEAN"
+        },
+        "foreign_keys": {
+          "patient_id": "patients(id)",
+          "provider_id": "providers(id)",
+          "appointment_id": "appointments(id)"
+        },
+        "record_count": 20
+      },
+      {
+        "table_name": "appointment_types",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(100)",
+          "duration_minutes": "INTEGER",
+          "description": "TEXT"
+        },
+        "foreign_keys": {},
+        "record_count": 15
+      },
+      {
+        "table_name": "provider_availability",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "provider_id": "INTEGER",
+          "provider_location_id": "INTEGER",
+          "day_of_week": "INTEGER",
+          "start_time": "TIME",
+          "end_time": "TIME",
+          "is_active": "BOOLEAN"
+        },
+        "foreign_keys": {
+          "provider_id": "providers(id)",
+          "provider_location_id": "provider_locations(id)"
+        },
+        "record_count": 51
+      },
+      {
+        "table_name": "provider_insurance_accepted",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "provider_id": "INTEGER",
+          "insurance_provider_id": "INTEGER"
+        },
+        "foreign_keys": {
+          "provider_id": "providers(id)",
+          "insurance_provider_id": "insurance_providers(id)"
+        },
+        "record_count": 85
+      }
+    ]
+  }
+}
