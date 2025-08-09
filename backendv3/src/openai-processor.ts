@@ -14,8 +14,7 @@ const StructuredOutput = z.object({
 type ClaudeOutput = any;
 
 export async function processWithStructuredOutput(
-  claudeOutput: ClaudeOutput,
-  count: number = 2
+  claudeOutput: ClaudeOutput
 ): Promise<z.infer<typeof StructuredOutput>> {
   const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
@@ -64,6 +63,7 @@ Each tool should:
     - Be useful to roles like founders, ops, product, eng, support, or sales
     - Assume the frontend is a web-based app using standard inputs/tables
     - Be intended for employees of the business (founders, engineers, marketers, etc.)
+    - Not be a duplicate of the company's product/service (e.g. if the company has a product for managing appointments, don't suggest a tool for managing appointments)
 
 You must NOT suggest:
     - Anything that relies on external APIs or realtime infra
@@ -72,6 +72,15 @@ You must NOT suggest:
     - anything that is meant for customers of the company's product, as this is purely for employees of the business (founders, engineers, marketers, etc.) This includes if the tool is meant for an enterprise application, where their customers might be founders, engineers, etc.
 
 The tools can be dashboards, workflows, review queues, editors, explorers, or triage interfaces — anything that helps users **see what matters and act fast**
+
+Here are some examples of tools that are useful for companies (take note the actual prompt for the tools should be longer than these descriptions):
+- Customer notification system: Send helpful notifications to customers at just the right moments.
+
+- Discount approval tool: Build a tool to validate, approve, and keep track of discounts and offer redemptions.
+
+- Refund processor: Give customer support agents (or whoever is processing a refund) a simple tool that connects your database and payment platforms to lookup orders and process refunds.
+
+- Gamification settings tool: Build a tool for setting gamification criteria for digital products.
 
 Each idea must be distinct — no overlap or redundant views. they should vary in target user and business purpose.
 
@@ -84,9 +93,9 @@ The suggestions that are generated should be one of the following:
 
 CRITICAL: these are tools for the company who owns the database. they are not for the end users of the database or their product. this is critical to know for suggesting the correct tools. Do NOT suggest tools that are for the customers of the company's product.
 
-Output a list of ${count} ideas. Each should have:
+Output a list of 5 ideas. Each should have:
     - title (max 8-10 words, specific and useful)
-    - prompt: basically a good ass prompt for the LLM to build the tool.
+    - prompt: basically a good ass prompt for the LLM to build the tool. this should be around 2 lines.
     - features: 4-5 real, UI-level actions or components it would contain`
       }
     ],

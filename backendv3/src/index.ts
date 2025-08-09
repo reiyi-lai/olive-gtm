@@ -8,18 +8,42 @@ import { createOliveIntegration } from "./olive-integration.js";
 import fs from "fs";
 import path from "path";
 
-export const company_name = "Zocdoc"
-const website_to_build = "https://www.zocdoc.com/"
+const args = process.argv.slice(2);
+if (args.length < 2) {
+  console.error('Usage: pnpm dev <company_name> <website_to_build>');
+  process.exit(1);
+}
+export const company_name = args[0] as string;
+const website_to_build = args[1] as string;
+
+const dataDir = path.join(process.cwd(), "data");
 
 function saveClaudeOutput(claudeOutput: any, companyName: string) {
-  try {
-    const dataDir = path.join(process.cwd(), "data");
     const fileName = `${companyName.toLowerCase()}.json`;
     const filePath = path.join(dataDir, fileName);
-
     fs.writeFileSync(filePath, JSON.stringify(claudeOutput, null, 2));
+}
+
+function loadExistingClaudeOutput(companyName: string): any | null {
+  try {
+    // Get all JSON files in the data directory
+    const files = fs.readdirSync(dataDir)
+    for (const file of files) {
+      const fileNameWithoutExtension = file.replace('.json', '');
+      
+      // Check if filename is contained within company_name
+      if (companyName.toLowerCase().includes(fileNameWithoutExtension.toLowerCase())) {
+        const filePath = path.join(dataDir, file);
+        const fileContent = fs.readFileSync(filePath, 'utf-8');
+        const claudeOutput = JSON.parse(fileContent);
+        console.log(`Found matching Claude output for ${companyName}: ${filePath}`);
+        return claudeOutput;
+      }
+    }
+    return null;
   } catch (error) {
-    console.error("Error saving Claude output:", error);
+    console.error("Error loading existing Claude output:", error);
+    return null;
   }
 }
 
@@ -28,8 +52,11 @@ async function main() {
     let claudeOutput: any = null;
 
     try {
-      // Step 1: Get output from Claude Code SDK with Neon MCP
-      for await (const message of query({
+      claudeOutput = loadExistingClaudeOutput(company_name);
+      
+      if (!claudeOutput) {
+        // Step 1: Get output from Claude Code SDK with Neon MCP
+        for await (const message of query({
         prompt: `${userPrompt({ website: website_to_build })}`,
         options: {
           appendSystemPrompt: systemPrompt,
@@ -69,28 +96,29 @@ async function main() {
           }
         }
       }
+      saveClaudeOutput(claudeOutput, company_name);
+    } 
 
-      // Step 2: Process with OpenAI structured output
-      if (claudeOutput) {
-        saveClaudeOutput(claudeOutput, company_name);
-        console.log("Processing with OpenAI structured output...");
-        
-        const structuredResult = await processWithStructuredOutput(
-          claudeOutput
-        );
-        
-        console.log("Final Structured Output:");
-        console.log(JSON.stringify(structuredResult, null, 2));
-        
-        // Step 3: Create Olive Integration
-        console.log("Starting Olive integration...");
-        await createOliveIntegration(structuredResult);
-        
-        return structuredResult;
-      } else {
-        console.log("Error processing with OpenAI structured output, returning Claude output only");
-        return claudeOutput;
-      }
+    // Step 2: Process with OpenAI structured output
+    if (claudeOutput) {
+      console.log("Processing with OpenAI structured output...");
+      
+      const structuredResult = await processWithStructuredOutput(
+        claudeOutput
+      );
+      
+      console.log("Final Structured Output:");
+      console.log(JSON.stringify(structuredResult, null, 2));
+      
+      // Step 3: Create Olive Integration
+      console.log("Starting Olive integration...");
+      await createOliveIntegration(structuredResult);
+      
+      return structuredResult;
+    } else {
+      console.log("No Claude output found, cannot proceed with processing");
+      return null;
+    }
 
     } catch (error) {
       console.error(`error building database for ${website_to_build}:`, error);
