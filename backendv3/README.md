@@ -1,6 +1,4 @@
-# Olive GTM Backend v3
-
-## Setup
+## Installation & Setup
 
 ```bash
 # Install dependencies
