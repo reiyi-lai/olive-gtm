@@ -1,0 +1,179 @@
+{
+  "company_analysis": {
+    "website": "https://cluely.com/",
+    "business_description": "Cluely is an AI-powered meeting assistant that provides real-time information and insights during live conversations across various platforms. The platform acts as an undetectable background listener that delivers instant contextual answers, web searches, and meeting intelligence while users are in calls.",
+    "business_model": "Freemium SaaS subscription model with three tiers: Starter (free with basic AI models and community support), Pro ($20/month with advanced AI models and priority support), and Enterprise (custom pricing with coaching, CRM integrations, SSO, and advanced analytics)",
+    "target_customers": "Professionals in sales, recruiting, consulting, customer support, students, executives, and anyone needing instant information during meetings across industries like technology, consulting, real estate, healthcare, finance, and more",
+    "key_features": [
+      "Real-time meeting intelligence",
+      "Multi-platform integration (Zoom, Teams, Slack, Webex)",
+      "AI-powered search and analysis",
+      "Undetectable background listening",
+      "Live note-taking and transcription",
+      "Post-meeting performance analytics",
+      "CRM integrations",
+      "Sales coaching and scorecards"
+    ],
+    "likely_data_needs": [
+      "User profiles and subscription management",
+      "Meeting recordings and transcripts",
+      "AI query logs and responses",
+      "Usage analytics and billing data",
+      "Integration settings for third-party platforms",
+      "Performance metrics and coaching data"
+    ],
+    "industry": "AI-powered productivity and meeting intelligence software"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_y5KJLa8hgScF@ep-odd-voice-aecmaor5-pooler.c-2.us-east-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+  "database_info": {
+    "project_id": "flat-sky-95280213",
+    "database_name": "neondb",
+    "schema": [
+      {
+        "table_name": "subscription_plans",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(50) NOT NULL UNIQUE",
+          "price_monthly": "DECIMAL(10,2) NOT NULL",
+          "features": "JSONB NOT NULL",
+          "max_ai_responses": "INTEGER",
+          "has_priority_support": "BOOLEAN DEFAULT FALSE",
+          "has_coaching": "BOOLEAN DEFAULT FALSE",
+          "has_crm_integration": "BOOLEAN DEFAULT FALSE",
+          "has_sso": "BOOLEAN DEFAULT FALSE",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {},
+        "record_count": 3
+      },
+      {
+        "table_name": "users",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "email": "VARCHAR(255) NOT NULL UNIQUE",
+          "password_hash": "VARCHAR(255) NOT NULL",
+          "first_name": "VARCHAR(100) NOT NULL",
+          "last_name": "VARCHAR(100) NOT NULL",
+          "company": "VARCHAR(255)",
+          "job_title": "VARCHAR(255)",
+          "subscription_plan_id": "INTEGER REFERENCES subscription_plans(id)",
+          "subscription_status": "VARCHAR(20) DEFAULT 'active'",
+          "subscription_start_date": "DATE",
+          "subscription_end_date": "DATE",
+          "ai_responses_used_this_month": "INTEGER DEFAULT 0",
+          "total_meetings": "INTEGER DEFAULT 0",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "last_login_at": "TIMESTAMP",
+          "is_active": "BOOLEAN DEFAULT TRUE"
+        },
+        "foreign_keys": {
+          "subscription_plan_id": "subscription_plans(id)"
+        },
+        "record_count": 130
+      },
+      {
+        "table_name": "meetings",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "user_id": "INTEGER REFERENCES users(id)",
+          "meeting_title": "VARCHAR(255)",
+          "meeting_platform": "VARCHAR(50) NOT NULL",
+          "external_meeting_id": "VARCHAR(255)",
+          "start_time": "TIMESTAMP NOT NULL",
+          "end_time": "TIMESTAMP",
+          "duration_minutes": "INTEGER",
+          "participant_count": "INTEGER DEFAULT 1",
+          "meeting_type": "VARCHAR(50)",
+          "meeting_status": "VARCHAR(20) DEFAULT 'completed'",
+          "total_ai_queries": "INTEGER DEFAULT 0",
+          "performance_score": "DECIMAL(3,2)",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "user_id": "users(id)"
+        },
+        "record_count": 150
+      },
+      {
+        "table_name": "meeting_transcripts",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "meeting_id": "INTEGER REFERENCES meetings(id)",
+          "speaker_name": "VARCHAR(255)",
+          "speaker_type": "VARCHAR(20)",
+          "transcript_text": "TEXT NOT NULL",
+          "timestamp_in_meeting": "INTEGER",
+          "confidence_score": "DECIMAL(3,2)",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "meeting_id": "meetings(id)"
+        },
+        "record_count": 10
+      },
+      {
+        "table_name": "ai_interactions",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "meeting_id": "INTEGER REFERENCES meetings(id)",
+          "user_id": "INTEGER REFERENCES users(id)",
+          "query_text": "TEXT NOT NULL",
+          "response_text": "TEXT NOT NULL",
+          "ai_model": "VARCHAR(50) NOT NULL",
+          "query_type": "VARCHAR(50)",
+          "response_time_ms": "INTEGER",
+          "tokens_used": "INTEGER",
+          "context_used": "TEXT",
+          "is_real_time": "BOOLEAN DEFAULT TRUE",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "meeting_id": "meetings(id)",
+          "user_id": "users(id)"
+        },
+        "record_count": 120
+      },
+      {
+        "table_name": "usage_metrics",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "user_id": "INTEGER REFERENCES users(id)",
+          "metric_date": "DATE NOT NULL",
+          "meetings_count": "INTEGER DEFAULT 0",
+          "ai_queries_count": "INTEGER DEFAULT 0",
+          "total_meeting_minutes": "INTEGER DEFAULT 0",
+          "transcription_minutes": "INTEGER DEFAULT 0",
+          "search_queries": "INTEGER DEFAULT 0",
+          "coaching_requests": "INTEGER DEFAULT 0",
+          "note_requests": "INTEGER DEFAULT 0",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "user_id": "users(id)"
+        },
+        "record_count": 20
+      },
+      {
+        "table_name": "integration_settings",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "user_id": "INTEGER REFERENCES users(id)",
+          "integration_type": "VARCHAR(50) NOT NULL",
+          "is_enabled": "BOOLEAN DEFAULT FALSE",
+          "configuration": "JSONB",
+          "last_sync_at": "TIMESTAMP",
+          "sync_status": "VARCHAR(20) DEFAULT 'pending'",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "user_id": "users(id)"
+        },
+        "record_count": 10
+      }
+    ]
+  }
+}

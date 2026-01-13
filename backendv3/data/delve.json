@@ -1,0 +1,263 @@
+{
+  "company_analysis": {
+    "website": "https://delve.co/",
+    "business_description": "Delve is an AI-powered compliance automation platform that helps technology companies achieve and maintain security certifications like SOC 2, HIPAA, ISO 27001, and GDPR in days instead of months. Their platform uses AI agents to automate compliance tasks including evidence collection, policy writing, security questionnaire completion, and infrastructure scanning.",
+    "business_model": "SaaS platform with tiered pricing (Startup, Growth, Enterprise) based on company size and compliance needs, offering both self-service and white-glove onboarding options",
+    "target_customers": [
+      "Fast-growing tech companies and startups needing compliance certifications",
+      "AI and technology companies seeking to win enterprise contracts",
+      "Midmarket companies requiring SOC 2, HIPAA, or ISO 27001 certification",
+      "Companies in regulated industries (healthcare, finance, insurance)",
+      "Organizations looking to streamline compliance processes and reduce time-to-certification"
+    ],
+    "key_features": [
+      "AI agents for automated evidence collection and screenshot taking",
+      "Automated policy generation and compliance documentation",
+      "Security questionnaire auto-completion",
+      "Infrastructure and code scanning for compliance issues",
+      "1:1 Slack support with compliance experts",
+      "Customized compliance workflows by company size",
+      "Real-time compliance project tracking and progress monitoring"
+    ],
+    "likely_data_needs": [
+      "Customer companies with subscription tiers and compliance project statuses",
+      "Users at customer companies (CISOs, compliance managers, security engineers)",
+      "Compliance projects tracking certifications (SOC 2, HIPAA, ISO 27001) with progress and timelines",
+      "Control implementations with evidence collection (screenshots, policies, audit logs) showing AI automation",
+      "Security questionnaires with AI completion percentages and infrastructure scan findings"
+    ],
+    "industry": "Compliance Technology (ComplianceTech/GRC SaaS)"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_YClW8IEJdhw6@ep-square-bush-ae0imphf-pooler.c-2.us-east-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+  "database_info": {
+    "project_id": "broad-wave-42131687",
+    "database_name": "neondb",
+    "schema": [
+      {
+        "table_name": "companies",
+        "columns": {
+          "id": "integer PRIMARY KEY",
+          "name": "varchar NOT NULL",
+          "domain": "varchar NOT NULL",
+          "industry": "varchar",
+          "company_size": "varchar",
+          "created_at": "timestamp DEFAULT CURRENT_TIMESTAMP",
+          "subscription_tier": "varchar",
+          "mrr": "numeric",
+          "status": "varchar"
+        },
+        "foreign_keys": {},
+        "record_count": 25
+      },
+      {
+        "table_name": "users",
+        "columns": {
+          "id": "integer PRIMARY KEY",
+          "company_id": "integer",
+          "email": "varchar NOT NULL",
+          "first_name": "varchar",
+          "last_name": "varchar",
+          "role": "varchar",
+          "last_login": "timestamp",
+          "created_at": "timestamp DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "company_id": "REFERENCES companies(id)"
+        },
+        "record_count": 70
+      },
+      {
+        "table_name": "compliance_frameworks",
+        "columns": {
+          "id": "integer PRIMARY KEY",
+          "name": "varchar NOT NULL",
+          "description": "text",
+          "typical_duration_days": "integer",
+          "certification_body": "varchar"
+        },
+        "foreign_keys": {},
+        "record_count": 8
+      },
+      {
+        "table_name": "compliance_projects",
+        "columns": {
+          "id": "integer PRIMARY KEY",
+          "company_id": "integer",
+          "framework_id": "integer",
+          "status": "varchar",
+          "start_date": "date",
+          "target_completion_date": "date",
+          "actual_completion_date": "date",
+          "progress_percentage": "integer",
+          "assigned_expert_email": "varchar"
+        },
+        "foreign_keys": {
+          "company_id": "REFERENCES companies(id)",
+          "framework_id": "REFERENCES compliance_frameworks(id)"
+        },
+        "record_count": 58
+      },
+      {
+        "table_name": "controls",
+        "columns": {
+          "id": "integer PRIMARY KEY",
+          "framework_id": "integer",
+          "control_number": "varchar",
+          "title": "varchar",
+          "description": "text",
+          "category": "varchar"
+        },
+        "foreign_keys": {
+          "framework_id": "REFERENCES compliance_frameworks(id)"
+        },
+        "record_count": 48
+      },
+      {
+        "table_name": "control_implementations",
+        "columns": {
+          "id": "integer PRIMARY KEY",
+          "project_id": "integer",
+          "control_id": "integer",
+          "status": "varchar",
+          "implementation_date": "date",
+          "notes": "text",
+          "evidence_count": "integer DEFAULT 0"
+        },
+        "foreign_keys": {
+          "project_id": "REFERENCES compliance_projects(id)",
+          "control_id": "REFERENCES controls(id)"
+        },
+        "record_count": 120
+      },
+      {
+        "table_name": "evidence",
+        "columns": {
+          "id": "integer PRIMARY KEY",
+          "control_implementation_id": "integer",
+          "evidence_type": "varchar",
+          "file_name": "varchar",
+          "file_url": "text",
+          "collected_by": "varchar",
+          "collected_at": "timestamp",
+          "ai_generated": "boolean DEFAULT false"
+        },
+        "foreign_keys": {
+          "control_implementation_id": "REFERENCES control_implementations(id)"
+        },
+        "record_count": 87
+      },
+      {
+        "table_name": "security_questionnaires",
+        "columns": {
+          "id": "integer PRIMARY KEY",
+          "company_id": "integer",
+          "prospect_name": "varchar",
+          "questionnaire_name": "varchar",
+          "total_questions": "integer",
+          "answered_questions": "integer",
+          "status": "varchar",
+          "received_date": "date",
+          "completed_date": "date",
+          "ai_completion_percentage": "integer"
+        },
+        "foreign_keys": {
+          "company_id": "REFERENCES companies(id)"
+        },
+        "record_count": 77
+      },
+      {
+        "table_name": "ai_tasks",
+        "columns": {
+          "id": "integer PRIMARY KEY",
+          "project_id": "integer",
+          "task_type": "varchar",
+          "description": "text",
+          "status": "varchar",
+          "created_at": "timestamp",
+          "completed_at": "timestamp",
+          "ai_agent_type": "varchar"
+        },
+        "foreign_keys": {
+          "project_id": "REFERENCES compliance_projects(id)"
+        },
+        "record_count": 50
+      },
+      {
+        "table_name": "support_tickets",
+        "columns": {
+          "id": "integer PRIMARY KEY",
+          "company_id": "integer",
+          "user_id": "integer",
+          "subject": "varchar",
+          "description": "text",
+          "status": "varchar",
+          "priority": "varchar",
+          "created_at": "timestamp",
+          "resolved_at": "timestamp",
+          "slack_channel_id": "varchar"
+        },
+        "foreign_keys": {
+          "company_id": "REFERENCES companies(id)",
+          "user_id": "REFERENCES users(id)"
+        },
+        "record_count": 37
+      },
+      {
+        "table_name": "policies",
+        "columns": {
+          "id": "integer PRIMARY KEY",
+          "company_id": "integer",
+          "policy_name": "varchar",
+          "policy_type": "varchar",
+          "content": "text",
+          "version": "integer",
+          "created_at": "timestamp",
+          "last_updated": "timestamp",
+          "ai_generated": "boolean DEFAULT false",
+          "status": "varchar"
+        },
+        "foreign_keys": {
+          "company_id": "REFERENCES companies(id)"
+        },
+        "record_count": 51
+      },
+      {
+        "table_name": "infrastructure_scans",
+        "columns": {
+          "id": "integer PRIMARY KEY",
+          "company_id": "integer",
+          "scan_type": "varchar",
+          "scan_date": "timestamp",
+          "issues_found": "integer",
+          "critical_issues": "integer",
+          "high_issues": "integer",
+          "medium_issues": "integer",
+          "low_issues": "integer",
+          "status": "varchar"
+        },
+        "foreign_keys": {
+          "company_id": "REFERENCES companies(id)"
+        },
+        "record_count": 75
+      },
+      {
+        "table_name": "scan_findings",
+        "columns": {
+          "id": "integer PRIMARY KEY",
+          "scan_id": "integer",
+          "severity": "varchar",
+          "finding_type": "varchar",
+          "description": "text",
+          "resource_name": "varchar",
+          "remediation_steps": "text",
+          "status": "varchar",
+          "resolved_at": "timestamp"
+        },
+        "foreign_keys": {
+          "scan_id": "REFERENCES infrastructure_scans(id)"
+        },
+        "record_count": 42
+      }
+    ]
+  }
+}

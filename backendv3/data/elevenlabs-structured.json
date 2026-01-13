@@ -1,0 +1,38 @@
+{
+  "tool_suggestions": [
+    {
+      "title": "Subscription Management Dashboard",
+      "prompt": "Create a comprehensive dashboard to manage and track user subscriptions, billing cycles, and credit usage.",
+      "features": [
+        "View and update user subscription tiers and details",
+        "Track credit usage and remaining balance",
+        "Generate and manage billing cycle reports",
+        "Automate notification alerts for expiring subscriptions",
+        "Process subscription upgrades or downgrades"
+      ]
+    },
+    {
+      "title": "Voice Generation Analytics Explorer",
+      "prompt": "Develop an analytics explorer tool to visualize audio generation data and performance metrics for decision-making.",
+      "features": [
+        "Visualize audio generation trends over time",
+        "Identify top-performing models and voices",
+        "Track processing status and error statistics",
+        "Drill down into specific user and project data",
+        "Filter and export analytical reports for review"
+      ]
+    },
+    {
+      "title": "API Usage Monitoring Console",
+      "prompt": "Build a console to monitor and analyze API request statistics, enabling optimization of usage and resource allocation.",
+      "features": [
+        "Real-time API request status monitoring",
+        "Visualize request volume by endpoint",
+        "Detect and alert on high latency or failure rates",
+        "Track individual user API usage patterns",
+        "Generate API usage summary reports"
+      ]
+    }
+  ],
+  "connection_string": "postgresql://neondb_owner:npg_IXJuLThD3w9C@ep-wispy-king-aeovykfp-pooler.c-2.us-east-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
+}

@@ -1,0 +1,35 @@
+{
+  "tool_suggestions": [
+    {
+      "title": "Vendor Performance Dashboard",
+      "prompt": "Create a dashboard for operations to track and compare vendor performance through ratings and pricing.",
+      "features": [
+        "Vendor list with rating and price comparison",
+        "Graphical analysis of vendor performance over time",
+        "Filter vendors by location and service category",
+        "Detailed view with recent communication history"
+      ]
+    },
+    {
+      "title": "Event Budget Management Interface",
+      "prompt": "Build a tool for finance teams to track, allocate, and manage event budgets and expenses.",
+      "features": [
+        "Budget allocation and tracking for each event",
+        "Expense item approval workflow",
+        "Summary reports of budget utilization",
+        "Dashboard with alerts for overspend risks"
+      ]
+    },
+    {
+      "title": "Attendee Registration and Check-in Manager",
+      "prompt": "Design a tool for event coordinators to monitor and manage attendee registration and check-ins seamlessly.",
+      "features": [
+        "Real-time dashboard of attendee registration status",
+        "Check-in interface with QR code scanning",
+        "Alerts for VIP attendees and special needs",
+        "Detailed attendee profile management"
+      ]
+    }
+  ],
+  "connection_string": "postgresql://neondb_owner:npg_wtzgL8TW3DqP@ep-green-lab-ads2m35c-pooler.c-2.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
+}

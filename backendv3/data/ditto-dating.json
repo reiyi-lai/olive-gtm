@@ -1,0 +1,216 @@
+{
+  "company_analysis": {
+    "website": "https://ditt.ai/",
+    "business_description": "AI-powered dating platform specifically designed for college students that uses frontier LLMs to curate in-person coffee dates without requiring users to swipe or manually chat with matches. The platform focuses on arranging real-world meetings on college campuses with strong safety measures.",
+    "business_model": "Dating-as-a-Service for college students - likely subscription-based or per-date fee model targeting the 18+ college demographic across California campuses",
+    "target_customers": "College students aged 18+ currently enrolled in California universities, focusing on students seeking meaningful romantic connections through curated in-person dates",
+    "key_features": [
+      "AI-powered compatibility matching using LLMs",
+      "Automated coffee date arrangement",
+      "Campus-focused venue selection",
+      "No-swipe, no-chat interface",
+      "Comprehensive safety verification system",
+      "Anti-ghosting policies",
+      "Support team availability during dates"
+    ],
+    "likely_data_needs": [
+      "Student verification and profiles",
+      "University affiliations",
+      "AI compatibility scoring",
+      "Date scheduling and venue management",
+      "Safety reporting and moderation",
+      "User feedback and rating systems",
+      "Administrative actions and bans"
+    ],
+    "industry": "EdTech / Dating Technology"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_3xK1bJkjGERc@ep-twilight-firefly-aefrf6r4-pooler.c-2.us-east-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+  "database_info": {
+    "project_id": "mute-king-41299654",
+    "database_name": "neondb",
+    "schema": [
+      {
+        "table_name": "universities",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(255) NOT NULL",
+          "city": "VARCHAR(100) NOT NULL",
+          "state": "VARCHAR(50) NOT NULL",
+          "country": "VARCHAR(50) DEFAULT 'USA'",
+          "student_count": "INTEGER",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {},
+        "record_count": 10
+      },
+      {
+        "table_name": "users",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "email": "VARCHAR(255) UNIQUE NOT NULL",
+          "first_name": "VARCHAR(100) NOT NULL",
+          "last_name": "VARCHAR(100) NOT NULL",
+          "age": "INTEGER CHECK (age >= 18 AND age <= 30)",
+          "university_id": "INTEGER",
+          "year_in_school": "VARCHAR(20)",
+          "major": "VARCHAR(100)",
+          "gender": "VARCHAR(20)",
+          "sexual_orientation": "VARCHAR(50)",
+          "bio": "TEXT",
+          "verification_status": "VARCHAR(20) DEFAULT 'pending'",
+          "is_active": "BOOLEAN DEFAULT true",
+          "is_banned": "BOOLEAN DEFAULT false",
+          "last_active": "TIMESTAMP",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "university_id": "REFERENCES universities(id)"
+        },
+        "record_count": 150
+      },
+      {
+        "table_name": "user_preferences",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "user_id": "INTEGER",
+          "preferred_gender": "VARCHAR(20)",
+          "min_age": "INTEGER CHECK (min_age >= 18)",
+          "max_age": "INTEGER CHECK (max_age <= 30)",
+          "distance_preference": "INTEGER DEFAULT 5",
+          "interests": "TEXT[]",
+          "deal_breakers": "TEXT[]"
+        },
+        "foreign_keys": {
+          "user_id": "REFERENCES users(id) ON DELETE CASCADE"
+        },
+        "record_count": 150
+      },
+      {
+        "table_name": "venues",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(255) NOT NULL",
+          "address": "VARCHAR(500) NOT NULL",
+          "city": "VARCHAR(100) NOT NULL",
+          "venue_type": "VARCHAR(50) DEFAULT 'coffee_shop'",
+          "latitude": "DECIMAL(10, 8)",
+          "longitude": "DECIMAL(11, 8)",
+          "rating": "DECIMAL(3, 2)",
+          "university_id": "INTEGER",
+          "is_active": "BOOLEAN DEFAULT true"
+        },
+        "foreign_keys": {
+          "university_id": "REFERENCES universities(id)"
+        },
+        "record_count": 20
+      },
+      {
+        "table_name": "matches",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "user1_id": "INTEGER",
+          "user2_id": "INTEGER",
+          "compatibility_score": "DECIMAL(5, 2)",
+          "matching_algorithm_version": "VARCHAR(20) DEFAULT 'v2.1'",
+          "ai_reasoning": "TEXT",
+          "match_status": "VARCHAR(20) DEFAULT 'pending'",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "expires_at": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "user1_id": "REFERENCES users(id)",
+          "user2_id": "REFERENCES users(id)"
+        },
+        "record_count": 66
+      },
+      {
+        "table_name": "dates",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "match_id": "INTEGER",
+          "venue_id": "INTEGER",
+          "scheduled_date": "DATE NOT NULL",
+          "scheduled_time": "TIME NOT NULL",
+          "duration_minutes": "INTEGER DEFAULT 60",
+          "date_status": "VARCHAR(20) DEFAULT 'scheduled'",
+          "confirmation_user1": "BOOLEAN DEFAULT false",
+          "confirmation_user2": "BOOLEAN DEFAULT false"
+        },
+        "foreign_keys": {
+          "match_id": "REFERENCES matches(id)",
+          "venue_id": "REFERENCES venues(id)"
+        },
+        "record_count": 24
+      },
+      {
+        "table_name": "date_feedback",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "date_id": "INTEGER",
+          "user_id": "INTEGER",
+          "overall_rating": "INTEGER CHECK (overall_rating >= 1 AND overall_rating <= 5)",
+          "would_see_again": "BOOLEAN",
+          "feedback_text": "TEXT",
+          "safety_concerns": "TEXT"
+        },
+        "foreign_keys": {
+          "date_id": "REFERENCES dates(id)",
+          "user_id": "REFERENCES users(id)"
+        },
+        "record_count": 14
+      },
+      {
+        "table_name": "user_interactions",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "from_user_id": "INTEGER",
+          "to_user_id": "INTEGER",
+          "interaction_type": "VARCHAR(50)",
+          "interaction_data": "JSONB",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "from_user_id": "REFERENCES users(id)",
+          "to_user_id": "REFERENCES users(id)"
+        },
+        "record_count": 200
+      },
+      {
+        "table_name": "safety_reports",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "reporter_user_id": "INTEGER",
+          "reported_user_id": "INTEGER",
+          "date_id": "INTEGER",
+          "report_type": "VARCHAR(50) NOT NULL",
+          "description": "TEXT NOT NULL",
+          "status": "VARCHAR(20) DEFAULT 'open'",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "reporter_user_id": "REFERENCES users(id)",
+          "reported_user_id": "REFERENCES users(id)",
+          "date_id": "REFERENCES dates(id)"
+        },
+        "record_count": 7
+      },
+      {
+        "table_name": "admin_actions",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "admin_user_id": "INTEGER",
+          "target_user_id": "INTEGER",
+          "action_type": "VARCHAR(50) NOT NULL",
+          "reason": "TEXT",
+          "details": "JSONB",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "admin_user_id": "REFERENCES users(id)",
+          "target_user_id": "REFERENCES users(id)"
+        },
+        "record_count": 625
+      }
+    ]
+  }
+}

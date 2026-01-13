@@ -1,0 +1,38 @@
+{
+  "tool_suggestions": [
+    {
+      "title": "AI Agent Performance Dashboard",
+      "prompt": "Design a dashboard for monitoring AI agent performance using metrics like resolution rates, satisfaction scores, and escalation frequency.",
+      "features": [
+        "View daily and weekly performance metrics",
+        "Filter data by agent, channel, and date",
+        "Chart resolution rates vs deflection rates",
+        "List top-performers and under-performers",
+        "Export performance reports"
+      ]
+    },
+    {
+      "title": "Conversation Audit and Feedback Review",
+      "prompt": "Create an audit tool for reviewing and tagging conversation logs to assess AI agent efficiency and user satisfaction.",
+      "features": [
+        "Search and filter conversations by agent or channel",
+        "Review conversation transcripts with sentiment analysis",
+        "Tag conversations needing follow-up",
+        "Track feedback ratings and comments",
+        "Generate reports on common issues"
+      ]
+    },
+    {
+      "title": "Knowledge Base Content Editor",
+      "prompt": "Develop a tool to manage and update knowledge base articles, track version changes, and assess article usage statistics.",
+      "features": [
+        "Create, edit, and archive articles",
+        "Track article version history",
+        "View usage metrics and most accessed articles",
+        "Manage tags and categories",
+        "Collaborate with team on article drafts"
+      ]
+    }
+  ],
+  "connection_string": "postgresql://neondb_owner:npg_HDbvVfKk1Mo5@ep-dry-frost-adgj8i3n-pooler.c-2.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
+}

@@ -1,0 +1,35 @@
+{
+  "tool_suggestions": [
+    {
+      "title": "API Usage Insights Dashboard",
+      "prompt": "Create a dashboard to provide detailed insights into API usage patterns, helping ops and engineering teams optimize resource allocation.",
+      "features": [
+        "View total monthly API requests per organization",
+        "Filter requests by status code and response time",
+        "Visualize top endpoints and query types by request volume",
+        "Generate exportable reports of usage trends"
+      ]
+    },
+    {
+      "title": "User Permissions & Access Manager",
+      "prompt": "Develop a tool to manage and audit user roles and permissions across organizations, ensuring proper access control and compliance.",
+      "features": [
+        "List and edit user roles within each organization",
+        "Audit log view of permission changes over time",
+        "Export user access reports for compliance review",
+        "Set automated alerts for unauthorized role changes"
+      ]
+    },
+    {
+      "title": "Subscription Renewal & Alert System",
+      "prompt": "Build a system to monitor subscription statuses and send alerts for upcoming renewals, supporting the sales team in retention efforts.",
+      "features": [
+        "Dashboard view of upcoming subscription renewals",
+        "Automated email alerts for renewals and expirations",
+        "Track historical subscription status changes",
+        "Search and filter subscriptions by organization and plan"
+      ]
+    }
+  ],
+  "connection_string": "postgresql://neondb_owner:npg_PU3pl5jWdFnq@ep-bitter-flower-ado0otv3-pooler.c-2.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
+}

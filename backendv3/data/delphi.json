@@ -1,0 +1,187 @@
+{
+  "company_analysis": {
+    "website": "https://www.delphi.ai/",
+    "business_description": "Delphi.ai is the world's first digital cloning platform that uses AI to create interactive digital twins of thought leaders, experts, and influencers. Users upload their content (videos, podcasts, documents) and within hours, Delphi creates an AI clone that can hold real-time conversations, share insights, and provide personalized guidance 24/7.",
+    "business_model": "Subscription-based SaaS with tiered pricing (Pro at $19/month and Premium at $29/month). Monetizes by enabling experts to scale their influence and monetize their expertise through AI-powered digital clones that can interact with unlimited users simultaneously.",
+    "target_customers": [
+      "Thought leaders and influencers seeking to scale their personal brand and reach",
+      "Subject matter experts (coaches, consultants, educators) wanting to monetize their knowledge 24/7",
+      "Entrepreneurs and founders looking to provide personalized guidance to more people",
+      "Content creators (podcasters, YouTubers, authors) expanding audience engagement",
+      "Professional service providers (lawyers, therapists, trainers) offering scalable advisory services"
+    ],
+    "key_features": [
+      "AI clone training from uploaded audio, video, podcasts, and documents",
+      "Real-time video conversations with digital clones",
+      "Multi-language support (16x language expansion)",
+      "Content citation system linking responses to source material",
+      "Voice cloning with natural conversation abilities",
+      "Public and private clone visibility options",
+      "Analytics and conversation tracking"
+    ],
+    "likely_data_needs": [
+      "User profiles and subscription management for clone creators",
+      "AI clone configurations with training status and performance metrics",
+      "Content uploads with transcription and language processing",
+      "Conversation logs with message history and cited sources",
+      "Analytics data tracking clone usage and engagement"
+    ],
+    "industry": "AI/ML SaaS, Digital Cloning, Conversational AI"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_JDKT0N8rsOvF@ep-silent-leaf-ae3yux0p-pooler.c-2.us-east-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+  "database_info": {
+    "project_id": "long-mud-48171130",
+    "database_name": "neondb",
+    "schema": [
+      {
+        "table_name": "users",
+        "columns": {
+          "id": "integer PRIMARY KEY",
+          "email": "varchar UNIQUE NOT NULL",
+          "full_name": "varchar NOT NULL",
+          "role": "varchar NOT NULL",
+          "bio": "text",
+          "profile_image_url": "text",
+          "created_at": "timestamp DEFAULT CURRENT_TIMESTAMP",
+          "last_login": "timestamp",
+          "subscription_status": "varchar DEFAULT 'trial'",
+          "is_verified": "boolean DEFAULT false"
+        },
+        "foreign_keys": {},
+        "record_count": 30
+      },
+      {
+        "table_name": "ai_clones",
+        "columns": {
+          "id": "integer PRIMARY KEY",
+          "user_id": "integer",
+          "clone_name": "varchar NOT NULL",
+          "clone_description": "text",
+          "avatar_url": "text",
+          "voice_model": "varchar",
+          "language_primary": "varchar DEFAULT 'en'",
+          "status": "varchar DEFAULT 'training'",
+          "visibility": "varchar DEFAULT 'private'",
+          "total_interactions": "integer DEFAULT 0",
+          "rating_average": "numeric(3,2) DEFAULT 0.00",
+          "created_at": "timestamp DEFAULT CURRENT_TIMESTAMP",
+          "last_trained_at": "timestamp",
+          "is_active": "boolean DEFAULT true"
+        },
+        "foreign_keys": {
+          "user_id": "users(id) ON DELETE CASCADE"
+        },
+        "record_count": 30
+      },
+      {
+        "table_name": "content_uploads",
+        "columns": {
+          "id": "integer PRIMARY KEY",
+          "clone_id": "integer",
+          "content_type": "varchar NOT NULL",
+          "file_name": "varchar NOT NULL",
+          "file_url": "text NOT NULL",
+          "file_size_mb": "numeric(10,2)",
+          "duration_seconds": "integer",
+          "language": "varchar",
+          "transcription_status": "varchar DEFAULT 'pending'",
+          "uploaded_at": "timestamp DEFAULT CURRENT_TIMESTAMP",
+          "processed_at": "timestamp"
+        },
+        "foreign_keys": {
+          "clone_id": "ai_clones(id) ON DELETE CASCADE"
+        },
+        "record_count": 40
+      },
+      {
+        "table_name": "subscriptions",
+        "columns": {
+          "id": "integer PRIMARY KEY",
+          "user_id": "integer",
+          "plan_type": "varchar NOT NULL",
+          "billing_cycle": "varchar NOT NULL",
+          "price_usd": "numeric(10,2) NOT NULL",
+          "status": "varchar NOT NULL",
+          "started_at": "timestamp DEFAULT CURRENT_TIMESTAMP",
+          "expires_at": "timestamp",
+          "auto_renew": "boolean DEFAULT true",
+          "payment_method": "varchar"
+        },
+        "foreign_keys": {
+          "user_id": "users(id) ON DELETE CASCADE"
+        },
+        "record_count": 30
+      },
+      {
+        "table_name": "conversations",
+        "columns": {
+          "id": "integer PRIMARY KEY",
+          "clone_id": "integer",
+          "visitor_id": "varchar",
+          "visitor_name": "varchar",
+          "visitor_email": "varchar",
+          "started_at": "timestamp DEFAULT CURRENT_TIMESTAMP",
+          "ended_at": "timestamp",
+          "total_messages": "integer DEFAULT 0",
+          "conversation_rating": "integer",
+          "feedback_text": "text"
+        },
+        "foreign_keys": {
+          "clone_id": "ai_clones(id) ON DELETE CASCADE"
+        },
+        "record_count": 105
+      },
+      {
+        "table_name": "messages",
+        "columns": {
+          "id": "integer PRIMARY KEY",
+          "conversation_id": "integer",
+          "sender_type": "varchar NOT NULL",
+          "message_text": "text NOT NULL",
+          "cited_content_id": "integer",
+          "timestamp_cited": "integer",
+          "sent_at": "timestamp DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "conversation_id": "conversations(id) ON DELETE CASCADE",
+          "cited_content_id": "content_uploads(id)"
+        },
+        "record_count": 238
+      },
+      {
+        "table_name": "clone_analytics",
+        "columns": {
+          "id": "integer PRIMARY KEY",
+          "clone_id": "integer",
+          "date": "date NOT NULL",
+          "total_conversations": "integer DEFAULT 0",
+          "total_messages": "integer DEFAULT 0",
+          "avg_conversation_duration_seconds": "integer DEFAULT 0",
+          "unique_visitors": "integer DEFAULT 0",
+          "avg_rating": "numeric(3,2) DEFAULT 0.00"
+        },
+        "foreign_keys": {
+          "clone_id": "ai_clones(id) ON DELETE CASCADE"
+        },
+        "record_count": 80
+      },
+      {
+        "table_name": "training_jobs",
+        "columns": {
+          "id": "integer PRIMARY KEY",
+          "clone_id": "integer",
+          "job_status": "varchar NOT NULL",
+          "started_at": "timestamp DEFAULT CURRENT_TIMESTAMP",
+          "completed_at": "timestamp",
+          "duration_seconds": "integer",
+          "content_count": "integer",
+          "error_message": "text"
+        },
+        "foreign_keys": {
+          "clone_id": "ai_clones(id) ON DELETE CASCADE"
+        },
+        "record_count": 40
+      }
+    ]
+  }
+}

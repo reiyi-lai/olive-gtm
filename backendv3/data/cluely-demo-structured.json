@@ -1,0 +1,38 @@
+{
+  "tool_suggestions": [
+    {
+      "title": "Subscription Plan Analysis Dashboard",
+      "prompt": "Create a dashboard for internal stakeholders to analyze subscription plan performance, user demographics, and feature engagement.",
+      "features": [
+        "Visualize user distribution across different subscription plans",
+        "Analyze correlation between feature usage and subscription tiers",
+        "Track subscription plan churn rates over time",
+        "Monitor revenue generated from each subscription plan",
+        "Identify top-performing features and propose upgrades"
+      ]
+    },
+    {
+      "title": "User Meeting Insights Explorer",
+      "prompt": "Build a tool for examining user-specific meeting and AI interaction trends to enhance Cluely's performance and user engagement.",
+      "features": [
+        "Filter and view meeting data by user, platform, or date range",
+        "Analyze AI interaction patterns and query types per user",
+        "Compare meeting durations and activity levels across users",
+        "Identify users with high engagement for potential feedback sessions",
+        "Generate reports on user performance scores and AI response efficiency"
+      ]
+    },
+    {
+      "title": "Integration Management Interface",
+      "prompt": "Develop a tool for the engineering team to monitor and adjust user integration settings and statuses efficiently.",
+      "features": [
+        "List and manage integration settings for individual users",
+        "Enable or disable specific integrations with configuration details",
+        "Track synchronization statuses and resolve pending integrations",
+        "Log recent sync activities and user adjustments",
+        "Provide summary reports of integration usage trends"
+      ]
+    }
+  ],
+  "connection_string": "postgresql://neondb_owner:npg_y5KJLa8hgScF@ep-odd-voice-aecmaor5-pooler.c-2.us-east-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
+}

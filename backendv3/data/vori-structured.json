@@ -1,0 +1,35 @@
+{
+  "tool_suggestions": [
+    {
+      "title": "Inventory Optimization Dashboard",
+      "prompt": "Create a dashboard to monitor and manage inventory levels across all store locations.",
+      "features": [
+        "Visualize current vs. ideal stock levels",
+        "Receive alerts for low stock items",
+        "View restock history and upcoming orders",
+        "Filter by store, category, or supplier"
+      ]
+    },
+    {
+      "title": "Supplier Management Portal",
+      "prompt": "Develop a portal for managing supplier information and monitoring purchase orders.",
+      "features": [
+        "View and update supplier contact details",
+        "Track purchase order status and history",
+        "Analyze payment terms and spending trends",
+        "Generate reports on supplier performance"
+      ]
+    },
+    {
+      "title": "Employee Access Control Manager",
+      "prompt": "Build a tool to manage employee permissions and roles across stores.",
+      "features": [
+        "Assign and modify employee roles and permissions",
+        "Monitor activities related to sensitive operations",
+        "Generate audit logs for permission changes",
+        "View employee contact and employment details"
+      ]
+    }
+  ],
+  "connection_string": "postgresql://neondb_owner:npg_ZqBnsWLDY05v@ep-holy-dawn-ae9xf0fm-pooler.c-2.us-east-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
+}

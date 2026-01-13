@@ -1,0 +1,35 @@
+{
+  "tool_suggestions": [
+    {
+      "title": "Customer Relationship Health Dashboard",
+      "prompt": "Build a dashboard that visualizes the health of customer relationships based on existing data, allowing internal teams to identify which relationships need attention.",
+      "features": [
+        "Visualize relationship scores and health trends over time",
+        "Display recent communication activities with sentiment analysis",
+        "Show upcoming meetings and reminders related to key contacts",
+        "Highlight contacts with recent job changes or notable activities"
+      ]
+    },
+    {
+      "title": "Internal Contact Tagging System",
+      "prompt": "Create a tagging system for internal teams to categorize and manage contacts effectively, enabling quick access to strategic relationship data.",
+      "features": [
+        "Tag and categorize contacts based on relationship type or priority",
+        "Filter and search contacts by tags and relationship score",
+        "View detailed contact information and recent interactions",
+        "Assign tags to multiple contacts in bulk"
+      ]
+    },
+    {
+      "title": "Meeting Effectiveness Tracker",
+      "prompt": "Develop a tool that assesses and tracks the effectiveness of meetings, helping internal teams optimize meeting strategies and improve outcomes.",
+      "features": [
+        "Analyze meeting participation and response rates",
+        "Track meeting frequency and duration per contact or team",
+        "Visualize meeting outcomes based on collected feedback",
+        "Provide insights on meeting types associated with successful outcomes"
+      ]
+    }
+  ],
+  "connection_string": "postgresql://neondb_owner:npg_H0JpBDZKlPx7@ep-hidden-union-adulcnwe-pooler.c-2.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
+}

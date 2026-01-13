@@ -1,0 +1,35 @@
+{
+  "tool_suggestions": [
+    {
+      "title": "Workspace Performance Dashboard",
+      "prompt": "Create a dashboard to analyze and display key performance metrics of each workspace, helping teams and leaders quickly assess workspace health and activity.",
+      "features": [
+        "Overview of active vs. inactive workspaces",
+        "Trend analysis of workspace creation and member growth",
+        "Charts for usage of key features like pages and databases",
+        "Drill-down into specific workspace metrics for detailed insights"
+      ]
+    },
+    {
+      "title": "User Engagement Monitoring Tool",
+      "prompt": "Build a tool to track user engagement levels and activity patterns within the platform, aiding in improving user retention strategies.",
+      "features": [
+        "Visualize user active vs. inactive periods over time",
+        "Identify top users based on activity frequency and impact",
+        "Analyze trends in user sign-ups and participation",
+        "Alerts for sudden drops or spikes in user activity"
+      ]
+    },
+    {
+      "title": "Project Management Insights Tool",
+      "prompt": "Develop a tool to provide insights into project progress and status, enabling teams to manage tasks and priorities efficiently.",
+      "features": [
+        "Overview dashboard showing status of all projects",
+        "Filters to view tasks by priority and due date",
+        "Comparative analysis of project timelines and delays",
+        "Task assignment tracker to monitor workloads"
+      ]
+    }
+  ],
+  "connection_string": "postgresql://neondb_owner:npg_89MKsAQZHtDr@ep-super-shape-adia5xro-pooler.c-2.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
+}

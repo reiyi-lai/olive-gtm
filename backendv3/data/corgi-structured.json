@@ -1,0 +1,35 @@
+{
+  "tool_suggestions": [
+    {
+      "title": "Risk Assessment Review Dashboard",
+      "prompt": "Create a dashboard to review and analyze risk assessments for each company, focusing on overall, cyber, and liability risk scores.",
+      "features": [
+        "Visualize overall, cyber, and liability risk scores",
+        "Filter and sort assessments by date or company",
+        "View AI confidence levels and risk factors",
+        "Access mitigation recommendations and history"
+      ]
+    },
+    {
+      "title": "Claims Management and Resolution Interface",
+      "prompt": "Design an interface to manage, track, and resolve insurance claims efficiently, with options to update status and add adjuster notes.",
+      "features": [
+        "View and filter claims by status (submitted, in progress, resolved)",
+        "Update claim status and add or edit adjuster notes",
+        "Link related claims and policies for comprehensive view",
+        "Analyze AI risk assessment and adjust payments"
+      ]
+    },
+    {
+      "title": "Policy Renewal Monitoring Tool",
+      "prompt": "Develop a tool to track upcoming policy renewals and manage auto-renew settings for each policy.",
+      "features": [
+        "List policies with upcoming renewal dates and status",
+        "Toggle and update auto-renew settings quickly",
+        "Send reminders or notifications for manual renewals",
+        "Adjust and view premium amounts for renewed policies"
+      ]
+    }
+  ],
+  "connection_string": "postgresql://neondb_owner:npg_g9Dtw3MBukfR@ep-hidden-math-aez012v8-pooler.c-2.us-east-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
+}

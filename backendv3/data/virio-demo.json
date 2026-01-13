@@ -1,0 +1,210 @@
+{
+  "company_analysis": {
+    "website": "https://www.virio.ai/",
+    "business_description": "Virio is a B2B content marketing agency specializing in LinkedIn video content creation for business executives and companies. They provide end-to-end content services including research, strategy, script writing, video production, editing, social media distribution, and performance analytics.",
+    "business_model": "Agency retainer model - charges monthly retainers to clients for comprehensive video content marketing services with guaranteed 3x ROI",
+    "target_customers": "B2B executives, companies seeking to enhance LinkedIn lead generation, businesses wanting professional video content for social selling",
+    "key_features": [
+      "Content research and strategy",
+      "Professional script writing",
+      "Video production and editing",
+      "Social media distribution",
+      "Performance analytics and ROI tracking",
+      "Data-driven content optimization"
+    ],
+    "likely_data_needs": [
+      "Client relationship management",
+      "Content campaign tracking",
+      "Video performance metrics",
+      "Team resource allocation",
+      "ROI measurement and reporting",
+      "Content research and strategy documentation"
+    ],
+    "industry": "Digital Marketing Agency / Content Marketing Services"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_sVMB6p4KHhzq@ep-sparkling-boat-af1xtzrs-pooler.c-2.us-west-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+  "database_info": {
+    "project_id": "sparkling-smoke-90692722",
+    "database_name": "neondb",
+    "schema": [
+      {
+        "table_name": "clients",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "company_name": "VARCHAR(255) NOT NULL",
+          "industry": "VARCHAR(100)",
+          "company_size": "VARCHAR(50)",
+          "contact_name": "VARCHAR(255) NOT NULL",
+          "contact_email": "VARCHAR(255) NOT NULL",
+          "contact_phone": "VARCHAR(50)",
+          "linkedin_url": "VARCHAR(500)",
+          "website_url": "VARCHAR(500)",
+          "monthly_retainer": "DECIMAL(10,2)",
+          "contract_start_date": "DATE NOT NULL",
+          "contract_end_date": "DATE",
+          "status": "VARCHAR(50) DEFAULT 'active'",
+          "roi_target": "DECIMAL(5,2) DEFAULT 3.00",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {},
+        "record_count": 12
+      },
+      {
+        "table_name": "campaigns",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "client_id": "INTEGER REFERENCES clients(id)",
+          "campaign_name": "VARCHAR(255) NOT NULL",
+          "objective": "TEXT",
+          "target_audience": "TEXT",
+          "start_date": "DATE NOT NULL",
+          "end_date": "DATE",
+          "budget": "DECIMAL(10,2)",
+          "status": "VARCHAR(50) DEFAULT 'active'",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "client_id": "clients(id)"
+        },
+        "record_count": 15
+      },
+      {
+        "table_name": "videos",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "campaign_id": "INTEGER REFERENCES campaigns(id)",
+          "title": "VARCHAR(255) NOT NULL",
+          "script_text": "TEXT",
+          "video_duration_seconds": "INTEGER",
+          "production_status": "VARCHAR(50) DEFAULT 'planning'",
+          "video_file_url": "VARCHAR(500)",
+          "thumbnail_url": "VARCHAR(500)",
+          "publish_date": "DATE",
+          "linkedin_post_url": "VARCHAR(500)",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "campaign_id": "campaigns(id)"
+        },
+        "record_count": 20
+      },
+      {
+        "table_name": "video_metrics",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "video_id": "INTEGER REFERENCES videos(id)",
+          "metric_date": "DATE NOT NULL",
+          "views": "INTEGER DEFAULT 0",
+          "likes": "INTEGER DEFAULT 0",
+          "comments": "INTEGER DEFAULT 0",
+          "shares": "INTEGER DEFAULT 0",
+          "click_through_rate": "DECIMAL(5,2)",
+          "engagement_rate": "DECIMAL(5,2)",
+          "leads_generated": "INTEGER DEFAULT 0",
+          "conversion_value": "DECIMAL(10,2) DEFAULT 0",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "video_id": "videos(id)"
+        },
+        "record_count": 48
+      },
+      {
+        "table_name": "content_research",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "campaign_id": "INTEGER REFERENCES campaigns(id)",
+          "research_topic": "VARCHAR(255) NOT NULL",
+          "target_keywords": "TEXT",
+          "competitor_analysis": "TEXT",
+          "trend_insights": "TEXT",
+          "content_angles": "TEXT",
+          "research_date": "DATE NOT NULL",
+          "researcher_name": "VARCHAR(255)",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "campaign_id": "campaigns(id)"
+        },
+        "record_count": 16
+      },
+      {
+        "table_name": "team_members",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(255) NOT NULL",
+          "email": "VARCHAR(255) NOT NULL UNIQUE",
+          "role": "VARCHAR(100) NOT NULL",
+          "specialization": "VARCHAR(255)",
+          "hire_date": "DATE NOT NULL",
+          "status": "VARCHAR(50) DEFAULT 'active'",
+          "hourly_rate": "DECIMAL(8,2)",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {},
+        "record_count": 10
+      },
+      {
+        "table_name": "campaign_assignments",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "campaign_id": "INTEGER REFERENCES campaigns(id)",
+          "team_member_id": "INTEGER REFERENCES team_members(id)",
+          "role_in_campaign": "VARCHAR(100)",
+          "hours_allocated": "DECIMAL(6,2)",
+          "assigned_date": "DATE NOT NULL",
+          "status": "VARCHAR(50) DEFAULT 'active'",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "campaign_id": "campaigns(id)",
+          "team_member_id": "team_members(id)"
+        },
+        "record_count": 50
+      },
+      {
+        "table_name": "roi_tracking",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "client_id": "INTEGER REFERENCES clients(id)",
+          "period_start": "DATE NOT NULL",
+          "period_end": "DATE NOT NULL",
+          "total_investment": "DECIMAL(12,2) NOT NULL",
+          "total_revenue_generated": "DECIMAL(12,2) DEFAULT 0",
+          "leads_generated": "INTEGER DEFAULT 0",
+          "qualified_leads": "INTEGER DEFAULT 0",
+          "closed_deals": "INTEGER DEFAULT 0",
+          "roi_multiple": "DECIMAL(5,2)",
+          "notes": "TEXT",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "client_id": "clients(id)"
+        },
+        "record_count": 15
+      },
+      {
+        "table_name": "social_accounts",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "client_id": "INTEGER REFERENCES clients(id)",
+          "platform": "VARCHAR(50) NOT NULL",
+          "account_handle": "VARCHAR(255)",
+          "account_url": "VARCHAR(500)",
+          "follower_count": "INTEGER DEFAULT 0",
+          "engagement_rate": "DECIMAL(5,2)",
+          "last_updated": "DATE",
+          "status": "VARCHAR(50) DEFAULT 'active'",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "client_id": "clients(id)"
+        },
+        "record_count": 15
+      }
+    ]
+  }
+}

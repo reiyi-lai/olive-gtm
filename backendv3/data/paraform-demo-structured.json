@@ -1,0 +1,35 @@
+{
+  "tool_suggestions": [
+    {
+      "title": "Recruiter Performance Dashboard",
+      "prompt": "Create a dashboard that allows HR managers to track recruiter performance, using data such as placements and ratings.",
+      "features": [
+        "View recruiter placement statistics and rankings",
+        "Analyze recruiter commission and earnings",
+        "Track recruiter activity and specialization",
+        "Flag recruiters with low performance for further review"
+      ]
+    },
+    {
+      "title": "Job Posting Management Interface",
+      "prompt": "Develop a multi-page tool for creating, updating, and reviewing job postings to streamline company hiring operations.",
+      "features": [
+        "Create and edit detailed job postings",
+        "Monitor the status and progress of job openings",
+        "Assign recruiters to specific job postings",
+        "Generate reports on job posting performance"
+      ]
+    },
+    {
+      "title": "Candidate Interview Coordination System",
+      "prompt": "Design a system to coordinate candidate interviews, integrating schedules and feedback to optimize workflow.",
+      "features": [
+        "Schedule and reschedule interviews",
+        "View candidate interview history and feedback",
+        "Coordinate interviewer availability and times",
+        "Aggregate interview feedback for decision making"
+      ]
+    }
+  ],
+  "connection_string": "postgresql://neondb_owner:npg_sP8DvKF7dfka@ep-plain-union-adnrlbx5-pooler.c-2.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
+}

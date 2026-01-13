@@ -1,0 +1,195 @@
+{
+  "company_analysis": {
+    "website": "https://www.coffeespace.com/",
+    "business_description": "CoffeeSpace is a mobile-first cofounder matching platform that connects entrepreneurs across industries to find compatible business partners. The platform uses intelligent matching algorithms with personality-focused profiles and granular filters to facilitate meaningful professional connections between technical and non-technical founders.",
+    "business_model": "Freemium SaaS model with free basic tier (10 daily likes) and premium subscriptions ($19.99/month or $179.99/year for Premium, $39.99/month or $359.99/year for Pro) offering unlimited likes, super likes, profile boosts, advanced filters, and priority support.",
+    "target_customers": "Entrepreneurs across all industries, startup founders at idea-stage or committed building phase, professionals from top universities and companies, both technical and non-technical backgrounds seeking business partnerships.",
+    "key_features": [
+      "Granular matching filters",
+      "Personality-focused profile prompts",
+      "Daily personalized recommendations",
+      "Transparent connection invites",
+      "Mobile-first design",
+      "Dual-sided compatibility matching",
+      "Super likes and profile boosts"
+    ],
+    "likely_data_needs": [
+      "User profiles with background/skills",
+      "Matching preferences and filters",
+      "Swipe interaction data",
+      "Match and connection logs",
+      "Location and industry data",
+      "Leads generation and manaagement"
+    ],
+    "industry": "Professional Networking / Matchmaking Platform"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_uD8nJahx0Ltr@ep-broad-wildflower-af1mxfok-pooler.c-2.us-west-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+  "database_info": {
+    "project_id": "young-boat-49132013",
+    "database_name": "neondb",
+    "schema": [
+      {
+        "table_name": "industries",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(100) NOT NULL UNIQUE",
+          "description": "TEXT",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {},
+        "record_count": 15
+      },
+      {
+        "table_name": "locations",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "city": "VARCHAR(100) NOT NULL",
+          "state": "VARCHAR(50)",
+          "country": "VARCHAR(100) NOT NULL",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {},
+        "record_count": 25
+      },
+      {
+        "table_name": "subscription_plans",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(50) NOT NULL",
+          "price": "DECIMAL(10,2) NOT NULL",
+          "billing_cycle": "VARCHAR(20) NOT NULL",
+          "features": "JSONB",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {},
+        "record_count": 5
+      },
+      {
+        "table_name": "users",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "email": "VARCHAR(255) NOT NULL UNIQUE",
+          "first_name": "VARCHAR(100) NOT NULL",
+          "last_name": "VARCHAR(100) NOT NULL",
+          "profile_photo_url": "VARCHAR(500)",
+          "bio": "TEXT",
+          "age": "INTEGER",
+          "gender": "VARCHAR(20)",
+          "industry_id": "INTEGER",
+          "location_id": "INTEGER",
+          "is_technical": "BOOLEAN DEFAULT false",
+          "experience_level": "VARCHAR(50)",
+          "linkedin_url": "VARCHAR(500)",
+          "twitter_url": "VARCHAR(500)",
+          "is_active": "BOOLEAN DEFAULT true",
+          "last_active": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "industry_id": "industries(id)",
+          "location_id": "locations(id)"
+        },
+        "record_count": 210
+      },
+      {
+        "table_name": "user_preferences",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "user_id": "INTEGER NOT NULL",
+          "min_age": "INTEGER",
+          "max_age": "INTEGER",
+          "preferred_genders": "TEXT[]",
+          "preferred_industries": "INTEGER[]",
+          "preferred_locations": "INTEGER[]",
+          "is_technical_preference": "VARCHAR(20)",
+          "experience_level_preference": "VARCHAR(50)",
+          "max_distance_km": "INTEGER",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "user_id": "users(id)"
+        },
+        "record_count": 210
+      },
+      {
+        "table_name": "user_skills",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "user_id": "INTEGER NOT NULL",
+          "skill_name": "VARCHAR(100) NOT NULL",
+          "proficiency_level": "VARCHAR(20)",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "user_id": "users(id)"
+        },
+        "record_count": 800
+      },
+      {
+        "table_name": "user_subscriptions",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "user_id": "INTEGER NOT NULL",
+          "plan_id": "INTEGER NOT NULL",
+          "status": "VARCHAR(20) DEFAULT 'active'",
+          "started_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "ends_at": "TIMESTAMP",
+          "auto_renew": "BOOLEAN DEFAULT true",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "user_id": "users(id)",
+          "plan_id": "subscription_plans(id)"
+        },
+        "record_count": 200
+      },
+      {
+        "table_name": "swipes",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "swiper_id": "INTEGER NOT NULL",
+          "swiped_id": "INTEGER NOT NULL",
+          "action": "VARCHAR(10) NOT NULL CHECK (action IN ('like', 'pass'))",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "swiper_id": "users(id)",
+          "swiped_id": "users(id)"
+        },
+        "record_count": 1985
+      },
+      {
+        "table_name": "matches",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "user1_id": "INTEGER NOT NULL",
+          "user2_id": "INTEGER NOT NULL",
+          "matched_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "is_active": "BOOLEAN DEFAULT true"
+        },
+        "foreign_keys": {
+          "user1_id": "users(id)",
+          "user2_id": "users(id)"
+        },
+        "record_count": 2
+      },
+      {
+        "table_name": "conversations",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "match_id": "INTEGER NOT NULL",
+          "sender_id": "INTEGER NOT NULL",
+          "message": "TEXT NOT NULL",
+          "sent_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "is_read": "BOOLEAN DEFAULT false"
+        },
+        "foreign_keys": {
+          "match_id": "matches(id)",
+          "sender_id": "users(id)"
+        },
+        "record_count": 4
+      }
+    ]
+  }
+}

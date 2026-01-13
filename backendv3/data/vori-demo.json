@@ -1,0 +1,259 @@
+{
+  "company_analysis": {
+    "website": "https://www.vori.com/",
+    "business_description": "Vori is a technology company providing an all-in-one point-of-sale (POS) and operations software specifically designed for independent grocery stores. They offer a cloud-based platform that brings independent grocery stores into the digital age.",
+    "business_model": "Software-as-a-Service (SaaS) model charging subscription fees for their comprehensive platform",
+    "target_customers": "Independent grocery stores (single or multiple locations), small to medium-sized grocery retailers",
+    "key_features": [
+      "Cloud-based POS System",
+      "Payment Processing (EBT, contactless, gift cards)",
+      "Back Office Management",
+      "Price Change Tracking",
+      "Shopper Engagement/Loyalty Platform",
+      "Supplier Data Integration",
+      "Inventory Management",
+      "Pricing Automation",
+      "Customer Loyalty Tracking",
+      "Reporting and Analytics"
+    ],
+    "likely_data_needs": [
+      "Customer transaction records",
+      "Inventory data",
+      "Supplier information",
+      "Pricing history",
+      "Customer loyalty program details",
+      "Sales and financial reports",
+      "User/employee accounts",
+      "Payment processing data"
+    ],
+    "industry": "Retail Technology / Point-of-Sale Software"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_JmnBGC8iuo1h@ep-jolly-voice-ad9a4ljt-pooler.c-2.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+  "database_info": {
+    "project_id": "dark-cloud-97293332",
+    "database_name": "neondb",
+    "schema": [
+      {
+        "table_name": "stores",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(255)",
+          "address": "TEXT",
+          "city": "VARCHAR(100)",
+          "state": "VARCHAR(50)",
+          "zip_code": "VARCHAR(20)",
+          "phone": "VARCHAR(20)",
+          "email": "VARCHAR(255)",
+          "owner_name": "VARCHAR(255)",
+          "subscription_plan": "VARCHAR(50)",
+          "created_at": "TIMESTAMP",
+          "updated_at": "TIMESTAMP"
+        },
+        "foreign_keys": {},
+        "record_count": 20
+      },
+      {
+        "table_name": "suppliers",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(255)",
+          "contact_person": "VARCHAR(255)",
+          "email": "VARCHAR(255)",
+          "phone": "VARCHAR(20)",
+          "address": "TEXT",
+          "payment_terms": "VARCHAR(100)",
+          "created_at": "TIMESTAMP"
+        },
+        "foreign_keys": {},
+        "record_count": 10
+      },
+      {
+        "table_name": "product_categories",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(255)",
+          "description": "TEXT"
+        },
+        "foreign_keys": {},
+        "record_count": 12
+      },
+      {
+        "table_name": "products",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "sku": "VARCHAR(100) UNIQUE",
+          "name": "VARCHAR(255)",
+          "description": "TEXT",
+          "category_id": "INTEGER",
+          "supplier_id": "INTEGER",
+          "unit_cost": "DECIMAL(10,2)",
+          "retail_price": "DECIMAL(10,2)",
+          "tax_rate": "DECIMAL(5,4)",
+          "is_ebt_eligible": "BOOLEAN",
+          "barcode": "VARCHAR(50)",
+          "created_at": "TIMESTAMP",
+          "updated_at": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "category_id": "product_categories(id)",
+          "supplier_id": "suppliers(id)"
+        },
+        "record_count": 78
+      },
+      {
+        "table_name": "customers",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "first_name": "VARCHAR(100)",
+          "last_name": "VARCHAR(100)",
+          "email": "VARCHAR(255)",
+          "phone": "VARCHAR(20)",
+          "address": "TEXT",
+          "city": "VARCHAR(100)",
+          "state": "VARCHAR(50)",
+          "zip_code": "VARCHAR(20)",
+          "date_of_birth": "DATE",
+          "is_loyalty_member": "BOOLEAN",
+          "loyalty_points": "INTEGER",
+          "created_at": "TIMESTAMP"
+        },
+        "foreign_keys": {},
+        "record_count": 20
+      },
+      {
+        "table_name": "employees",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "store_id": "INTEGER",
+          "employee_id": "VARCHAR(50) UNIQUE",
+          "first_name": "VARCHAR(100)",
+          "last_name": "VARCHAR(100)",
+          "email": "VARCHAR(255)",
+          "phone": "VARCHAR(20)",
+          "role": "VARCHAR(50)",
+          "hourly_rate": "DECIMAL(8,2)",
+          "hire_date": "DATE",
+          "is_active": "BOOLEAN",
+          "created_at": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "store_id": "stores(id)"
+        },
+        "record_count": 32
+      },
+      {
+        "table_name": "transactions",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "store_id": "INTEGER",
+          "employee_id": "INTEGER",
+          "customer_id": "INTEGER",
+          "transaction_number": "VARCHAR(50) UNIQUE",
+          "subtotal": "DECIMAL(10,2)",
+          "tax_amount": "DECIMAL(10,2)",
+          "discount_amount": "DECIMAL(10,2)",
+          "total_amount": "DECIMAL(10,2)",
+          "payment_method_id": "INTEGER",
+          "transaction_date": "TIMESTAMP",
+          "status": "VARCHAR(20)"
+        },
+        "foreign_keys": {
+          "store_id": "stores(id)",
+          "employee_id": "employees(id)",
+          "customer_id": "customers(id)",
+          "payment_method_id": "payment_methods(id)"
+        },
+        "record_count": 60
+      },
+      {
+        "table_name": "transaction_items",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "transaction_id": "INTEGER",
+          "product_id": "INTEGER",
+          "quantity": "INTEGER",
+          "unit_price": "DECIMAL(10,2)",
+          "discount_amount": "DECIMAL(10,2)",
+          "line_total": "DECIMAL(10,2)"
+        },
+        "foreign_keys": {
+          "transaction_id": "transactions(id)",
+          "product_id": "products(id)"
+        },
+        "record_count": 75
+      },
+      {
+        "table_name": "store_inventory",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "store_id": "INTEGER",
+          "product_id": "INTEGER",
+          "quantity_on_hand": "INTEGER",
+          "reorder_level": "INTEGER",
+          "last_restock_date": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "store_id": "stores(id)",
+          "product_id": "products(id)"
+        },
+        "record_count": 52
+      },
+      {
+        "table_name": "loyalty_rewards",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "customer_id": "INTEGER",
+          "points_earned": "INTEGER",
+          "points_redeemed": "INTEGER",
+          "transaction_id": "INTEGER",
+          "reward_date": "TIMESTAMP",
+          "description": "TEXT"
+        },
+        "foreign_keys": {
+          "customer_id": "customers(id)",
+          "transaction_id": "transactions(id)"
+        },
+        "record_count": 11
+      },
+      {
+        "table_name": "price_changes",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "product_id": "INTEGER",
+          "store_id": "INTEGER",
+          "old_price": "DECIMAL(10,2)",
+          "new_price": "DECIMAL(10,2)",
+          "change_reason": "VARCHAR(255)",
+          "effective_date": "TIMESTAMP",
+          "created_by": "INTEGER"
+        },
+        "foreign_keys": {
+          "product_id": "products(id)",
+          "store_id": "stores(id)",
+          "created_by": "employees(id)"
+        },
+        "record_count": 7
+      },
+      {
+        "table_name": "daily_sales_summary",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "store_id": "INTEGER",
+          "sales_date": "DATE",
+          "total_transactions": "INTEGER",
+          "total_revenue": "DECIMAL(12,2)",
+          "total_tax": "DECIMAL(10,2)",
+          "total_discounts": "DECIMAL(10,2)",
+          "cash_sales": "DECIMAL(10,2)",
+          "card_sales": "DECIMAL(10,2)",
+          "ebt_sales": "DECIMAL(10,2)",
+          "created_at": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "store_id": "stores(id)"
+        },
+        "record_count": 17
+      }
+    ]
+  }
+}

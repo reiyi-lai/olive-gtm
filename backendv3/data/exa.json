@@ -1,0 +1,176 @@
+{
+  "company_analysis": {
+    "website": "https://exa.ai/",
+    "business_description": "Exa is an AI-powered web search API that provides advanced semantic search capabilities for developers and AI applications. Their search engine is built from scratch with proprietary vector database technology designed specifically for the AI era.",
+    "business_model": "API-as-a-Service with tiered pricing from free to enterprise plans, charging based on request volume and feature access",
+    "target_customers": [
+      "• AI application developers building LLM-powered products",
+      "• Enterprise companies like Notion, Vercel, Databricks, AWS, and Cursor",
+      "• Startups building AI agents and chatbots needing real-time web data",
+      "• Content platforms requiring semantic search and web crawling",
+      "• Research tools and knowledge management systems"
+    ],
+    "key_features": [
+      "Search API - semantic web search with advanced filters",
+      "Crawl API - extract all pages from websites",
+      "Answer API - natural language summaries of results",
+      "Research API - structured research outputs",
+      "Websets - complex queries for large-scale result sets"
+    ],
+    "likely_data_needs": [
+      "API customer organizations and user management",
+      "API keys and authentication for access control",
+      "Request logs tracking all API calls with performance metrics",
+      "Search query data with filters and result counts",
+      "Website crawl jobs with status tracking"
+    ],
+    "industry": "AI Infrastructure / Search Technology"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_PU3pl5jWdFnq@ep-bitter-flower-ado0otv3-pooler.c-2.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+  "database_info": {
+    "project_id": "green-dream-60385157",
+    "database_name": "neondb",
+    "schema": [
+      {
+        "table_name": "organizations",
+        "columns": {
+          "id": "integer PRIMARY KEY",
+          "name": "varchar NOT NULL",
+          "domain": "varchar",
+          "industry": "varchar",
+          "company_size": "varchar",
+          "created_at": "timestamp DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "timestamp DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {},
+        "record_count": 101
+      },
+      {
+        "table_name": "pricing_plans",
+        "columns": {
+          "id": "integer PRIMARY KEY",
+          "name": "varchar NOT NULL",
+          "price_per_month": "numeric",
+          "requests_included": "integer",
+          "features": "jsonb",
+          "is_enterprise": "boolean DEFAULT false",
+          "created_at": "timestamp DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {},
+        "record_count": 6
+      },
+      {
+        "table_name": "users",
+        "columns": {
+          "id": "integer PRIMARY KEY",
+          "organization_id": "integer",
+          "email": "varchar NOT NULL UNIQUE",
+          "full_name": "varchar",
+          "role": "varchar",
+          "created_at": "timestamp DEFAULT CURRENT_TIMESTAMP",
+          "last_login": "timestamp"
+        },
+        "foreign_keys": {
+          "organization_id": "REFERENCES organizations(id)"
+        },
+        "record_count": 204
+      },
+      {
+        "table_name": "subscriptions",
+        "columns": {
+          "id": "integer PRIMARY KEY",
+          "organization_id": "integer",
+          "pricing_plan_id": "integer",
+          "status": "varchar",
+          "start_date": "timestamp",
+          "end_date": "timestamp",
+          "monthly_request_limit": "integer",
+          "created_at": "timestamp DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "organization_id": "REFERENCES organizations(id)",
+          "pricing_plan_id": "REFERENCES pricing_plans(id)"
+        },
+        "record_count": 100
+      },
+      {
+        "table_name": "api_keys",
+        "columns": {
+          "id": "integer PRIMARY KEY",
+          "organization_id": "integer",
+          "key_hash": "varchar NOT NULL UNIQUE",
+          "key_name": "varchar",
+          "environment": "varchar",
+          "is_active": "boolean DEFAULT true",
+          "created_at": "timestamp DEFAULT CURRENT_TIMESTAMP",
+          "last_used_at": "timestamp"
+        },
+        "foreign_keys": {
+          "organization_id": "REFERENCES organizations(id)"
+        },
+        "record_count": 120
+      },
+      {
+        "table_name": "api_requests",
+        "columns": {
+          "id": "integer PRIMARY KEY",
+          "api_key_id": "integer",
+          "organization_id": "integer",
+          "endpoint": "varchar",
+          "request_method": "varchar",
+          "query_text": "text",
+          "filters": "jsonb",
+          "results_count": "integer",
+          "response_time_ms": "integer",
+          "status_code": "integer",
+          "created_at": "timestamp DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "api_key_id": "REFERENCES api_keys(id)",
+          "organization_id": "REFERENCES organizations(id)"
+        },
+        "record_count": 500
+      },
+      {
+        "table_name": "search_queries",
+        "columns": {
+          "id": "integer PRIMARY KEY",
+          "api_request_id": "integer",
+          "organization_id": "integer",
+          "query_text": "text NOT NULL",
+          "query_type": "varchar",
+          "num_results": "integer",
+          "categories": "jsonb",
+          "domains_filter": "jsonb",
+          "date_filter": "jsonb",
+          "created_at": "timestamp DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "api_request_id": "REFERENCES api_requests(id)",
+          "organization_id": "REFERENCES organizations(id)"
+        },
+        "record_count": 121
+      },
+      {
+        "table_name": "crawl_jobs",
+        "columns": {
+          "id": "integer PRIMARY KEY",
+          "organization_id": "integer",
+          "api_key_id": "integer",
+          "target_domain": "varchar",
+          "status": "varchar",
+          "pages_crawled": "integer DEFAULT 0",
+          "pages_total": "integer",
+          "started_at": "timestamp",
+          "completed_at": "timestamp",
+          "created_at": "timestamp DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "organization_id": "REFERENCES organizations(id)",
+          "api_key_id": "REFERENCES api_keys(id)"
+        },
+        "record_count": 63
+      }
+    ]
+  }
+}

@@ -1,0 +1,264 @@
+{
+  "company_analysis": {
+    "website": "https://www.figma.com/",
+    "business_description": "Figma is a collaborative interface design platform that enables design teams to work together in real-time. They offer a comprehensive suite of design tools including Figma Design (interface design), Dev Mode (design-to-code translation), FigJam (digital whiteboarding), Figma Slides, Figma Draw, Figma Sites, and Figma Make (AI-powered creation).",
+    "business_model": "SaaS subscription model with tiered pricing (free, starter, professional, organization, enterprise) based on team size and feature access. Revenue comes from monthly/annual subscriptions, with higher tiers offering advanced collaboration, admin controls, and enterprise features.",
+    "target_customers": "Design professionals, product teams, software development companies, enterprise organizations, individual designers, and creative agencies across all industries who need collaborative design tools.",
+    "key_features": [
+      "Real-time collaborative design",
+      "Cross-platform accessibility",
+      "Design system management",
+      "Prototyping and interaction design",
+      "Developer handoff tools",
+      "Team and organization management",
+      "Version control and file history",
+      "Comments and feedback system",
+      "Component libraries",
+      "AI-powered design tools"
+    ],
+    "likely_data_needs": [
+      "User accounts and authentication",
+      "Organization and team management",
+      "File and project storage",
+      "Version control and history",
+      "Collaboration permissions",
+      "Design components and assets",
+      "Comments and feedback",
+      "Prototypes and sharing",
+      "Usage analytics and activity logs",
+      "Billing and subscription management"
+    ],
+    "industry": "Design Software / Creative Tools SaaS"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_FAvE3w9KIGns@ep-rapid-sky-adtvzuad-pooler.c-2.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+  "database_info": {
+    "project_id": "holy-surf-02075717",
+    "database_name": "neondb",
+    "schema": [
+      {
+        "table_name": "organizations",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(255) NOT NULL",
+          "domain": "VARCHAR(255)",
+          "plan_type": "VARCHAR(50) DEFAULT 'free'",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "seats_limit": "INTEGER DEFAULT 3",
+          "billing_email": "VARCHAR(255)",
+          "status": "VARCHAR(20) DEFAULT 'active'"
+        },
+        "foreign_keys": {},
+        "record_count": 30
+      },
+      {
+        "table_name": "users",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "email": "VARCHAR(255) UNIQUE NOT NULL",
+          "first_name": "VARCHAR(100)",
+          "last_name": "VARCHAR(100)",
+          "avatar_url": "VARCHAR(500)",
+          "organization_id": "INTEGER",
+          "role": "VARCHAR(50) DEFAULT 'member'",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "last_login": "TIMESTAMP",
+          "status": "VARCHAR(20) DEFAULT 'active'",
+          "is_verified": "BOOLEAN DEFAULT false"
+        },
+        "foreign_keys": {
+          "organization_id": "organizations(id)"
+        },
+        "record_count": 60
+      },
+      {
+        "table_name": "teams",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(255) NOT NULL",
+          "description": "TEXT",
+          "organization_id": "INTEGER",
+          "created_by": "INTEGER",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "is_private": "BOOLEAN DEFAULT false"
+        },
+        "foreign_keys": {
+          "organization_id": "organizations(id)",
+          "created_by": "users(id)"
+        },
+        "record_count": 60
+      },
+      {
+        "table_name": "team_members",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "team_id": "INTEGER",
+          "user_id": "INTEGER",
+          "role": "VARCHAR(50) DEFAULT 'member'",
+          "joined_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "team_id": "teams(id)",
+          "user_id": "users(id)"
+        },
+        "record_count": 65
+      },
+      {
+        "table_name": "projects",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(255) NOT NULL",
+          "description": "TEXT",
+          "team_id": "INTEGER",
+          "created_by": "INTEGER",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "thumbnail_url": "VARCHAR(500)",
+          "visibility": "VARCHAR(20) DEFAULT 'team'",
+          "status": "VARCHAR(20) DEFAULT 'active'"
+        },
+        "foreign_keys": {
+          "team_id": "teams(id)",
+          "created_by": "users(id)"
+        },
+        "record_count": 30
+      },
+      {
+        "table_name": "files",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(255) NOT NULL",
+          "project_id": "INTEGER",
+          "created_by": "INTEGER",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "file_type": "VARCHAR(50) DEFAULT 'design'",
+          "thumbnail_url": "VARCHAR(500)",
+          "version": "INTEGER DEFAULT 1",
+          "size_bytes": "INTEGER DEFAULT 0",
+          "last_opened": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "project_id": "projects(id)",
+          "created_by": "users(id)"
+        },
+        "record_count": 30
+      },
+      {
+        "table_name": "file_versions",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "file_id": "INTEGER",
+          "version_number": "INTEGER NOT NULL",
+          "created_by": "INTEGER",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "description": "TEXT",
+          "file_data_url": "VARCHAR(500)",
+          "is_current": "BOOLEAN DEFAULT false"
+        },
+        "foreign_keys": {
+          "file_id": "files(id)",
+          "created_by": "users(id)"
+        },
+        "record_count": 31
+      },
+      {
+        "table_name": "collaborators",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "file_id": "INTEGER",
+          "user_id": "INTEGER",
+          "permission": "VARCHAR(50) DEFAULT 'view'",
+          "invited_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "invited_by": "INTEGER",
+          "status": "VARCHAR(20) DEFAULT 'active'"
+        },
+        "foreign_keys": {
+          "file_id": "files(id)",
+          "user_id": "users(id)",
+          "invited_by": "users(id)"
+        },
+        "record_count": 62
+      },
+      {
+        "table_name": "comments",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "file_id": "INTEGER",
+          "user_id": "INTEGER",
+          "content": "TEXT NOT NULL",
+          "x_position": "FLOAT",
+          "y_position": "FLOAT",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "status": "VARCHAR(20) DEFAULT 'open'",
+          "parent_comment_id": "INTEGER"
+        },
+        "foreign_keys": {
+          "file_id": "files(id)",
+          "user_id": "users(id)",
+          "parent_comment_id": "comments(id)"
+        },
+        "record_count": 60
+      },
+      {
+        "table_name": "design_components",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(255) NOT NULL",
+          "description": "TEXT",
+          "file_id": "INTEGER",
+          "created_by": "INTEGER",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "component_type": "VARCHAR(50)",
+          "usage_count": "INTEGER DEFAULT 0",
+          "is_published": "BOOLEAN DEFAULT false"
+        },
+        "foreign_keys": {
+          "file_id": "files(id)",
+          "created_by": "users(id)"
+        },
+        "record_count": 39
+      },
+      {
+        "table_name": "prototypes",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(255) NOT NULL",
+          "file_id": "INTEGER",
+          "created_by": "INTEGER",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "start_frame": "VARCHAR(255)",
+          "device_type": "VARCHAR(50) DEFAULT 'desktop'",
+          "share_url": "VARCHAR(500)"
+        },
+        "foreign_keys": {
+          "file_id": "files(id)",
+          "created_by": "users(id)"
+        },
+        "record_count": 30
+      },
+      {
+        "table_name": "activity_logs",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "user_id": "INTEGER",
+          "file_id": "INTEGER",
+          "action": "VARCHAR(100) NOT NULL",
+          "details": "JSONB",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "ip_address": "INET",
+          "user_agent": "TEXT"
+        },
+        "foreign_keys": {
+          "user_id": "users(id)",
+          "file_id": "files(id)"
+        },
+        "record_count": 31
+      }
+    ]
+  }
+}

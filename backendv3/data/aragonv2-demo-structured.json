@@ -1,0 +1,35 @@
+{
+  "tool_suggestions": [
+    {
+      "title": "Subscription and Revenue Dashboard",
+      "prompt": "Create a comprehensive dashboard to visualize subscription tiers, revenue trends, and active plan metrics for company management.",
+      "features": [
+        "Visualize active vs. canceled subscriptions over time",
+        "Display total revenue and average revenue per user (ARPU)",
+        "Filter data by subscription tier and user demographics",
+        "Export detailed reports in CSV format"
+      ]
+    },
+    {
+      "title": "Headshot Generation Performance Monitor",
+      "prompt": "Develop a performance monitoring tool to track and analyze the efficiency of AI headshot processing sessions in real-time.",
+      "features": [
+        "Track average and total processing times by session",
+        "Visualize weekly and monthly trends in AI generation rates",
+        "Identify sessions with extended processing times for optimization",
+        "Alert system for managing delayed sessions"
+      ]
+    },
+    {
+      "title": "User Retention and Engagement Tracker",
+      "prompt": "Design a tool to monitor user engagement and retention rates, drilling down into sessions, login frequency, and usage patterns.",
+      "features": [
+        "Plot user login frequency and returning user rates",
+        "Compare subscription renewal rates across tiers",
+        "Analyze photo session usage and headshot downloads",
+        "Generate insights on user preferences from activity data"
+      ]
+    }
+  ],
+  "connection_string": "postgresql://neondb_owner:npg_2R5ujgHpiOcn@ep-calm-water-afp9qx0l-pooler.c-2.us-west-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
+}

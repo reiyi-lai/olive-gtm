@@ -1,0 +1,244 @@
+{
+  "company_analysis": {
+    "website": "https://www.paraform.com/",
+    "business_description": "Paraform is a recruiting marketplace platform that connects high-growth companies with elite recruiters. They operate as a two-sided marketplace facilitating talent acquisition through AI-powered recruiting tools and curated recruiter networks.",
+    "business_model": "Two-sided marketplace revenue model - charges companies for successful placements and takes commissions from recruiter earnings. Revenue streams include placement fees, subscription services, and premium recruiting tools.",
+    "target_customers": [
+      "High-growth startups",
+      "Technology companies",
+      "Growth-stage organizations",
+      "Independent recruiters",
+      "Recruitment agencies",
+      "Talent acquisition specialists"
+    ],
+    "key_features": [
+      "AI-powered recruiting tools",
+      "Curated recruiter network",
+      "Streamlined hiring workflows",
+      "White-glove talent acquisition support",
+      "70% interview rate",
+      "3x faster hiring process",
+      "98% customer satisfaction"
+    ],
+    "likely_data_needs": [
+      "Company profiles and hiring requirements",
+      "Recruiter networks and specializations",
+      "Job posting and candidate matching",
+      "Interview scheduling and tracking",
+      "Placement success metrics",
+      "Payment and commission tracking",
+      "Communication between parties"
+    ],
+    "industry": "HR Technology / Recruiting Platform"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_sP8DvKF7dfka@ep-plain-union-adnrlbx5-pooler.c-2.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+  "database_info": {
+    "project_id": "blue-sunset-01420875",
+    "database_name": "neondb",
+    "schema": [
+      {
+        "table_name": "companies",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(255) NOT NULL",
+          "website": "VARCHAR(255)",
+          "industry": "VARCHAR(100)",
+          "size_category": "VARCHAR(50)",
+          "location": "VARCHAR(255)",
+          "description": "TEXT",
+          "hiring_budget": "DECIMAL(12,2)",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "is_active": "BOOLEAN DEFAULT true"
+        },
+        "foreign_keys": {},
+        "record_count": 30
+      },
+      {
+        "table_name": "recruiters",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "first_name": "VARCHAR(100) NOT NULL",
+          "last_name": "VARCHAR(100) NOT NULL",
+          "email": "VARCHAR(255) UNIQUE NOT NULL",
+          "phone": "VARCHAR(20)",
+          "location": "VARCHAR(255)",
+          "years_experience": "INTEGER",
+          "rating": "DECIMAL(3,2)",
+          "total_placements": "INTEGER DEFAULT 0",
+          "commission_rate": "DECIMAL(4,2)",
+          "linkedin_url": "VARCHAR(255)",
+          "bio": "TEXT",
+          "is_verified": "BOOLEAN DEFAULT false",
+          "is_active": "BOOLEAN DEFAULT true"
+        },
+        "foreign_keys": {},
+        "record_count": 20
+      },
+      {
+        "table_name": "recruiter_specializations",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "recruiter_id": "INTEGER REFERENCES recruiters(id)",
+          "specialization": "VARCHAR(100) NOT NULL",
+          "seniority_level": "VARCHAR(50)"
+        },
+        "foreign_keys": {
+          "recruiter_id": "recruiters(id)"
+        },
+        "record_count": 60
+      },
+      {
+        "table_name": "job_postings",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "company_id": "INTEGER REFERENCES companies(id)",
+          "assigned_recruiter_id": "INTEGER REFERENCES recruiters(id)",
+          "title": "VARCHAR(255) NOT NULL",
+          "department": "VARCHAR(100)",
+          "level": "VARCHAR(50)",
+          "location": "VARCHAR(255)",
+          "remote_policy": "VARCHAR(50)",
+          "salary_min": "INTEGER",
+          "salary_max": "INTEGER",
+          "equity_min": "DECIMAL(5,2)",
+          "equity_max": "DECIMAL(5,2)",
+          "description": "TEXT",
+          "requirements": "TEXT",
+          "status": "VARCHAR(50) DEFAULT 'open'",
+          "urgency_level": "VARCHAR(20)",
+          "commission_amount": "DECIMAL(10,2)",
+          "deadline": "DATE"
+        },
+        "foreign_keys": {
+          "company_id": "companies(id)",
+          "assigned_recruiter_id": "recruiters(id)"
+        },
+        "record_count": 20
+      },
+      {
+        "table_name": "candidates",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "recruiter_id": "INTEGER REFERENCES recruiters(id)",
+          "first_name": "VARCHAR(100) NOT NULL",
+          "last_name": "VARCHAR(100) NOT NULL",
+          "email": "VARCHAR(255) NOT NULL",
+          "current_title": "VARCHAR(255)",
+          "current_company": "VARCHAR(255)",
+          "years_experience": "INTEGER",
+          "location": "VARCHAR(255)",
+          "desired_salary_min": "INTEGER",
+          "desired_salary_max": "INTEGER",
+          "remote_preference": "VARCHAR(50)",
+          "linkedin_url": "VARCHAR(255)",
+          "skills": "TEXT",
+          "status": "VARCHAR(50) DEFAULT 'active'"
+        },
+        "foreign_keys": {
+          "recruiter_id": "recruiters(id)"
+        },
+        "record_count": 20
+      },
+      {
+        "table_name": "applications",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "job_posting_id": "INTEGER REFERENCES job_postings(id)",
+          "candidate_id": "INTEGER REFERENCES candidates(id)",
+          "recruiter_id": "INTEGER REFERENCES recruiters(id)",
+          "status": "VARCHAR(50) DEFAULT 'submitted'",
+          "recruiter_notes": "TEXT",
+          "fit_score": "INTEGER CHECK (fit_score >= 1 AND fit_score <= 10)"
+        },
+        "foreign_keys": {
+          "job_posting_id": "job_postings(id)",
+          "candidate_id": "candidates(id)",
+          "recruiter_id": "recruiters(id)"
+        },
+        "record_count": 20
+      },
+      {
+        "table_name": "interviews",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "application_id": "INTEGER REFERENCES applications(id)",
+          "interview_type": "VARCHAR(50)",
+          "scheduled_at": "TIMESTAMP",
+          "duration_minutes": "INTEGER DEFAULT 60",
+          "interviewer_name": "VARCHAR(255)",
+          "interviewer_title": "VARCHAR(255)",
+          "status": "VARCHAR(50) DEFAULT 'scheduled'",
+          "feedback": "TEXT",
+          "rating": "INTEGER CHECK (rating >= 1 AND rating <= 5)"
+        },
+        "foreign_keys": {
+          "application_id": "applications(id)"
+        },
+        "record_count": 19
+      },
+      {
+        "table_name": "placements",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "job_posting_id": "INTEGER REFERENCES job_postings(id)",
+          "candidate_id": "INTEGER REFERENCES candidates(id)",
+          "recruiter_id": "INTEGER REFERENCES recruiters(id)",
+          "company_id": "INTEGER REFERENCES companies(id)",
+          "final_salary": "INTEGER",
+          "final_equity": "DECIMAL(5,2)",
+          "commission_earned": "DECIMAL(10,2)",
+          "start_date": "DATE",
+          "placement_date": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "job_posting_id": "job_postings(id)",
+          "candidate_id": "candidates(id)",
+          "recruiter_id": "recruiters(id)",
+          "company_id": "companies(id)"
+        },
+        "record_count": 7
+      },
+      {
+        "table_name": "payments",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "placement_id": "INTEGER REFERENCES placements(id)",
+          "recruiter_id": "INTEGER REFERENCES recruiters(id)",
+          "company_id": "INTEGER REFERENCES companies(id)",
+          "amount": "DECIMAL(10,2)",
+          "payment_type": "VARCHAR(50)",
+          "status": "VARCHAR(50) DEFAULT 'pending'",
+          "due_date": "DATE",
+          "paid_date": "DATE"
+        },
+        "foreign_keys": {
+          "placement_id": "placements(id)",
+          "recruiter_id": "recruiters(id)",
+          "company_id": "companies(id)"
+        },
+        "record_count": 7
+      },
+      {
+        "table_name": "messages",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "sender_type": "VARCHAR(20) NOT NULL",
+          "sender_id": "INTEGER NOT NULL",
+          "recipient_type": "VARCHAR(20) NOT NULL",
+          "recipient_id": "INTEGER NOT NULL",
+          "job_posting_id": "INTEGER REFERENCES job_postings(id)",
+          "candidate_id": "INTEGER REFERENCES candidates(id)",
+          "subject": "VARCHAR(255)",
+          "body": "TEXT",
+          "is_read": "BOOLEAN DEFAULT false"
+        },
+        "foreign_keys": {
+          "job_posting_id": "job_postings(id)",
+          "candidate_id": "candidates(id)"
+        },
+        "record_count": 10
+      }
+    ]
+  }
+}

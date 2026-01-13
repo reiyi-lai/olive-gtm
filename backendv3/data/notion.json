@@ -1,0 +1,243 @@
+{
+  "company_analysis": {
+    "website": "https://notion.com",
+    "business_description": "Notion is an AI-powered all-in-one workspace platform that centralizes documentation, project management, knowledge bases, and collaboration tools. It serves as a unified platform where teams can create documents, manage projects, build wikis, track tasks, and leverage AI assistance for various work activities. Notion combines the functionality of multiple productivity tools into a single, interconnected workspace, making it easier for teams to organize information and collaborate effectively.",
+    "business_model": "Freemium SaaS (Software as a Service) with tiered subscription plans. Notion offers a free tier for individual users and paid plans (Plus, Business, Enterprise) with increasing features, storage, and collaboration capabilities. Revenue is generated through monthly or annual subscriptions, with enterprise plans offering custom pricing, advanced security features, dedicated support, and higher usage limits. The platform targets both individual users and teams of all sizes, from startups to large enterprises.",
+    "target_customers": "Notion targets a diverse customer base including: (1) Startups and small businesses looking for affordable, flexible workspace solutions, (2) Enterprise teams at companies like OpenAI, Figma, Volvo, Ramp, and NVIDIA who need scalable collaboration tools, (3) Specific functional teams including Product, Engineering, Design, IT, and Marketing departments, (4) Knowledge workers who need to organize information and collaborate on projects, (5) Educational institutions and students for note-taking and learning management.",
+    "key_features": [
+      "AI-powered search and content generation",
+      "Collaborative document editing with real-time updates",
+      "Customizable databases and spreadsheets",
+      "Project management with kanban boards, timelines, and calendars",
+      "Knowledge base and wiki creation",
+      "Task and workflow tracking",
+      "Templates for various use cases",
+      "Integration with tools like Slack, GitHub, Google Calendar, Figma",
+      "Mobile apps for iOS and Android",
+      "Meeting notes with AI assistance",
+      "Enterprise search across all workspace content",
+      "Customizable workspaces and pages with blocks",
+      "Comments and collaboration features",
+      "Version history and page permissions"
+    ],
+    "likely_data_needs": [
+      "Workspace and team organization data",
+      "User accounts with roles and permissions",
+      "Pages and documents with hierarchical structure",
+      "Content blocks (text, code, images, embeds)",
+      "Projects and task management data",
+      "Custom databases created by users",
+      "Comments and collaboration threads",
+      "Activity logs for audit and analytics",
+      "Integration configurations with third-party tools",
+      "User activity and engagement metrics",
+      "Document view counts and access patterns",
+      "Template libraries",
+      "AI usage and query logs",
+      "Subscription and billing information",
+      "Team member invitations and access levels"
+    ],
+    "industry": "Productivity Software / Collaboration Tools / SaaS"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_89MKsAQZHtDr@ep-super-shape-adia5xro-pooler.c-2.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+  "database_info": {
+    "project_id": "young-bush-17769170",
+    "database_name": "neondb",
+    "schema": [
+      {
+        "table_name": "workspaces",
+        "columns": {
+          "workspace_id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(255) NOT NULL",
+          "slug": "VARCHAR(100) UNIQUE NOT NULL",
+          "plan_type": "VARCHAR(50) NOT NULL",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "total_members": "INTEGER DEFAULT 1",
+          "is_active": "BOOLEAN DEFAULT true",
+          "owner_email": "VARCHAR(255)"
+        },
+        "foreign_keys": {},
+        "record_count": 15
+      },
+      {
+        "table_name": "users",
+        "columns": {
+          "user_id": "SERIAL PRIMARY KEY",
+          "workspace_id": "INTEGER",
+          "email": "VARCHAR(255) NOT NULL",
+          "full_name": "VARCHAR(255)",
+          "role": "VARCHAR(50)",
+          "avatar_url": "TEXT",
+          "joined_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "last_active_at": "TIMESTAMP",
+          "is_guest": "BOOLEAN DEFAULT false"
+        },
+        "foreign_keys": {
+          "workspace_id": "REFERENCES workspaces(workspace_id)"
+        },
+        "record_count": 87
+      },
+      {
+        "table_name": "pages",
+        "columns": {
+          "page_id": "SERIAL PRIMARY KEY",
+          "workspace_id": "INTEGER",
+          "title": "VARCHAR(500)",
+          "icon": "VARCHAR(50)",
+          "cover_url": "TEXT",
+          "parent_page_id": "INTEGER",
+          "created_by": "INTEGER",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "is_template": "BOOLEAN DEFAULT false",
+          "is_public": "BOOLEAN DEFAULT false",
+          "view_count": "INTEGER DEFAULT 0"
+        },
+        "foreign_keys": {
+          "workspace_id": "REFERENCES workspaces(workspace_id)",
+          "parent_page_id": "REFERENCES pages(page_id)",
+          "created_by": "REFERENCES users(user_id)"
+        },
+        "record_count": 67
+      },
+      {
+        "table_name": "blocks",
+        "columns": {
+          "block_id": "SERIAL PRIMARY KEY",
+          "page_id": "INTEGER",
+          "block_type": "VARCHAR(50) NOT NULL",
+          "content": "TEXT",
+          "position": "INTEGER NOT NULL",
+          "parent_block_id": "INTEGER",
+          "created_by": "INTEGER",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "page_id": "REFERENCES pages(page_id)",
+          "parent_block_id": "REFERENCES blocks(block_id)",
+          "created_by": "REFERENCES users(user_id)"
+        },
+        "record_count": 57
+      },
+      {
+        "table_name": "projects",
+        "columns": {
+          "project_id": "SERIAL PRIMARY KEY",
+          "workspace_id": "INTEGER",
+          "name": "VARCHAR(255) NOT NULL",
+          "description": "TEXT",
+          "status": "VARCHAR(50)",
+          "owner_id": "INTEGER",
+          "start_date": "DATE",
+          "due_date": "DATE",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "priority": "VARCHAR(20)"
+        },
+        "foreign_keys": {
+          "workspace_id": "REFERENCES workspaces(workspace_id)",
+          "owner_id": "REFERENCES users(user_id)"
+        },
+        "record_count": 30
+      },
+      {
+        "table_name": "tasks",
+        "columns": {
+          "task_id": "SERIAL PRIMARY KEY",
+          "project_id": "INTEGER",
+          "page_id": "INTEGER",
+          "title": "VARCHAR(500) NOT NULL",
+          "description": "TEXT",
+          "status": "VARCHAR(50)",
+          "priority": "VARCHAR(20)",
+          "assigned_to": "INTEGER",
+          "created_by": "INTEGER",
+          "due_date": "DATE",
+          "completed_at": "TIMESTAMP",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "project_id": "REFERENCES projects(project_id)",
+          "page_id": "REFERENCES pages(page_id)",
+          "assigned_to": "REFERENCES users(user_id)",
+          "created_by": "REFERENCES users(user_id)"
+        },
+        "record_count": 50
+      },
+      {
+        "table_name": "notion_databases",
+        "columns": {
+          "database_id": "SERIAL PRIMARY KEY",
+          "workspace_id": "INTEGER",
+          "page_id": "INTEGER",
+          "name": "VARCHAR(255) NOT NULL",
+          "description": "TEXT",
+          "created_by": "INTEGER",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "view_type": "VARCHAR(50)"
+        },
+        "foreign_keys": {
+          "workspace_id": "REFERENCES workspaces(workspace_id)",
+          "page_id": "REFERENCES pages(page_id)",
+          "created_by": "REFERENCES users(user_id)"
+        },
+        "record_count": 20
+      },
+      {
+        "table_name": "comments",
+        "columns": {
+          "comment_id": "SERIAL PRIMARY KEY",
+          "page_id": "INTEGER",
+          "block_id": "INTEGER",
+          "user_id": "INTEGER",
+          "content": "TEXT NOT NULL",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "is_resolved": "BOOLEAN DEFAULT false",
+          "parent_comment_id": "INTEGER"
+        },
+        "foreign_keys": {
+          "page_id": "REFERENCES pages(page_id)",
+          "block_id": "REFERENCES blocks(block_id)",
+          "user_id": "REFERENCES users(user_id)",
+          "parent_comment_id": "REFERENCES comments(comment_id)"
+        },
+        "record_count": 20
+      },
+      {
+        "table_name": "activity_logs",
+        "columns": {
+          "activity_id": "SERIAL PRIMARY KEY",
+          "workspace_id": "INTEGER",
+          "user_id": "INTEGER",
+          "action_type": "VARCHAR(100) NOT NULL",
+          "entity_type": "VARCHAR(50)",
+          "entity_id": "INTEGER",
+          "details": "JSONB",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "workspace_id": "REFERENCES workspaces(workspace_id)",
+          "user_id": "REFERENCES users(user_id)"
+        },
+        "record_count": 45
+      },
+      {
+        "table_name": "integrations",
+        "columns": {
+          "integration_id": "SERIAL PRIMARY KEY",
+          "workspace_id": "INTEGER",
+          "integration_type": "VARCHAR(100) NOT NULL",
+          "config": "JSONB",
+          "enabled": "BOOLEAN DEFAULT true",
+          "connected_by": "INTEGER",
+          "connected_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "workspace_id": "REFERENCES workspaces(workspace_id)",
+          "connected_by": "REFERENCES users(user_id)"
+        },
+        "record_count": 23
+      }
+    ]
+  }
+}

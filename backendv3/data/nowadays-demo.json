@@ -1,0 +1,276 @@
+{
+  "company_analysis": {
+    "website": "https://www.nowadays.ai/",
+    "business_description": "Nowadays is an AI-powered corporate event planning platform that streamlines the entire event organization process. They automate venue sourcing, budgeting, vendor management, and logistics to replace traditional event planning methods with an efficient, AI-driven solution.",
+    "business_model": "SaaS platform charging for event planning services and platform access. Revenue from subscription tiers (basic, professional, enterprise) and likely transaction fees on vendor bookings.",
+    "target_customers": "Startups, enterprise companies, people teams, executive assistants, event marketers, travel agents, and agencies that organize corporate events.",
+    "key_features": [
+      "Flight & budget estimator",
+      "Venue sourcing from 400K+ vetted venues",
+      "AI-powered email and phone outreach",
+      "Proposal comparison and translation",
+      "Registration management",
+      "Vendor coordination",
+      "Budget tracking",
+      "Expert support"
+    ],
+    "likely_data_needs": [
+      "Company profiles and subscription tiers",
+      "User management and roles",
+      "Venue database with ratings and amenities",
+      "Event details and status tracking",
+      "Attendee registration and check-in",
+      "Vendor directory and quotes",
+      "Budget categories and expense tracking",
+      "Travel booking coordination",
+      "Communication logs for AI outreach"
+    ],
+    "industry": "Event Technology / SaaS"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_wtzgL8TW3DqP@ep-green-lab-ads2m35c-pooler.c-2.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+  "database_info": {
+    "project_id": "divine-queen-50259022",
+    "database_name": "neondb",
+    "schema": [
+      {
+        "table_name": "companies",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(255)",
+          "industry": "VARCHAR(100)",
+          "employee_count": "INTEGER",
+          "annual_revenue": "BIGINT",
+          "headquarters_location": "VARCHAR(255)",
+          "contact_email": "VARCHAR(255)",
+          "phone": "VARCHAR(50)",
+          "subscription_tier": "VARCHAR(50)",
+          "created_at": "TIMESTAMP",
+          "updated_at": "TIMESTAMP"
+        },
+        "foreign_keys": {},
+        "record_count": 20
+      },
+      {
+        "table_name": "users",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "company_id": "INTEGER",
+          "first_name": "VARCHAR(100)",
+          "last_name": "VARCHAR(100)",
+          "email": "VARCHAR(255)",
+          "phone": "VARCHAR(50)",
+          "role": "VARCHAR(100)",
+          "department": "VARCHAR(100)",
+          "is_admin": "BOOLEAN",
+          "last_login": "TIMESTAMP",
+          "created_at": "TIMESTAMP",
+          "updated_at": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "company_id": "companies(id)"
+        },
+        "record_count": 44
+      },
+      {
+        "table_name": "venues",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(255)",
+          "venue_type": "VARCHAR(100)",
+          "capacity": "INTEGER",
+          "location_city": "VARCHAR(100)",
+          "location_state": "VARCHAR(50)",
+          "location_country": "VARCHAR(50)",
+          "address": "TEXT",
+          "price_per_person": "DECIMAL(10,2)",
+          "rating": "DECIMAL(3,2)",
+          "amenities": "TEXT[]",
+          "contact_email": "VARCHAR(255)",
+          "contact_phone": "VARCHAR(50)",
+          "is_verified": "BOOLEAN",
+          "created_at": "TIMESTAMP",
+          "updated_at": "TIMESTAMP"
+        },
+        "foreign_keys": {},
+        "record_count": 40
+      },
+      {
+        "table_name": "events",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "company_id": "INTEGER",
+          "organizer_user_id": "INTEGER",
+          "event_name": "VARCHAR(255)",
+          "event_type": "VARCHAR(100)",
+          "description": "TEXT",
+          "start_date": "DATE",
+          "end_date": "DATE",
+          "start_time": "TIME",
+          "end_time": "TIME",
+          "venue_id": "INTEGER",
+          "expected_attendees": "INTEGER",
+          "actual_attendees": "INTEGER",
+          "total_budget": "DECIMAL(12,2)",
+          "actual_cost": "DECIMAL(12,2)",
+          "status": "VARCHAR(50)",
+          "priority": "VARCHAR(20)",
+          "created_at": "TIMESTAMP",
+          "updated_at": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "company_id": "companies(id)",
+          "organizer_user_id": "users(id)",
+          "venue_id": "venues(id)"
+        },
+        "record_count": 40
+      },
+      {
+        "table_name": "attendees",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "event_id": "INTEGER",
+          "first_name": "VARCHAR(100)",
+          "last_name": "VARCHAR(100)",
+          "email": "VARCHAR(255)",
+          "phone": "VARCHAR(50)",
+          "company": "VARCHAR(255)",
+          "job_title": "VARCHAR(255)",
+          "dietary_restrictions": "TEXT",
+          "special_needs": "TEXT",
+          "registration_status": "VARCHAR(50)",
+          "check_in_status": "VARCHAR(50)",
+          "registration_date": "TIMESTAMP",
+          "check_in_time": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "event_id": "events(id)"
+        },
+        "record_count": 48
+      },
+      {
+        "table_name": "vendors",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(255)",
+          "vendor_type": "VARCHAR(100)",
+          "service_category": "VARCHAR(100)",
+          "location_city": "VARCHAR(100)",
+          "location_state": "VARCHAR(50)",
+          "contact_email": "VARCHAR(255)",
+          "contact_phone": "VARCHAR(50)",
+          "website": "VARCHAR(255)",
+          "rating": "DECIMAL(3,2)",
+          "price_range": "VARCHAR(50)",
+          "description": "TEXT",
+          "is_verified": "BOOLEAN",
+          "created_at": "TIMESTAMP",
+          "updated_at": "TIMESTAMP"
+        },
+        "foreign_keys": {},
+        "record_count": 40
+      },
+      {
+        "table_name": "vendor_quotes",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "event_id": "INTEGER",
+          "vendor_id": "INTEGER",
+          "service_type": "VARCHAR(100)",
+          "quoted_price": "DECIMAL(10,2)",
+          "quote_details": "TEXT",
+          "quote_status": "VARCHAR(50)",
+          "valid_until": "DATE",
+          "submitted_at": "TIMESTAMP",
+          "updated_at": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "event_id": "events(id)",
+          "vendor_id": "vendors(id)"
+        },
+        "record_count": 31
+      },
+      {
+        "table_name": "travel_bookings",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "event_id": "INTEGER",
+          "attendee_id": "INTEGER",
+          "departure_airport": "VARCHAR(10)",
+          "arrival_airport": "VARCHAR(10)",
+          "departure_date": "DATE",
+          "return_date": "DATE",
+          "airline": "VARCHAR(100)",
+          "flight_cost": "DECIMAL(10,2)",
+          "booking_status": "VARCHAR(50)",
+          "confirmation_number": "VARCHAR(100)",
+          "created_at": "TIMESTAMP",
+          "updated_at": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "event_id": "events(id)",
+          "attendee_id": "attendees(id)"
+        },
+        "record_count": 37
+      },
+      {
+        "table_name": "budget_categories",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "event_id": "INTEGER",
+          "category_name": "VARCHAR(100)",
+          "allocated_amount": "DECIMAL(10,2)",
+          "spent_amount": "DECIMAL(10,2)",
+          "created_at": "TIMESTAMP",
+          "updated_at": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "event_id": "events(id)"
+        },
+        "record_count": 53
+      },
+      {
+        "table_name": "expense_items",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "budget_category_id": "INTEGER",
+          "vendor_id": "INTEGER",
+          "description": "TEXT",
+          "amount": "DECIMAL(10,2)",
+          "expense_date": "DATE",
+          "receipt_url": "VARCHAR(500)",
+          "approval_status": "VARCHAR(50)",
+          "approved_by": "INTEGER",
+          "created_at": "TIMESTAMP",
+          "updated_at": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "budget_category_id": "budget_categories(id)",
+          "vendor_id": "vendors(id)",
+          "approved_by": "users(id)"
+        },
+        "record_count": 46
+      },
+      {
+        "table_name": "communication_logs",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "event_id": "INTEGER",
+          "vendor_id": "INTEGER",
+          "communication_type": "VARCHAR(50)",
+          "subject": "VARCHAR(255)",
+          "message_content": "TEXT",
+          "sent_at": "TIMESTAMP",
+          "response_received": "BOOLEAN",
+          "response_content": "TEXT",
+          "response_at": "TIMESTAMP",
+          "status": "VARCHAR(50)"
+        },
+        "foreign_keys": {
+          "event_id": "events(id)",
+          "vendor_id": "vendors(id)"
+        },
+        "record_count": 31
+      }
+    ]
+  }
+}

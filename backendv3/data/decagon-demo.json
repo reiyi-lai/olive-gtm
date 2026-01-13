@@ -1,0 +1,176 @@
+{
+  "company_analysis": {
+    "website": "https://decagon.ai/",
+    "business_description": "Decagon provides a conversational AI platform for customer experience (CX) across multiple channels, enabling companies to build and scale AI customer service agents. They offer Agent Operating Procedures (AOPs) for dynamic customer interaction logic, omnichannel support, enterprise-grade AI agent customization, and unified knowledge graphs.",
+    "business_model": "SaaS platform providing AI-powered customer service automation tools with subscription-based pricing across Basic, Pro, and Enterprise tiers",
+    "target_customers": "Technology companies, retail businesses, travel & hospitality industries, financial services, healthcare organizations, media and telecommunications companies, and other enterprises needing scalable customer support",
+    "key_features": [
+      "Agent Operating Procedures (AOPs)",
+      "Omnichannel support (chat, email, voice, SMS)",
+      "Enterprise-grade AI agent customization",
+      "Unified knowledge graph",
+      "Scalable AI workflows",
+      "Conversation observability and insights",
+      "Natural language instruction for AI agent design"
+    ],
+    "likely_data_needs": [
+      "Customer interaction logs",
+      "Conversation transcripts",
+      "User intent and context data",
+      "Performance metrics (resolution rates, deflection rates)",
+      "AI agent configuration and version history",
+      "Knowledge base content",
+      "User feedback and satisfaction scores"
+    ],
+    "industry": "Artificial Intelligence / Customer Experience Technology"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_HDbvVfKk1Mo5@ep-dry-frost-adgj8i3n-pooler.c-2.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+  "database_info": {
+    "project_id": "rough-flower-39400950",
+    "database_name": "neondb",
+    "schema": [
+      {
+        "table_name": "customers",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "company_name": "VARCHAR(255) NOT NULL",
+          "industry": "VARCHAR(100)",
+          "contact_email": "VARCHAR(255)",
+          "phone": "VARCHAR(50)",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "subscription_tier": "VARCHAR(50)",
+          "status": "VARCHAR(50) DEFAULT 'active'"
+        },
+        "foreign_keys": {},
+        "record_count": 20
+      },
+      {
+        "table_name": "ai_agents",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "customer_id": "INTEGER REFERENCES customers(id)",
+          "agent_name": "VARCHAR(255) NOT NULL",
+          "agent_type": "VARCHAR(100)",
+          "channels": "TEXT[]",
+          "knowledge_base_id": "VARCHAR(255)",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "status": "VARCHAR(50) DEFAULT 'active'",
+          "configuration": "JSONB"
+        },
+        "foreign_keys": {
+          "customer_id": "customers(id)"
+        },
+        "record_count": 21
+      },
+      {
+        "table_name": "conversations",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "customer_id": "INTEGER REFERENCES customers(id)",
+          "agent_id": "INTEGER REFERENCES ai_agents(id)",
+          "session_id": "VARCHAR(255) UNIQUE",
+          "channel": "VARCHAR(50)",
+          "user_id": "VARCHAR(255)",
+          "started_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "ended_at": "TIMESTAMP",
+          "status": "VARCHAR(50)",
+          "resolution_status": "VARCHAR(100)",
+          "satisfaction_score": "INTEGER CHECK (satisfaction_score BETWEEN 1 AND 5)"
+        },
+        "foreign_keys": {
+          "customer_id": "customers(id)",
+          "agent_id": "ai_agents(id)"
+        },
+        "record_count": 45
+      },
+      {
+        "table_name": "messages",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "conversation_id": "INTEGER REFERENCES conversations(id)",
+          "message_type": "VARCHAR(50)",
+          "sender": "VARCHAR(50)",
+          "content": "TEXT",
+          "intent": "VARCHAR(255)",
+          "confidence_score": "DECIMAL(3,2)",
+          "timestamp": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "metadata": "JSONB"
+        },
+        "foreign_keys": {
+          "conversation_id": "conversations(id)"
+        },
+        "record_count": 31
+      },
+      {
+        "table_name": "knowledge_base",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "customer_id": "INTEGER REFERENCES customers(id)",
+          "title": "VARCHAR(500)",
+          "content": "TEXT",
+          "category": "VARCHAR(100)",
+          "tags": "TEXT[]",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "is_active": "BOOLEAN DEFAULT true"
+        },
+        "foreign_keys": {
+          "customer_id": "customers(id)"
+        },
+        "record_count": 20
+      },
+      {
+        "table_name": "performance_metrics",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "agent_id": "INTEGER REFERENCES ai_agents(id)",
+          "date": "DATE",
+          "total_conversations": "INTEGER",
+          "resolved_conversations": "INTEGER",
+          "deflection_rate": "DECIMAL(5,2)",
+          "avg_resolution_time": "INTEGER",
+          "avg_satisfaction_score": "DECIMAL(3,2)",
+          "escalations": "INTEGER"
+        },
+        "foreign_keys": {
+          "agent_id": "ai_agents(id)"
+        },
+        "record_count": 60
+      },
+      {
+        "table_name": "escalations",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "conversation_id": "INTEGER REFERENCES conversations(id)",
+          "agent_id": "INTEGER REFERENCES ai_agents(id)",
+          "escalated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "escalation_reason": "VARCHAR(255)",
+          "assigned_to": "VARCHAR(255)",
+          "resolved_at": "TIMESTAMP",
+          "resolution_notes": "TEXT"
+        },
+        "foreign_keys": {
+          "conversation_id": "conversations(id)",
+          "agent_id": "ai_agents(id)"
+        },
+        "record_count": 4
+      },
+      {
+        "table_name": "user_feedback",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "conversation_id": "INTEGER REFERENCES conversations(id)",
+          "rating": "INTEGER CHECK (rating BETWEEN 1 AND 5)",
+          "feedback_text": "TEXT",
+          "sentiment": "VARCHAR(50)",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "follow_up_required": "BOOLEAN DEFAULT false"
+        },
+        "foreign_keys": {
+          "conversation_id": "conversations(id)"
+        },
+        "record_count": 20
+      }
+    ]
+  }
+}

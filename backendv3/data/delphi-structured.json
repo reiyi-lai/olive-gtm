@@ -1,0 +1,38 @@
+{
+  "tool_suggestions": [
+    {
+      "title": "User Subscription Management Dashboard",
+      "prompt": "Create a dashboard for Delphi.ai employees to efficiently manage and track user subscriptions. This tool should support actions like updating subscription details, tracking payment history, and managing billing cycles.",
+      "features": [
+        "Subscription overview with filters for status and plan type",
+        "Edit user subscription details and billing cycles",
+        "View user payment history and upcoming renewals",
+        "Alerts for subscriptions nearing expiry without auto-renew",
+        "Downloadable reports for billing and renewals"
+      ]
+    },
+    {
+      "title": "AI Clone Performance Insight Tool",
+      "prompt": "Design a tool for Delphi.ai to visualize and analyze AI clone performance metrics. This includes tracking training status, user interactions, and feedback to improve product quality.",
+      "features": [
+        "Dashboard with real-time clone performance and status",
+        "Detailed analytics on user interactions and satisfaction ratings",
+        "Historical trend comparison for clone interactions and feedback",
+        "Alerts for clones with low average ratings",
+        "Export reports of interaction and performance analytics"
+      ]
+    },
+    {
+      "title": "Content Processing and Error Resolution Queue",
+      "prompt": "Develop a queue management tool to help Delphi.ai staff handle content processing jobs. This tool should track processing status, report errors, and allow updates on job statuses.",
+      "features": [
+        "Queue view for pending content processing jobs with filters",
+        "Error log and resolution actions for failed jobs",
+        "Update and track job statuses from pending to complete",
+        "Notifications for successfully processed content",
+        "Exportable logs for auditing content processing activities"
+      ]
+    }
+  ],
+  "connection_string": "postgresql://neondb_owner:npg_JDKT0N8rsOvF@ep-silent-leaf-ae3yux0p-pooler.c-2.us-east-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
+}

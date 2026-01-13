@@ -1,0 +1,231 @@
+{
+  "company_analysis": {
+    "website": "https://elevenlabs.io/",
+    "business_description": "ElevenLabs is a leading AI voice technology company that specializes in natural-sounding text-to-speech, voice cloning, and conversational AI solutions. They provide cutting-edge voice synthesis technology that enables content creators, developers, and businesses to generate realistic AI voices in over 70 languages. Their platform offers multiple AI models including Eleven v3 (the most expressive), Eleven Flash v2.5 (the fastest for real-time applications), and Eleven Multilingual v2 (emotionally-aware speech synthesis).",
+    "business_model": "Usage-based subscription model with multiple pricing tiers. Customers purchase monthly subscriptions that include credit allocations for generating audio. Pricing ranges from Free (10,000 characters/month) to Enterprise (150M+ characters/month, $3,500+). Revenue streams include: 1) Recurring subscription fees across 5+ tiers (Starter $4.17/mo, Creator $11/mo, Pro $82.50/mo, Scale $275/mo, Business $1,100/mo, Enterprise custom), 2) Additional credit purchases for users exceeding their monthly allocations, 3) API access fees for developers, and 4) Enterprise custom solutions. Credits are consumed based on character count (0.5-1 credit per character depending on the model).",
+    "target_customers": "1) Content Creators - YouTubers, podcasters, audiobook narrators, and social media influencers who need voiceovers for their content. 2) Developers - Software engineers building voice-enabled applications, chatbots, IVR systems, and voice assistants. 3) Businesses - Marketing agencies, e-learning platforms, media companies, and gaming studios requiring professional voice content at scale. 4) Enterprises - Large organizations needing voice technology for customer service, corporate training, accessibility features, and internal communications. 5) International Customers - Users across 120+ countries leveraging multilingual capabilities for global content.",
+    "key_features": [
+      "Text-to-Speech with 70+ languages",
+      "Voice Cloning (create custom voices from audio samples)",
+      "Multiple AI Models (v3, Flash v2.5, Multilingual v2)",
+      "Conversational AI with sub-200ms latency",
+      "Professional Voice Library (pre-made voices)",
+      "API Access for developers",
+      "Audio Tags for emotional expression ([excited], [whispers], etc.)",
+      "Multi-speaker dialogue generation",
+      "Speech-to-Text (Scribe model)",
+      "AI Music Generation (Eleven Music)",
+      "Real-time voice synthesis"
+    ],
+    "likely_data_needs": [
+      "User accounts and authentication",
+      "Subscription tier management and billing",
+      "Credit tracking and usage analytics",
+      "Voice library (premade and custom cloned voices)",
+      "Audio generation history and metadata",
+      "API request logs and rate limiting",
+      "Voice cloning requests and samples",
+      "Project organization for users",
+      "Payment transactions and invoices",
+      "Usage statistics for billing and analytics",
+      "Voice settings and configurations (stability, similarity, style)",
+      "Multi-language support metadata"
+    ],
+    "industry": "Artificial Intelligence / Voice Technology / Audio SaaS"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_IXJuLThD3w9C@ep-wispy-king-aeovykfp-pooler.c-2.us-east-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+  "database_info": {
+    "project_id": "wandering-lake-83480890",
+    "database_name": "neondb",
+    "schema": [
+      {
+        "table_name": "users",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "email": "VARCHAR(255) UNIQUE NOT NULL",
+          "username": "VARCHAR(100) UNIQUE NOT NULL",
+          "full_name": "VARCHAR(255)",
+          "user_role": "ENUM (individual, creator, developer, business, enterprise)",
+          "subscription_tier": "ENUM (free, starter, creator, pro, scale, business, enterprise)",
+          "credits_remaining": "INTEGER NOT NULL DEFAULT 10000",
+          "credits_used": "INTEGER NOT NULL DEFAULT 0",
+          "api_key": "VARCHAR(100) UNIQUE",
+          "is_api_enabled": "BOOLEAN DEFAULT false",
+          "created_at": "TIMESTAMP NOT NULL DEFAULT NOW()",
+          "last_login": "TIMESTAMP",
+          "country": "VARCHAR(100)",
+          "company_name": "VARCHAR(255)"
+        },
+        "foreign_keys": {},
+        "record_count": 55
+      },
+      {
+        "table_name": "subscriptions",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "user_id": "INTEGER NOT NULL REFERENCES users(id)",
+          "tier": "subscription_tier NOT NULL",
+          "monthly_credits": "INTEGER NOT NULL",
+          "price_usd": "DECIMAL(10,2) NOT NULL",
+          "billing_cycle_start": "DATE NOT NULL",
+          "billing_cycle_end": "DATE NOT NULL",
+          "is_active": "BOOLEAN DEFAULT true",
+          "auto_renew": "BOOLEAN DEFAULT true",
+          "created_at": "TIMESTAMP NOT NULL DEFAULT NOW()",
+          "cancelled_at": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "user_id": "users(id)"
+        },
+        "record_count": 49
+      },
+      {
+        "table_name": "voices",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "user_id": "INTEGER REFERENCES users(id)",
+          "voice_name": "VARCHAR(255) NOT NULL",
+          "voice_category": "ENUM (premade, cloned, instant, professional)",
+          "description": "TEXT",
+          "accent": "VARCHAR(100)",
+          "age": "VARCHAR(50)",
+          "gender": "VARCHAR(50)",
+          "use_case": "TEXT",
+          "is_public": "BOOLEAN DEFAULT false",
+          "samples_count": "INTEGER DEFAULT 0",
+          "clone_duration_seconds": "INTEGER",
+          "voice_settings": "JSONB",
+          "created_at": "TIMESTAMP NOT NULL DEFAULT NOW()",
+          "last_used": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "user_id": "users(id)"
+        },
+        "record_count": 26
+      },
+      {
+        "table_name": "projects",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "user_id": "INTEGER NOT NULL REFERENCES users(id)",
+          "project_name": "VARCHAR(255) NOT NULL",
+          "description": "TEXT",
+          "created_at": "TIMESTAMP NOT NULL DEFAULT NOW()",
+          "updated_at": "TIMESTAMP NOT NULL DEFAULT NOW()",
+          "is_archived": "BOOLEAN DEFAULT false"
+        },
+        "foreign_keys": {
+          "user_id": "users(id)"
+        },
+        "record_count": 51
+      },
+      {
+        "table_name": "audio_generations",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "user_id": "INTEGER NOT NULL REFERENCES users(id)",
+          "project_id": "INTEGER REFERENCES projects(id)",
+          "voice_id": "INTEGER REFERENCES voices(id)",
+          "model_type": "ENUM (eleven_multilingual_v2, eleven_flash_v2_5, eleven_turbo_v2, eleven_turbo_v2_5, eleven_v3)",
+          "input_text": "TEXT NOT NULL",
+          "character_count": "INTEGER NOT NULL",
+          "credits_used": "INTEGER NOT NULL",
+          "generation_status": "ENUM (pending, processing, completed, failed)",
+          "audio_url": "TEXT",
+          "duration_seconds": "DECIMAL(10,2)",
+          "stability": "DECIMAL(3,2)",
+          "similarity_boost": "DECIMAL(3,2)",
+          "style": "DECIMAL(3,2)",
+          "use_speaker_boost": "BOOLEAN DEFAULT false",
+          "created_at": "TIMESTAMP NOT NULL DEFAULT NOW()",
+          "completed_at": "TIMESTAMP",
+          "error_message": "TEXT"
+        },
+        "foreign_keys": {
+          "user_id": "users(id)",
+          "project_id": "projects(id)",
+          "voice_id": "voices(id)"
+        },
+        "record_count": 107
+      },
+      {
+        "table_name": "api_requests",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "user_id": "INTEGER NOT NULL REFERENCES users(id)",
+          "endpoint": "VARCHAR(255) NOT NULL",
+          "method": "VARCHAR(10) NOT NULL",
+          "status_code": "INTEGER NOT NULL",
+          "credits_consumed": "INTEGER DEFAULT 0",
+          "request_payload": "JSONB",
+          "response_time_ms": "INTEGER",
+          "ip_address": "VARCHAR(45)",
+          "user_agent": "TEXT",
+          "created_at": "TIMESTAMP NOT NULL DEFAULT NOW()"
+        },
+        "foreign_keys": {
+          "user_id": "users(id)"
+        },
+        "record_count": 45
+      },
+      {
+        "table_name": "voice_clone_requests",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "user_id": "INTEGER NOT NULL REFERENCES users(id)",
+          "voice_id": "INTEGER REFERENCES voices(id)",
+          "request_name": "VARCHAR(255) NOT NULL",
+          "sample_audio_urls": "TEXT[]",
+          "total_sample_duration": "INTEGER NOT NULL",
+          "processing_status": "generation_status ENUM",
+          "created_at": "TIMESTAMP NOT NULL DEFAULT NOW()",
+          "completed_at": "TIMESTAMP",
+          "error_message": "TEXT"
+        },
+        "foreign_keys": {
+          "user_id": "users(id)",
+          "voice_id": "voices(id)"
+        },
+        "record_count": 24
+      },
+      {
+        "table_name": "usage_analytics",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "user_id": "INTEGER NOT NULL REFERENCES users(id)",
+          "date": "DATE NOT NULL",
+          "credits_used": "INTEGER NOT NULL DEFAULT 0",
+          "api_calls": "INTEGER NOT NULL DEFAULT 0",
+          "audio_generations": "INTEGER NOT NULL DEFAULT 0",
+          "total_characters": "INTEGER NOT NULL DEFAULT 0",
+          "total_audio_seconds": "DECIMAL(10,2) NOT NULL DEFAULT 0",
+          "UNIQUE": "(user_id, date)"
+        },
+        "foreign_keys": {
+          "user_id": "users(id)"
+        },
+        "record_count": 61
+      },
+      {
+        "table_name": "payment_transactions",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "user_id": "INTEGER NOT NULL REFERENCES users(id)",
+          "subscription_id": "INTEGER REFERENCES subscriptions(id)",
+          "amount_usd": "DECIMAL(10,2) NOT NULL",
+          "credits_purchased": "INTEGER",
+          "transaction_type": "VARCHAR(50) NOT NULL",
+          "payment_method": "VARCHAR(50)",
+          "payment_status": "VARCHAR(50) NOT NULL",
+          "stripe_transaction_id": "VARCHAR(255)",
+          "created_at": "TIMESTAMP NOT NULL DEFAULT NOW()"
+        },
+        "foreign_keys": {
+          "user_id": "users(id)",
+          "subscription_id": "subscriptions(id)"
+        },
+        "record_count": 41
+      }
+    ]
+  }
+}

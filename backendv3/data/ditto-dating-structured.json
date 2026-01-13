@@ -1,0 +1,35 @@
+{
+  "tool_suggestions": [
+    {
+      "title": "Student Verification Monitoring Dashboard",
+      "prompt": "Build a tool to monitor and manage student verification statuses across California universities, providing insight into pending and active verifications.",
+      "features": [
+        "Overview of pending, approved, and rejected verifications with filtering by university",
+        "Detail view of individual student profiles with verification history and logs",
+        "Automated reminders for pending verifications to users and administrators",
+        "Search and filtering by demographics and university"
+      ]
+    },
+    {
+      "title": "Date Feedback Analysis Interface",
+      "prompt": "Create an interface to visualize and analyze feedback from arranged dates, focusing on safety concerns and ratings.",
+      "features": [
+        "Dashboard with aggregated feedback metrics and trends over time",
+        "Detailed view of individual date feedback, including safety concerns",
+        "Filtering and searching by university, date range, and rating",
+        "Export feature for generating reports on safety and satisfaction"
+      ]
+    },
+    {
+      "title": "Venue Performance and Engagement Tracker",
+      "prompt": "Develop a tool to track and analyze performance data of venues for date arrangements, focusing on utilization and user ratings.",
+      "features": [
+        "Dashboard displaying venue usage statistics and user ratings over time",
+        "Map view to visualize venue locations and performance comparison",
+        "Detailed venue profile with historical data on events and feedback",
+        "Alert system for inactive or low-rated venues requiring attention"
+      ]
+    }
+  ],
+  "connection_string": "postgresql://neondb_owner:npg_3xK1bJkjGERc@ep-twilight-firefly-aefrf6r4-pooler.c-2.us-east-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
+}

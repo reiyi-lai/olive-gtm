@@ -1,0 +1,35 @@
+{
+  "tool_suggestions": [
+    {
+      "title": "Team Collaboration Feedback Dashboard",
+      "prompt": "Create a dashboard to analyze team collaboration efficiency using comment activity and file interactions.",
+      "features": [
+        "View top collaborators by comments and contributions.",
+        "Analyze comment activity patterns over time.",
+        "Access detailed interaction histories per team.",
+        "Filter feedback by project or file."
+      ]
+    },
+    {
+      "title": "Project Health and Status Monitor",
+      "prompt": "Develop a tool to track and assess the health and status of ongoing projects, using data from file revisions and team activity.",
+      "features": [
+        "Display current status and last update time for projects.",
+        "Visualize recent file revisions and activity logs.",
+        "Generate alerts for projects with stagnating updates.",
+        "Filter projects by team and progress stage."
+      ]
+    },
+    {
+      "title": "User Activity & Engagement Insight Tool",
+      "prompt": "Build a tool to provide insights into user activity and engagement by analyzing login trends and access histories.",
+      "features": [
+        "View user login frequency and last active times.",
+        "Analyze organization-wide user engagement trends.",
+        "Identify users with decreased activity over time.",
+        "Filter data by user roles and teams for detailed insights."
+      ]
+    }
+  ],
+  "connection_string": "postgresql://neondb_owner:npg_FAvE3w9KIGns@ep-rapid-sky-adtvzuad-pooler.c-2.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
+}

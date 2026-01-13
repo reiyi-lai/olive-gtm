@@ -1,0 +1,200 @@
+{
+  "company_analysis": {
+    "website": "https://www.aragon.ai/",
+    "business_description": "AI-powered professional headshot generation platform that creates high-quality business photographs using artificial intelligence technology. Users upload personal photos and receive professionally-styled headshots with customizable backgrounds and attire options.",
+    "business_model": "Tiered subscription model with one-time purchases for AI headshot generation packages. Revenue streams include direct sales ($35-75 per package), potential enterprise plans for teams, and possible affiliate partnerships.",
+    "target_customers": "Professionals seeking LinkedIn/corporate headshots, businesses needing team photography, individuals in healthcare/real estate/legal sectors, job seekers, entrepreneurs, and anyone requiring professional business imagery.",
+    "key_features": [
+      "AI-generated professional headshots",
+      "Customizable backgrounds and attire",
+      "Quick turnaround (15-45 minutes)",
+      "Multiple pricing tiers",
+      "High-resolution downloads",
+      "Remix and customization features",
+      "Bulk generation capabilities"
+    ],
+    "likely_data_needs": [
+      "User account management",
+      "Photo upload and storage",
+      "AI generation processing",
+      "Payment and subscription tracking",
+      "User preferences and settings",
+      "Usage analytics",
+      "Generated content management"
+    ],
+    "industry": "AI/SaaS - Photo Generation and Professional Services"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_2R5ujgHpiOcn@ep-calm-water-afp9qx0l-pooler.c-2.us-west-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+  "database_info": {
+    "project_id": "late-brook-88271640",
+    "database_name": "neondb",
+    "schema": [
+      {
+        "table_name": "users",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "email": "VARCHAR(255) UNIQUE NOT NULL",
+          "name": "VARCHAR(255) NOT NULL",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "subscription_tier": "VARCHAR(50) DEFAULT 'basic'",
+          "total_credits": "INT DEFAULT 0",
+          "used_credits": "INT DEFAULT 0",
+          "last_login": "TIMESTAMP",
+          "profile_image_url": "TEXT"
+        },
+        "foreign_keys": {},
+        "record_count": 70
+      },
+      {
+        "table_name": "subscription_plans",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(100) NOT NULL",
+          "price": "DECIMAL(10,2) NOT NULL",
+          "credits_included": "INT NOT NULL",
+          "max_headshots": "INT NOT NULL",
+          "description": "TEXT",
+          "is_active": "BOOLEAN DEFAULT true"
+        },
+        "foreign_keys": {},
+        "record_count": 3
+      },
+      {
+        "table_name": "user_subscriptions",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "user_id": "INT",
+          "plan_id": "INT",
+          "status": "VARCHAR(50) NOT NULL",
+          "started_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "expires_at": "TIMESTAMP",
+          "payment_intent_id": "VARCHAR(255)",
+          "amount_paid": "DECIMAL(10,2)"
+        },
+        "foreign_keys": {
+          "user_id": "REFERENCES users(id)",
+          "plan_id": "REFERENCES subscription_plans(id)"
+        },
+        "record_count": 20
+      },
+      {
+        "table_name": "photo_sessions",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "user_id": "INT",
+          "session_name": "VARCHAR(255)",
+          "uploaded_photos_count": "INT DEFAULT 0",
+          "generated_photos_count": "INT DEFAULT 0",
+          "status": "VARCHAR(50) DEFAULT 'pending'",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "completed_at": "TIMESTAMP",
+          "processing_time_minutes": "INT"
+        },
+        "foreign_keys": {
+          "user_id": "REFERENCES users(id)"
+        },
+        "record_count": 40
+      },
+      {
+        "table_name": "uploaded_photos",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "session_id": "INT",
+          "file_name": "VARCHAR(255) NOT NULL",
+          "file_size_bytes": "BIGINT",
+          "upload_timestamp": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "s3_url": "TEXT NOT NULL",
+          "is_primary": "BOOLEAN DEFAULT false"
+        },
+        "foreign_keys": {
+          "session_id": "REFERENCES photo_sessions(id)"
+        },
+        "record_count": 20
+      },
+      {
+        "table_name": "generated_headshots",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "session_id": "INT",
+          "file_name": "VARCHAR(255) NOT NULL",
+          "s3_url": "TEXT NOT NULL",
+          "background_type": "VARCHAR(100)",
+          "clothing_style": "VARCHAR(100)",
+          "quality_score": "DECIMAL(3,2)",
+          "is_favorite": "BOOLEAN DEFAULT false",
+          "generated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "download_count": "INT DEFAULT 0"
+        },
+        "foreign_keys": {
+          "session_id": "REFERENCES photo_sessions(id)"
+        },
+        "record_count": 20
+      },
+      {
+        "table_name": "user_preferences",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "user_id": "INT",
+          "preferred_background": "VARCHAR(100)",
+          "preferred_clothing": "VARCHAR(100)",
+          "preferred_style": "VARCHAR(100)",
+          "exclude_backgrounds": "TEXT[]",
+          "exclude_clothing": "TEXT[]",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "user_id": "REFERENCES users(id)"
+        },
+        "record_count": 20
+      },
+      {
+        "table_name": "payment_transactions",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "user_id": "INT",
+          "subscription_id": "INT",
+          "amount": "DECIMAL(10,2) NOT NULL",
+          "currency": "VARCHAR(3) DEFAULT 'USD'",
+          "payment_method": "VARCHAR(50)",
+          "stripe_payment_id": "VARCHAR(255)",
+          "status": "VARCHAR(50) NOT NULL",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "processed_at": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "user_id": "REFERENCES users(id)",
+          "subscription_id": "REFERENCES user_subscriptions(id)"
+        },
+        "record_count": 20
+      },
+      {
+        "table_name": "usage_analytics",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "user_id": "INT",
+          "action_type": "VARCHAR(100) NOT NULL",
+          "session_id": "INT",
+          "metadata": "JSONB",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "user_id": "REFERENCES users(id)",
+          "session_id": "REFERENCES photo_sessions(id)"
+        },
+        "record_count": 40
+      },
+      {
+        "table_name": "system_settings",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "setting_key": "VARCHAR(100) UNIQUE NOT NULL",
+          "setting_value": "TEXT",
+          "description": "TEXT",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {},
+        "record_count": 20
+      }
+    ]
+  }
+}

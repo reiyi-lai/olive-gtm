@@ -1,0 +1,38 @@
+{
+  "tool_suggestions": [
+    {
+      "title": "Compliance Progress Dashboard",
+      "prompt": "Develop a dashboard to track and analyze the progress of compliance projects for Delve's internal use, helping ensure timely completion of certifications.",
+      "features": [
+        "Overview of all ongoing compliance projects with status and progress",
+        "Detailed view for each project showing timeline and assigned experts",
+        "Automated alerts for projects behind schedule",
+        "Historical comparison of past project durations",
+        "Export project progress reports to CSV"
+      ]
+    },
+    {
+      "title": "Security Finding Triage Interface",
+      "prompt": "Create a triage tool for Delve's team to efficiently review and manage security scan findings, ensuring prompt resolution and prioritization based on severity.",
+      "features": [
+        "List view of all unresolved scan findings with severity indicators",
+        "Detail view for each finding, including description and remediation steps",
+        "Filter findings by severity and status",
+        "Assign findings to team members for resolution",
+        "Generate summary reports of resolved vs. unresolved findings"
+      ]
+    },
+    {
+      "title": "Client Subscription and Status Manager",
+      "prompt": "Build an interface for Delve employees to manage client subscriptions and track compliance statuses, optimizing customer interactions and service.",
+      "features": [
+        "List of all client companies with subscription tiers and current status",
+        "Detailed view of client compliance projects and timelines",
+        "Modify and update subscription details and status",
+        "Send automated alerts to clients for upcoming renewals or project deadlines",
+        "Analytics on subscription trends and MRR changes"
+      ]
+    }
+  ],
+  "connection_string": "postgresql://neondb_owner:npg_YClW8IEJdhw6@ep-square-bush-ae0imphf-pooler.c-2.us-east-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
+}

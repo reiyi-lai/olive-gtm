@@ -1,0 +1,35 @@
+{
+  "tool_suggestions": [
+    {
+      "title": "Client ROI Monitoring Dashboard",
+      "prompt": "Create a dashboard to track and analyze client ROI including total investment, revenue, and leads generated over different periods.",
+      "features": [
+        "Select client to view detailed ROI analysis",
+        "Filter ROI by specific periods (monthly, quarterly)",
+        "Visualize ROI multiple through interactive charts",
+        "Compare ROI performance against target metrics"
+      ]
+    },
+    {
+      "title": "Campaign Performance Tracker",
+      "prompt": "Build a tool to monitor and assess the performance of campaigns including video metrics, audience engagement, and budget usage.",
+      "features": [
+        "List active campaigns with key performance indicators",
+        "Drill down to view detailed video metrics (views, likes, shares)",
+        "Budget usage tracking versus campaign budget",
+        "Generate performance reports for specific timeframes"
+      ]
+    },
+    {
+      "title": "Team Resource Management Interface",
+      "prompt": "Design an interface for team resource management, allowing allocation tracking and team performance insights in ongoing campaigns.",
+      "features": [
+        "View team member roles and campaign assignments",
+        "Allocate and adjust team hours per campaign",
+        "Monitor hours utilization and efficiency metrics",
+        "Highlight resource over-allocation risks for early intervention"
+      ]
+    }
+  ],
+  "connection_string": "postgresql://neondb_owner:npg_sVMB6p4KHhzq@ep-sparkling-boat-af1xtzrs-pooler.c-2.us-west-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
+}

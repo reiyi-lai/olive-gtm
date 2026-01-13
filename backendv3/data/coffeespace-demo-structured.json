@@ -1,0 +1,38 @@
+{
+  "tool_suggestions": [
+    {
+      "title": "User Engagement Metrics Dashboard",
+      "prompt": "Create a dashboard for founders to analyze user engagement using swipe and match data. Present insights in an easy-to-navigate layout for quick decision-making.",
+      "features": [
+        "Overview of daily/weekly/monthly active users",
+        "Top users by engagement metrics",
+        "Charts showing swipe and match trends",
+        "Alert system for low engagement periods",
+        "Exportable reports for stakeholder communication"
+      ]
+    },
+    {
+      "title": "Subscription Management Interface",
+      "prompt": "Design a tool for ops and support teams to oversee user subscriptions, manage renewals, and handle cancellations efficiently.",
+      "features": [
+        "Searchable list of all active subscriptions",
+        "Detailed view with renewal and payment history",
+        "One-click renewal or cancellation actions",
+        "Filter subscriptions by status and plan type",
+        "Automated email notifications for renewals"
+      ]
+    },
+    {
+      "title": "Founder Connection Status Review Tool",
+      "prompt": "Build a tool for founders to review and manage the status of connections and matches across the platform.",
+      "features": [
+        "List view of all matches with status indicators",
+        "Detailed match history and interaction logs",
+        "Action buttons for follow-up steps or reminders",
+        "Filter options by industry, location, and activity",
+        "Comment section for internal notes and communication"
+      ]
+    }
+  ],
+  "connection_string": "postgresql://neondb_owner:npg_uD8nJahx0Ltr@ep-broad-wildflower-af1mxfok-pooler.c-2.us-west-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
+}
