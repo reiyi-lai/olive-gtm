@@ -57,15 +57,15 @@ pnpm dev Toast https://pos.toasttab.com/
 
 **Output**: Results saved to `backendv3/data/` as JSON files
 
-### Option 2: Server Mode (With Frontend UI)
+### Option 2: Server w/ Frontend
 
-**Terminal 1 - Backend (Port 8000):**
+**Backend**
 ```bash
 cd backendv3
 pnpm server
 ```
 
-**Terminal 2 - Frontend (Port 3000):**
+**Frontend**
 ```bash
 cd frontendv3
 npm start
@@ -73,7 +73,7 @@ npm start
 
 ## Sample Output
 
-### Stage 1: Claude Analysis
+#### Stage 1: Claude Analysis
 ```json
 {
   "company_analysis": {
@@ -88,7 +88,7 @@ npm start
 }
 ```
 
-### Stage 2: Structured Output
+#### Stage 2: Structured Output
 ```json
 {
   "tool_suggestions": [
@@ -101,7 +101,7 @@ npm start
 }
 ```
 
-### Stage 3: Olive Integration
+#### Stage 3: Olive Integration
 ```json
 {
   "app_urls": [
@@ -119,7 +119,7 @@ npm start
 - **Database**: Neon PostgreSQL (cloud, created via MCP)
 - **Storage**: Local JSON files (for now)
 
-## Data Storage & Resume Capability
+## Data Storage
 
 Results are stored in `backendv3/data/`:
 
