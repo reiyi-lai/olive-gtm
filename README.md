@@ -2,10 +2,6 @@
 
 Workflow to research Olive's potential customers, generate their database schema with sample data, and create optimized dashboard prompts for Olive's platform.
 
-![Olive GTM Engine Workflow](./README-img.png)
-
-## Key Workflow
-
 **Stage 1: Claude Code SDK Analysis + Neon MCP**
 - Claude researches the company through conversational analysis with the Agent SDK
 - Uses Neon MCP server to create PostgreSQL database
@@ -16,6 +12,8 @@ Workflow to research Olive's potential customers, generate their database schema
 - Passes the Claude output into OpenAI
 - Generates 3 structured tool suggestions, each with corresponding prompt and key features
 - Uses OpenAI's 'structured output' to ensure JSON output format
+
+![Olive GTM Engine Workflow](./README-img.png)
 
 **Stage 3: Olive Integration**
 - Creates dashboard on Olive's staging platform with the generated prompts via connecting to Olive's API endpoints (including connecting database)
