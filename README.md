@@ -62,7 +62,7 @@ pnpm dev Toast https://pos.toasttab.com/
 **Backend**
 ```bash
 cd backendv3
-pnpm server
+pnpm run server
 ```
 
 **Frontend**
