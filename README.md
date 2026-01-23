@@ -1,6 +1,8 @@
 # Olive GTM Engine
 
-Workflow to research Olive's potential customers, generate their database schema with sample data, and create optimized dashboard prompts for Olive's platform.
+Workflow to research Olive's potential customers, generate their database schema with sample data, and create customized dashboards for leads on Olive's staging platform.
+
+See short demo: https://youtu.be/6TtcydM7MoI?si=nYBDchMOngg2HXYm.
 
 **Stage 1: Claude Code SDK Analysis + Neon MCP**
 - Claude researches the company through conversational analysis with the Agent SDK
