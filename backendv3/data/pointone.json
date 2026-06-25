@@ -1,0 +1,270 @@
+{
+  "company_analysis": {
+    "website": "https://pointone.com/",
+    "business_description": "PointOne is an AI-powered time and billing platform for law firms that passively captures activity across an attorney's applications and automatically generates complete, compliant time entries. The platform also handles pre-bill review and Outside Counsel Guidelines enforcement to help firms capture more billable time and reduce write-offs.",
+    "business_model": "B2B SaaS subscription targeting law firms, priced per attorney seat with tiered plans based on firm size and feature access (automated time capture, pre-bill review, OCG management, and analytics). Backed by Bessemer, Y Combinator, General Catalyst, and 8VC.",
+    "target_customers": "Law firms of all sizes — from solo practitioners and boutique firms to large global outfits; primary users are attorneys, billing coordinators, finance/operations teams, and managing partners who oversee billing compliance and realization",
+    "key_features": [
+      "Passive automated time tracking across documents, email, calendar, web, and calls",
+      "AI-generated narrative time entries compliant with firm and client rules",
+      "Pre-bill review with automated compliance flagging",
+      "Outside Counsel Guidelines (OCG) storage and rule enforcement",
+      "Real-time intelligence on time utilization and staffing",
+      "Integrations with practice management and billing systems (Clio, Elite 3E, Aderant)"
+    ],
+    "likely_data_needs": [
+      "Attorney profiles, roles, and billing rates",
+      "Client and matter records",
+      "Captured application activity and generated time entries",
+      "Outside counsel guidelines and structured billing rules",
+      "Pre-bill review status and compliance flags"
+    ],
+    "industry": "Legal Technology (Legal Time & Billing Software)"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_pFj3QmOe1JgK@ep-twilight-river-atanfnzf-pooler.c-9.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+  "database_info": {
+    "project_id": "shiny-meadow-84019257",
+    "database_name": "neondb",
+    "schema": [
+      {
+        "table_name": "firms",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(255) NOT NULL",
+          "practice_type": "VARCHAR(100)",
+          "attorney_count": "INTEGER DEFAULT 0",
+          "headquarters_city": "VARCHAR(100)",
+          "headquarters_state": "VARCHAR(50)",
+          "billing_system": "VARCHAR(100)",
+          "subscription_plan": "VARCHAR(50) DEFAULT 'professional'",
+          "onboarded_at": "DATE",
+          "is_active": "BOOLEAN DEFAULT TRUE",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {},
+        "record_count": 24
+      },
+      {
+        "table_name": "attorneys",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "firm_id": "INTEGER REFERENCES firms(id)",
+          "first_name": "VARCHAR(100) NOT NULL",
+          "last_name": "VARCHAR(100) NOT NULL",
+          "email": "VARCHAR(255) NOT NULL UNIQUE",
+          "title": "VARCHAR(50)",
+          "practice_area": "VARCHAR(100)",
+          "standard_hourly_rate": "DECIMAL(10,2)",
+          "annual_billable_target": "INTEGER",
+          "bar_state": "VARCHAR(50)",
+          "is_active": "BOOLEAN DEFAULT TRUE",
+          "last_active_at": "TIMESTAMP",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "firm_id": "firms(id)"
+        },
+        "record_count": 180
+      },
+      {
+        "table_name": "clients",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "firm_id": "INTEGER REFERENCES firms(id)",
+          "name": "VARCHAR(255) NOT NULL",
+          "industry": "VARCHAR(100)",
+          "primary_contact_name": "VARCHAR(255)",
+          "primary_contact_email": "VARCHAR(255)",
+          "billing_currency": "VARCHAR(10) DEFAULT 'USD'",
+          "relationship_start_date": "DATE",
+          "status": "VARCHAR(20) DEFAULT 'active'",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "firm_id": "firms(id)"
+        },
+        "record_count": 95
+      },
+      {
+        "table_name": "matters",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "client_id": "INTEGER REFERENCES clients(id)",
+          "responsible_attorney_id": "INTEGER REFERENCES attorneys(id)",
+          "matter_number": "VARCHAR(50) NOT NULL UNIQUE",
+          "matter_name": "VARCHAR(255) NOT NULL",
+          "practice_area": "VARCHAR(100)",
+          "billing_arrangement": "VARCHAR(50) DEFAULT 'hourly'",
+          "budget_amount": "DECIMAL(12,2)",
+          "opened_date": "DATE NOT NULL",
+          "closed_date": "DATE",
+          "status": "VARCHAR(20) DEFAULT 'open'",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "client_id": "clients(id)",
+          "responsible_attorney_id": "attorneys(id)"
+        },
+        "record_count": 320
+      },
+      {
+        "table_name": "captured_activities",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "attorney_id": "INTEGER REFERENCES attorneys(id)",
+          "matter_id": "INTEGER REFERENCES matters(id)",
+          "source_application": "VARCHAR(100) NOT NULL",
+          "activity_type": "VARCHAR(50) NOT NULL",
+          "activity_summary": "TEXT",
+          "started_at": "TIMESTAMP NOT NULL",
+          "ended_at": "TIMESTAMP",
+          "duration_seconds": "INTEGER",
+          "matched_confidence": "DECIMAL(3,2)",
+          "is_billable_candidate": "BOOLEAN DEFAULT TRUE",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "attorney_id": "attorneys(id)",
+          "matter_id": "matters(id)"
+        },
+        "record_count": 2400
+      },
+      {
+        "table_name": "time_entries",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "attorney_id": "INTEGER REFERENCES attorneys(id)",
+          "matter_id": "INTEGER REFERENCES matters(id)",
+          "activity_id": "INTEGER REFERENCES captured_activities(id)",
+          "work_date": "DATE NOT NULL",
+          "narrative": "TEXT NOT NULL",
+          "duration_hours": "DECIMAL(5,2) NOT NULL",
+          "hourly_rate": "DECIMAL(10,2)",
+          "billable_amount": "DECIMAL(10,2)",
+          "task_code": "VARCHAR(20)",
+          "activity_code": "VARCHAR(20)",
+          "generation_method": "VARCHAR(20) DEFAULT 'ai'",
+          "status": "VARCHAR(20) DEFAULT 'draft'",
+          "is_billable": "BOOLEAN DEFAULT TRUE",
+          "submitted_at": "TIMESTAMP",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "attorney_id": "attorneys(id)",
+          "matter_id": "matters(id)",
+          "activity_id": "captured_activities(id)"
+        },
+        "record_count": 1850
+      },
+      {
+        "table_name": "outside_counsel_guidelines",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "client_id": "INTEGER REFERENCES clients(id)",
+          "firm_id": "INTEGER REFERENCES firms(id)",
+          "title": "VARCHAR(255) NOT NULL",
+          "effective_date": "DATE",
+          "version": "VARCHAR(20) DEFAULT 'v1.0'",
+          "document_url": "VARCHAR(500)",
+          "total_rules": "INTEGER DEFAULT 0",
+          "status": "VARCHAR(20) DEFAULT 'active'",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "client_id": "clients(id)",
+          "firm_id": "firms(id)"
+        },
+        "record_count": 60
+      },
+      {
+        "table_name": "ocg_rules",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "guideline_id": "INTEGER REFERENCES outside_counsel_guidelines(id)",
+          "rule_category": "VARCHAR(100) NOT NULL",
+          "rule_description": "TEXT NOT NULL",
+          "restriction_type": "VARCHAR(50)",
+          "applies_to_task_code": "VARCHAR(20)",
+          "max_allowed_value": "DECIMAL(10,2)",
+          "severity": "VARCHAR(20) DEFAULT 'warning'",
+          "is_auto_enforced": "BOOLEAN DEFAULT TRUE",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "guideline_id": "outside_counsel_guidelines(id)"
+        },
+        "record_count": 480
+      },
+      {
+        "table_name": "pre_bills",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "matter_id": "INTEGER REFERENCES matters(id)",
+          "billing_period_start": "DATE NOT NULL",
+          "billing_period_end": "DATE NOT NULL",
+          "total_hours": "DECIMAL(8,2)",
+          "total_amount": "DECIMAL(12,2)",
+          "reviewed_by_attorney_id": "INTEGER REFERENCES attorneys(id)",
+          "status": "VARCHAR(20) DEFAULT 'pending_review'",
+          "flag_count": "INTEGER DEFAULT 0",
+          "finalized_at": "TIMESTAMP",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "matter_id": "matters(id)",
+          "reviewed_by_attorney_id": "attorneys(id)"
+        },
+        "record_count": 210
+      },
+      {
+        "table_name": "compliance_flags",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "pre_bill_id": "INTEGER REFERENCES pre_bills(id)",
+          "time_entry_id": "INTEGER REFERENCES time_entries(id)",
+          "ocg_rule_id": "INTEGER REFERENCES ocg_rules(id)",
+          "flag_type": "VARCHAR(50) NOT NULL",
+          "flag_message": "TEXT",
+          "severity": "VARCHAR(20) DEFAULT 'warning'",
+          "resolution_status": "VARCHAR(20) DEFAULT 'open'",
+          "resolved_by_attorney_id": "INTEGER REFERENCES attorneys(id)",
+          "resolved_at": "TIMESTAMP",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "pre_bill_id": "pre_bills(id)",
+          "time_entry_id": "time_entries(id)",
+          "ocg_rule_id": "ocg_rules(id)",
+          "resolved_by_attorney_id": "attorneys(id)"
+        },
+        "record_count": 540
+      },
+      {
+        "table_name": "integrations",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "firm_id": "INTEGER REFERENCES firms(id)",
+          "integration_type": "VARCHAR(50) NOT NULL",
+          "provider_name": "VARCHAR(100) NOT NULL",
+          "is_enabled": "BOOLEAN DEFAULT TRUE",
+          "last_sync_at": "TIMESTAMP",
+          "sync_status": "VARCHAR(20) DEFAULT 'connected'",
+          "records_synced": "INTEGER DEFAULT 0",
+          "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        },
+        "foreign_keys": {
+          "firm_id": "firms(id)"
+        },
+        "record_count": 48
+      }
+    ]
+  }
+}
