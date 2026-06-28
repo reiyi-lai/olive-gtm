@@ -21,6 +21,29 @@ See short demo: https://youtu.be/6TtcydM7MoI?si=nYBDchMOngg2HXYm.
 - Creates dashboard on Olive's staging platform with the generated prompts via connecting to Olive's API endpoints (including connecting database)
 - Returns the app URLs for direct viewing on Olive's platform
 
+## Why Claude's Agent SDK
+Allows us to do the following in one continuous agent task:
+1. Research the company (WebFetch / WebSearch)
+2. Design a schema
+3. **Create a real Neon project** (Neon MCP tool call)
+4. **Create tables** (more tool calls)
+5. **Insert hundreds of rows across many tables** (many more tool calls)
+6. **Fetch SQL db connection string** (another tool call)
+7. Return final JSON with company research report and SQL connection string
+
+Neon's MCP server has tool calls like 
+- `create_project` — spin up a new Neon project
+- `run_sql / run_sql_transaction` — execute SQL against a branch
+- `get_database_tables`
+- `get_connection_string`
+
+What the Agent SDK does here:
+1. Spawn the npx @neondatabase/mcp-server-neon subprocess.
+2. Implement the JSON-RPC `initialize` handshake.
+3. Ask Neon MCP server for `tools/list`, understand each MCP tool schema and translate into Claude API's tools parameter format.
+4. Translate each into `tools/call` request to send to MCP server
+5. Read the MCP result, translate it back into a Claude tool_result message.
+
 ## Installation
 
 ### Setup
