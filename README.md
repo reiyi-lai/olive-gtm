@@ -44,6 +44,16 @@ What the Agent SDK does here:
 4. Translate each into `tools/call` request to send to MCP server
 5. Read the MCP result, translate it back into a Claude tool_result message.
 
+## Why Neon MCP
+1. AI-native MCP server
+Claude agent can drive it directly, and an entire database instance can be created in one agent loop
+
+2. Instant / serverless
+Created in seconds so the demo pipeline doesn't stall. Neon's scale-to-zero pricing means we can generate many demo DBs that mostly sit idle.
+
+3. Standard connection string
+Neon gives a public, SSL Postgres URL — which is what Olive API's database/create needs. A localhost DB won't work easily for this.
+
 ## Installation
 
 ### Setup
