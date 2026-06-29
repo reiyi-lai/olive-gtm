@@ -1,0 +1,38 @@
+{
+  "tool_suggestions": [
+    {
+      "title": "Retailer Partnership Performance Dashboard",
+      "prompt": "Create a dashboard for employees to analyze the performance of retailer partnerships, focusing on commissions, conversions, and product offerings.",
+      "features": [
+        "View commission summaries and trends over time",
+        "Filter by retailer type and partnership status",
+        "Analyze conversion rates and sales performance",
+        "Track new products added by partner retailers",
+        "Generate reports on retailer engagement and contributions"
+      ]
+    },
+    {
+      "title": "Customer Interaction Tracker and Analyzer",
+      "prompt": "Build a tool to track and analyze user sessions, interactions, and behavior trends to improve customer understanding and product enhancement.",
+      "features": [
+        "View user sessions with detailed interaction logs",
+        "Analyze click-through rates and session durations",
+        "Identify most-viewed products or categories",
+        "Track changes in user behavior over time",
+        "Export session data for further analysis"
+      ]
+    },
+    {
+      "title": "Product Price Evaluation and Strategy Tool",
+      "prompt": "Design a tool to evaluate product pricing strategies by analyzing price trends, competitor prices, and alert triggers to optimize revenue.",
+      "features": [
+        "Visualize price history and trends for each product",
+        "Compare current prices with competitors' pricing",
+        "Monitor effectiveness of price drop alerts",
+        "Adjust pricing strategies based on historical data",
+        "Generate actionable insights for pricing adjustments"
+      ]
+    }
+  ],
+  "connection_string": "postgresql://neondb_owner:npg_ITYH65zfgDwa@ep-square-truth-aj7m6yji-pooler.c-3.us-east-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
+}

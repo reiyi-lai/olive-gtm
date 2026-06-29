@@ -1,0 +1,214 @@
+{
+  "company_analysis": {
+    "website": "https://phia.com/",
+    "business_description": "Phia is an AI-powered shopping agent that helps consumers find the best prices on fashion items by scanning 250+ million products across 40,000+ retail and resale sites. The platform uses AI to compare prices in real-time, surface better-priced alternatives, and identify secondhand options.",
+    "business_model": "Affiliate commission model - Phia earns a commission when users purchase products through their platform by clicking on product links to partner retailers",
+    "target_customers": [
+      "Fashion-conscious shoppers seeking the best deals",
+      "Sustainability-minded consumers interested in resale/secondhand options",
+      "Price-sensitive online shoppers who want to save money",
+      "Millennials and Gen Z users comfortable with mobile/browser shopping tools"
+    ],
+    "key_features": [
+      "Browser extension and mobile app for price comparison",
+      "Real-time scanning of 250M+ products across retail and resale",
+      "AI-powered product matching to find similar/cheaper alternatives",
+      "Price drop alerts and saved items tracking",
+      "Integration with 9,600+ retail brand partners"
+    ],
+    "likely_data_needs": [
+      "Product catalog with pricing from multiple retailers",
+      "User accounts and shopping behavior tracking",
+      "Price history for trend analysis",
+      "Affiliate click and purchase conversion tracking",
+      "AI-generated product matches and alternatives"
+    ],
+    "industry": "E-commerce Technology / Fashion Tech"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_ITYH65zfgDwa@ep-square-truth-aj7m6yji-pooler.c-3.us-east-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+  "database_info": {
+    "project_id": "noisy-sea-49109796",
+    "database_name": "neondb",
+    "schema": [
+      {
+        "table_name": "retailers",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "name": "VARCHAR(255) NOT NULL",
+          "domain": "VARCHAR(255) UNIQUE NOT NULL",
+          "retailer_type": "VARCHAR(50) - retail/resale/luxury",
+          "commission_rate": "DECIMAL(5,2) - percentage",
+          "is_partner": "BOOLEAN",
+          "partner_since": "DATE",
+          "total_products": "INTEGER",
+          "created_at": "TIMESTAMP"
+        },
+        "foreign_keys": {},
+        "record_count": 30
+      },
+      {
+        "table_name": "products",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "retailer_id": "INTEGER REFERENCES retailers(id)",
+          "product_name": "VARCHAR(500) NOT NULL",
+          "brand": "VARCHAR(255)",
+          "category": "VARCHAR(100) - Clothing/Shoes/Accessories",
+          "subcategory": "VARCHAR(100)",
+          "current_price": "DECIMAL(10,2) NOT NULL",
+          "original_price": "DECIMAL(10,2)",
+          "currency": "VARCHAR(10)",
+          "product_url": "TEXT",
+          "image_url": "TEXT",
+          "sku": "VARCHAR(255)",
+          "condition": "VARCHAR(50) - new/pre-owned",
+          "size": "VARCHAR(50)",
+          "color": "VARCHAR(100)",
+          "in_stock": "BOOLEAN",
+          "last_seen": "TIMESTAMP",
+          "created_at": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "retailer_id": "retailers(id)"
+        },
+        "record_count": 133
+      },
+      {
+        "table_name": "users",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "email": "VARCHAR(255) UNIQUE NOT NULL",
+          "name": "VARCHAR(255) NOT NULL",
+          "created_at": "TIMESTAMP",
+          "last_active": "TIMESTAMP",
+          "total_savings_usd": "DECIMAL(10,2)",
+          "platform": "VARCHAR(50) - iOS/Chrome/Safari",
+          "subscription_tier": "VARCHAR(50)"
+        },
+        "foreign_keys": {},
+        "record_count": 50
+      },
+      {
+        "table_name": "price_history",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "product_id": "INTEGER REFERENCES products(id)",
+          "price": "DECIMAL(10,2) NOT NULL",
+          "recorded_at": "TIMESTAMP",
+          "price_change_pct": "DECIMAL(5,2)"
+        },
+        "foreign_keys": {
+          "product_id": "products(id)"
+        },
+        "record_count": 112
+      },
+      {
+        "table_name": "user_saved_items",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "user_id": "INTEGER REFERENCES users(id)",
+          "product_id": "INTEGER REFERENCES products(id)",
+          "saved_at": "TIMESTAMP",
+          "notes": "TEXT",
+          "priority": "VARCHAR(20) - high/medium/low"
+        },
+        "foreign_keys": {
+          "user_id": "users(id)",
+          "product_id": "products(id)"
+        },
+        "record_count": 80
+      },
+      {
+        "table_name": "price_alerts",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "user_id": "INTEGER REFERENCES users(id)",
+          "product_id": "INTEGER REFERENCES products(id)",
+          "target_price": "DECIMAL(10,2) NOT NULL",
+          "created_at": "TIMESTAMP",
+          "triggered_at": "TIMESTAMP",
+          "is_active": "BOOLEAN",
+          "notification_sent": "BOOLEAN"
+        },
+        "foreign_keys": {
+          "user_id": "users(id)",
+          "product_id": "products(id)"
+        },
+        "record_count": 44
+      },
+      {
+        "table_name": "clicks",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "user_id": "INTEGER REFERENCES users(id)",
+          "product_id": "INTEGER REFERENCES products(id)",
+          "retailer_id": "INTEGER REFERENCES retailers(id)",
+          "clicked_at": "TIMESTAMP",
+          "source": "VARCHAR(50) - browser_extension/mobile_app",
+          "session_id": "VARCHAR(255)"
+        },
+        "foreign_keys": {
+          "user_id": "users(id)",
+          "product_id": "products(id)",
+          "retailer_id": "retailers(id)"
+        },
+        "record_count": 100
+      },
+      {
+        "table_name": "purchases",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "user_id": "INTEGER REFERENCES users(id)",
+          "product_id": "INTEGER REFERENCES products(id)",
+          "retailer_id": "INTEGER REFERENCES retailers(id)",
+          "click_id": "INTEGER REFERENCES clicks(id)",
+          "purchase_price": "DECIMAL(10,2) NOT NULL",
+          "commission_earned": "DECIMAL(10,2)",
+          "purchased_at": "TIMESTAMP",
+          "order_id": "VARCHAR(255)"
+        },
+        "foreign_keys": {
+          "user_id": "users(id)",
+          "product_id": "products(id)",
+          "retailer_id": "retailers(id)",
+          "click_id": "clicks(id)"
+        },
+        "record_count": 45
+      },
+      {
+        "table_name": "product_matches",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "source_product_id": "INTEGER REFERENCES products(id)",
+          "matched_product_id": "INTEGER REFERENCES products(id)",
+          "match_type": "VARCHAR(50) - similar_style/exact_match/secondhand_alternative",
+          "similarity_score": "DECIMAL(5,2)",
+          "price_difference_pct": "DECIMAL(6,2)",
+          "created_at": "TIMESTAMP"
+        },
+        "foreign_keys": {
+          "source_product_id": "products(id)",
+          "matched_product_id": "products(id)"
+        },
+        "record_count": 51
+      },
+      {
+        "table_name": "user_sessions",
+        "columns": {
+          "id": "SERIAL PRIMARY KEY",
+          "user_id": "INTEGER REFERENCES users(id)",
+          "session_id": "VARCHAR(255) UNIQUE NOT NULL",
+          "platform": "VARCHAR(50) - browser_extension/mobile_app",
+          "browser": "VARCHAR(100)",
+          "started_at": "TIMESTAMP",
+          "ended_at": "TIMESTAMP",
+          "pages_viewed": "INTEGER"
+        },
+        "foreign_keys": {
+          "user_id": "users(id)"
+        },
+        "record_count": 50
+      }
+    ]
+  }
+}
